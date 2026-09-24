@@ -1,0 +1,77 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { siteConfig } from '../../config/site';
+import LearningPath from '../../components/LearningPath.astro';
+import { getLearningPaths } from '../../lib/concepts';
+import { readingMinutes } from '../../lib/reading-time';
+
+const paths = await getLearningPaths();
+const totalMinutes = (path: (typeof paths)[number]) =>
+  path.steps.reduce((sum, c) => sum + readingMinutes(c.body), 0);
+---
+
+<BaseLayout
+  title="Jalur Belajar"
+  description={`Urutan belajar konsep risiko di ${siteConfig.product}, disusun berdasarkan prasyarat.`}
+>
+  <header class="paths-header">
+    <h1>Jalur Belajar</h1>
+    <p>
+      Setiap jalur menyusun konsep berdasarkan prasyaratnya, sehingga setiap langkah dibangun di atas langkah
+      sebelumnya. Anda tetap bebas membuka konsep mana pun secara langsung.
+    </p>
+  </header>
+
+  {
+    paths.map((path) => (
+      <section class="path" aria-labelledby={`jalur-${path.id}`}>
+        <h2 id={`jalur-${path.id}`}>{path.title}</h2>
+        <p class="path__desc">{path.description}</p>
+        <p class="path__meta">
+          {path.steps.length} konsep · sekitar {totalMinutes(path)} menit baca
+        </p>
+        <LearningPath path={path} />
+      </section>
+    ))
+  }
+</BaseLayout>
+
+<style>
+  .paths-header {
+    max-width: var(--measure);
+    margin-bottom: 2.5rem;
+  }
+
+  .paths-header h1 {
+    margin: 0 0 0.75rem;
+    font-size: clamp(2rem, 5vw, 2.75rem);
+  }
+
+  .paths-header p {
+    margin: 0;
+    font-size: 1.125rem;
+    color: var(--ink-soft);
+  }
+
+  .path + .path {
+    margin-top: 3rem;
+  }
+
+  .path h2 {
+    margin: 0 0 0.5rem;
+    font-size: 1.625rem;
+  }
+
+  .path__desc {
+    max-width: var(--measure);
+    margin: 0;
+    color: var(--ink-soft);
+  }
+
+  .path__meta {
+    margin: 0.25rem 0 1.5rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--accent);
+  }
+</style>

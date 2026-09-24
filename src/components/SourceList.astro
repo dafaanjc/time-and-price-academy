@@ -1,0 +1,54 @@
+---
+import SourceCard from './SourceCard.astro';
+import { layoutSectionIds } from '../lib/sections';
+import { sortSources, type Source } from '../lib/sources';
+
+interface Props {
+  sources: Source[];
+}
+
+const sources = sortSources(Astro.props.sources);
+const id = layoutSectionIds.sources;
+---
+
+<section class="source-list" aria-labelledby={id}>
+  <h2 id={id}>Sumber</h2>
+  {
+    sources.length > 0 ? (
+      <ol>
+        {sources.map((source) => (
+          <li>
+            <SourceCard source={source} />
+          </li>
+        ))}
+      </ol>
+    ) : (
+      <p class="source-list__empty">Belum ada sumber terverifikasi untuk konsep ini.</p>
+    )
+  }
+</section>
+
+<style>
+  .source-list {
+    max-width: var(--measure);
+  }
+
+  h2 {
+    margin: 0 0 0.75rem;
+    font-size: 1.375rem;
+  }
+
+  ol {
+    display: grid;
+    gap: 0.5rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .source-list__empty {
+    margin: 0;
+    font-size: 0.9375rem;
+    color: var(--ink-faint);
+  }
+</style>

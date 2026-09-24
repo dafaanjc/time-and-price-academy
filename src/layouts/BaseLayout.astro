@@ -1,0 +1,62 @@
+---
+import '../styles/global.css';
+import { siteConfig } from '../config/site';
+import SeoHead from '../components/SeoHead.astro';
+import SiteHeader from '../components/SiteHeader.astro';
+import Sidebar from '../components/Sidebar.astro';
+import SiteFooter from '../components/SiteFooter.astro';
+
+interface Props {
+  title?: string;
+  description?: string;
+  type?: 'website' | 'article';
+  section?: string;
+}
+
+const { title, description, type, section } = Astro.props;
+---
+
+<!doctype html>
+<html lang={siteConfig.lang}>
+  <head>
+    <SeoHead title={title} description={description} type={type} section={section} />
+  </head>
+  <body>
+    <a class="skip-link" href="#konten">Langsung ke konten</a>
+    <SiteHeader />
+    <div class="shell">
+      <Sidebar />
+      <div class="shell__main">
+        <main id="konten" tabindex="-1">
+          <slot />
+        </main>
+        <SiteFooter />
+      </div>
+    </div>
+  </body>
+</html>
+
+<style>
+  .shell__main {
+    min-width: 0;
+    padding: 2rem var(--gutter) 0;
+  }
+
+  main:focus {
+    outline: none;
+  }
+
+  @media (min-width: 64rem) {
+    .shell {
+      display: grid;
+      grid-template-columns: var(--sidebar-width) minmax(0, 1fr);
+      max-width: 90rem;
+      margin-inline: auto;
+    }
+
+    .shell__main {
+      padding-top: 3rem;
+      padding-inline: 3rem;
+    }
+  }
+</style>

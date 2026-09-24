@@ -1,0 +1,248 @@
+/* ---------- Token ---------- */
+:root {
+  --paper: #f7f4ee;
+  --surface: #fffdf9;
+  --ink: #1c2126;
+  --ink-soft: #4a525a;
+  --ink-faint: #686f76; /* ≥ 4.5:1 pada --paper dan --surface (WCAG AA) */
+  --line: #e2ddd3;
+  --accent: #1f5873;
+  --accent-soft: #e3edf1;
+  --warn-bg: #fbf1dc;
+  --warn-ink: #6b4a0f;
+
+  --font-sans: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --font-serif: 'Iowan Old Style', 'Palatino Linotype', Palatino, Georgia, 'Times New Roman', serif;
+  --font-mono: ui-monospace, 'Cascadia Code', Consolas, Menlo, monospace;
+
+  --measure: 68ch;
+  --sidebar-width: 17rem;
+  --header-height: 3.5rem;
+  --gutter: 1rem;
+  --radius: 8px;
+
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --paper: #14181c;
+    --surface: #1b2025;
+    --ink: #e8e4dc;
+    --ink-soft: #b3b8bd;
+    --ink-faint: #8a9096;
+    --line: #2c333a;
+    --accent: #7fb6cf;
+    --accent-soft: #1e2d35;
+    --warn-bg: #2e2717;
+    --warn-ink: #e8cf98;
+    color-scheme: dark;
+  }
+}
+
+@media (min-width: 48rem) {
+  :root {
+    --gutter: 2rem;
+  }
+}
+
+/* ---------- Dasar ---------- */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  scroll-padding-top: calc(var(--header-height) + 1rem);
+}
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  font-size: 1.0625rem;
+  line-height: 1.65;
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--font-serif);
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+  text-wrap: balance;
+}
+
+p {
+  text-wrap: pretty;
+}
+
+a {
+  color: var(--accent);
+  text-underline-offset: 0.18em;
+}
+
+a:hover {
+  text-decoration-thickness: 2px;
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+img,
+svg {
+  max-width: 100%;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.skip-link {
+  position: absolute;
+  left: 1rem;
+  top: -3rem;
+  z-index: 100;
+  padding: 0.5rem 1rem;
+  background: var(--ink);
+  color: var(--paper);
+  border-radius: var(--radius);
+}
+
+.skip-link:focus {
+  top: 0.5rem;
+}
+
+/* Lebar baca untuk teks panjang. */
+.prose {
+  max-width: var(--measure);
+}
+
+.eyebrow {
+  margin: 0;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+
+.badge {
+  display: inline-block;
+  padding: 0.1rem 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  color: var(--ink-soft);
+  white-space: nowrap;
+}
+
+.badge--draft {
+  background: var(--warn-bg);
+  border-color: transparent;
+  color: var(--warn-ink);
+}
+
+/* ---------- Isi panjang (body MDX) ---------- */
+.content {
+  max-width: var(--measure);
+}
+
+.content h2 {
+  margin: 2.5rem 0 0.75rem;
+  font-size: 1.625rem;
+}
+
+.content h3 {
+  margin: 2rem 0 0.5rem;
+  font-size: 1.25rem;
+}
+
+.content p,
+.content ul,
+.content ol,
+.content blockquote,
+.content table,
+.content pre {
+  margin: 0 0 1.125rem;
+}
+
+.content ul,
+.content ol {
+  padding-left: 1.5rem;
+}
+
+.content li + li {
+  margin-top: 0.25rem;
+}
+
+.content blockquote {
+  padding-left: 1rem;
+  color: var(--ink-soft);
+  border-left: 3px solid var(--line);
+}
+
+.content code {
+  font-family: var(--font-mono);
+  font-size: 0.9em;
+  padding: 0.1em 0.3em;
+  background: var(--accent-soft);
+  border-radius: 4px;
+}
+
+.content pre {
+  padding: 1rem;
+  /* Rumus dibungkus alih-alih digulir, agar terbaca di layar sempit tanpa scroll. */
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+}
+
+.content pre code {
+  padding: 0;
+  background: none;
+}
+
+.content :not(pre) > code {
+  white-space: nowrap;
+}
+
+.content table {
+  display: block;
+  max-width: 100%;
+  overflow-x: auto;
+  border-collapse: collapse;
+  font-size: 0.9375rem;
+}
+
+.content th,
+.content td {
+  padding: 0.5rem 0.75rem;
+  text-align: left;
+  border-bottom: 1px solid var(--line);
+}
+
+/* ---------- Grid kartu ---------- */
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 16rem), 1fr));
+  gap: 0.75rem;
+}

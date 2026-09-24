@@ -1,0 +1,59 @@
+---
+import { siteConfig } from '../config/site';
+import MobileNav from './MobileNav.astro';
+---
+
+<header class="site-header">
+  <a class="brand" href="/">
+    <span class="brand__product">{siteConfig.product}</span>
+    <span class="brand__master">{siteConfig.masterBrand}</span>
+  </a>
+  <MobileNav />
+</header>
+
+<style>
+  .site-header {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    height: var(--header-height);
+    padding-inline: var(--gutter);
+    background: color-mix(in srgb, var(--paper) 92%, transparent);
+    backdrop-filter: blur(8px);
+    border-bottom: 1px solid var(--line);
+  }
+
+  .brand {
+    display: flex;
+    align-items: baseline;
+    gap: 0.625rem;
+    min-width: 0;
+    color: var(--ink);
+    text-decoration: none;
+  }
+
+  .brand__product {
+    font-family: var(--font-serif);
+    font-size: 1.1875rem;
+    font-weight: 700;
+    letter-spacing: 0.01em;
+    white-space: nowrap;
+  }
+
+  .brand__master {
+    font-size: 0.8125rem;
+    color: var(--ink-faint);
+    white-space: nowrap;
+  }
+
+  /* Layar sangat sempit: nama master brand tetap tampil di hero dan footer. */
+  @media (max-width: 22.5rem) {
+    .brand__master {
+      display: none;
+    }
+  }
+</style>

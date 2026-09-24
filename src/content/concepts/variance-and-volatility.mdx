@@ -1,0 +1,102 @@
+---
+title: "Varians & Volatilitas"
+termEn: "Variance & Volatility"
+slug: variance-and-volatility
+category: foundations
+order: 6
+difficulty: intermediate
+description: "Ukuran seberapa jauh hasil menyebar di sekitar rata-ratanya; di pasar keuangan, volatilitas menggambarkan besarnya fluktuasi harga."
+status: draft
+featured: false
+prerequisites: [expected-value]
+related: [risk, probability-distribution]
+sources: []
+---
+
+## Mengapa Ini Penting
+
+Dua pilihan bisa memiliki [nilai harapan](/konsep/expected-value/) yang sama tetapi terasa sangat berbeda. Yang satu memberi hasil stabil, yang lain naik-turun tajam. Varians dan volatilitas mengukur perbedaan ini, yaitu **seberapa jauh hasil menyebar di sekitar rata-ratanya.**
+
+Di pasar keuangan, volatilitas adalah salah satu ukuran risiko yang paling sering dipakai: untuk membandingkan aset, menentukan ukuran posisi, dan memperkirakan rentang pergerakan harga yang wajar.
+
+## Gagasan Utama
+
+- **Varians** adalah rata-rata dari kuadrat selisih setiap hasil terhadap rata-ratanya. Selisih dikuadratkan agar selisih positif dan negatif tidak saling meniadakan, dan agar selisih besar mendapat bobot lebih besar.
+- **Simpangan baku** (*standard deviation*) adalah akar kuadrat dari varians. Satuannya sama dengan data aslinya, sehingga lebih mudah dibaca.
+- **Volatilitas** adalah istilah di pasar keuangan untuk simpangan baku dari *return* (persentase perubahan harga) dalam periode tertentu.
+
+```text
+Varians          σ² = Σ (xᵢ − μ)² / n
+Simpangan baku   σ  = √σ²
+```
+
+`μ` adalah rata-rata dan `n` adalah jumlah data. Saat menghitung dari **sampel** data, yang umum dilakukan adalah membagi dengan `n − 1` alih-alih `n`, agar perkiraannya tidak cenderung terlalu kecil.
+
+## Penjelasan Sederhana
+
+*Ilustrasi.* Dua aset memberikan return lima hari berikut:
+
+| Hari | Aset A | Aset B |
+| --- | --- | --- |
+| 1 | +1% | +5% |
+| 2 | +1% | −3% |
+| 3 | +1% | +4% |
+| 4 | +1% | −2% |
+| 5 | +1% | +1% |
+| **Rata-rata** | **+1%** | **+1%** |
+| **Simpangan baku** | **0%** | **≈ 3,16%** |
+
+Rata-rata keduanya sama, yaitu +1% per hari. Namun perjalanan aset B jauh lebih bergejolak. Aset A tidak memiliki sebaran sama sekali, sedangkan simpangan baku aset B sekitar 3,16%. Angka inilah yang membedakan keduanya.
+
+## Contoh Kehidupan Nyata
+
+Dua pekerja memiliki penghasilan rata-rata yang sama, yaitu Rp6.000.000 per bulan:
+
+- **Karyawan bergaji tetap** menerima jumlah yang hampir sama setiap bulan. Volatilitas penghasilannya rendah.
+- **Pekerja lepas** kadang menerima Rp12.000.000, kadang hanya Rp1.000.000. Volatilitas penghasilannya tinggi.
+
+Meskipun rata-ratanya sama, pekerja lepas membutuhkan dana cadangan lebih besar untuk melewati bulan-bulan sepi. Volatilitas yang tinggi menuntut bantalan yang lebih tebal.
+
+## Contoh Keuangan
+
+*Ilustrasi.* Sebuah saham mencatat return harian +1%, −2%, +1,5%, −0,5%, dan 0%.
+
+1. Rata-rata: (1 − 2 + 1,5 − 0,5 + 0) / 5 = 0%.
+2. Kuadrat selisih dari rata-rata: 1; 4; 2,25; 0,25; 0, dengan jumlah 7,5.
+3. Varians (populasi): 7,5 / 5 = 1,5, dengan satuan persen kuadrat.
+4. Simpangan baku harian: √1,5 ≈ 1,22%.
+
+Volatilitas biasanya dinyatakan per tahun. Dengan asumsi return harian saling independen, volatilitas harian dikalikan dengan akar jumlah hari perdagangan dalam setahun. Konvensi yang umum dipakai adalah sekitar 252 hari:
+
+```text
+Volatilitas tahunan ≈ 1,22% × √252 ≈ 19,4%
+```
+
+Lima data tentu terlalu sedikit untuk perkiraan yang andal. Contoh ini hanya untuk memperlihatkan cara hitungnya.
+
+## Contoh Trading
+
+*Ilustrasi, bukan rekomendasi.* Dua trader sama-sama membatasi risiko Rp500.000 per transaksi, tetapi memperdagangkan aset dengan volatilitas berbeda:
+
+- Pada aset yang **bergejolak**, harga wajar bergerak lebar dalam sehari. Titik keluar yang terlalu dekat mudah tersentuh oleh gerakan biasa, sehingga titik keluar perlu diletakkan lebih jauh. Akibatnya, **ukuran posisi harus lebih kecil** agar kerugiannya tetap Rp500.000.
+- Pada aset yang **tenang**, titik keluar bisa lebih dekat, sehingga ukuran posisi bisa lebih besar untuk batas kerugian yang sama.
+
+Dengan cara ini, volatilitas dipakai untuk **menyesuaikan besar posisi dengan kondisi pasar**, bukan untuk menebak arah harga.
+
+## Cara Kerja Konsep
+
+Langkah menghitung volatilitas dari data harga:
+
+1. Hitung return tiap periode: (harga sekarang − harga sebelumnya) / harga sebelumnya.
+2. Hitung rata-rata return.
+3. Hitung kuadrat selisih setiap return terhadap rata-rata, lalu rata-ratakan (bagi `n`, atau `n − 1` untuk sampel). Hasilnya adalah varians.
+4. Ambil akar kuadratnya untuk mendapatkan simpangan baku, yaitu volatilitas per periode.
+5. Bila perlu, ubah ke periode lain dengan mengalikan akar jumlah periode (dengan asumsi independen).
+
+Batasan yang perlu diingat:
+
+- **Naik dan turun diperlakukan sama.** Volatilitas tidak membedakan lonjakan harga dari kejatuhan harga, padahal bagi investor keduanya terasa sangat berbeda.
+- **Berubah dari waktu ke waktu.** Volatilitas masa lalu tidak menjamin volatilitas masa depan. Pasar bisa berganti dari tenang ke bergejolak dengan cepat.
+- **Tidak menangkap seluruh risiko.** Kejadian ekstrem di ekor [distribusi](/konsep/probability-distribution/) bisa lebih sering daripada yang tersirat dari simpangan baku. Situasi yang benar-benar baru termasuk [ketidakpastian](/konsep/risk-vs-uncertainty/), yang tidak bisa diukur dengan angka ini.
+
+Volatilitas adalah ukuran penting, tetapi tetap hanya salah satu cara melihat [risiko](/konsep/risk/).

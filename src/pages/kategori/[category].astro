@@ -1,0 +1,66 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import ConceptCard from '../../components/ConceptCard.astro';
+import { categories, type Category } from '../../data/categories';
+import { getConceptsByCategory } from '../../lib/concepts';
+
+export function getStaticPaths() {
+  return categories.map((category) => ({
+    params: { category: category.id },
+    props: { category },
+  }));
+}
+
+interface Props {
+  category: Category;
+}
+
+const { category } = Astro.props;
+const concepts = (await getConceptsByCategory()).get(category.id) ?? [];
+---
+
+<BaseLayout title={category.title} description={category.description}>
+  <header class="category-header">
+    <p class="eyebrow">Kategori</p>
+    <h1>{category.title}</h1>
+    <p class="category-header__desc">{category.description}</p>
+  </header>
+
+  {
+    concepts.length > 0 ? (
+      <div class="card-grid">
+        {concepts.map((concept) => (
+          <ConceptCard concept={concept} headingLevel={2} />
+        ))}
+      </div>
+    ) : (
+      <p class="empty">Konsep untuk kategori ini sedang disiapkan.</p>
+    )
+  }
+</BaseLayout>
+
+<style>
+  .category-header {
+    max-width: var(--measure);
+    margin-bottom: 2rem;
+  }
+
+  .category-header h1 {
+    margin: 0.5rem 0 0.75rem;
+    font-size: clamp(2rem, 5vw, 2.75rem);
+  }
+
+  .category-header__desc {
+    margin: 0;
+    font-size: 1.125rem;
+    color: var(--ink-soft);
+  }
+
+  .empty {
+    max-width: var(--measure);
+    padding: 1rem 1.25rem;
+    color: var(--ink-faint);
+    border: 1px dashed var(--line);
+    border-radius: var(--radius);
+  }
+</style>

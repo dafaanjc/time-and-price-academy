@@ -1,0 +1,94 @@
+---
+title: "Distribusi Probabilitas"
+termEn: "Probability Distribution"
+slug: probability-distribution
+category: foundations
+order: 4
+difficulty: intermediate
+description: "Gambaran lengkap tentang semua kemungkinan hasil beserta probabilitas masing-masing hasil."
+status: draft
+featured: false
+prerequisites: [probability]
+related: [expected-value, variance-and-volatility]
+sources: []
+---
+
+## Mengapa Ini Penting
+
+Probabilitas menjawab pertanyaan "seberapa mungkin **satu** hasil tertentu?" Keputusan yang melibatkan risiko biasanya membutuhkan gambaran yang lebih lengkap: **semua** hasil yang mungkin dan seberapa mungkin masing-masing. Gambaran lengkap inilah yang disebut distribusi probabilitas.
+
+Dari distribusi kita bisa menjawab pertanyaan praktis, misalnya "berapa hasil rata-ratanya?", "seberapa lebar penyebarannya?", dan "seberapa mungkin terjadi kerugian besar?"
+
+## Gagasan Utama
+
+**Distribusi probabilitas adalah daftar atau fungsi yang memasangkan setiap hasil yang mungkin dengan probabilitasnya.** Jumlah seluruh probabilitas dalam satu distribusi selalu 1 (100%).
+
+Ada dua jenis utama:
+
+- **Diskret**: hasilnya bisa dihitung satu per satu, misalnya angka dadu atau jumlah transaksi yang untung.
+- **Kontinu**: hasilnya bisa bernilai berapa pun dalam suatu rentang, misalnya persentase perubahan harga. Karena nilainya tak terhingga banyaknya, yang dihitung adalah probabilitas hasil berada dalam suatu **rentang**, bukan tepat di satu titik.
+
+## Penjelasan Sederhana
+
+Lempar dua dadu yang adil dan jumlahkan angkanya. Hasilnya bisa 2 sampai 12, tetapi tidak semuanya sama mungkin. Dari 36 kombinasi yang mungkin:
+
+| Jumlah | Kombinasi | Probabilitas |
+| --- | --- | --- |
+| 2 | 1 | 1/36 ≈ 2,8% |
+| 3 | 2 | 2/36 ≈ 5,6% |
+| 4 | 3 | 3/36 ≈ 8,3% |
+| 5 | 4 | 4/36 ≈ 11,1% |
+| 6 | 5 | 5/36 ≈ 13,9% |
+| 7 | 6 | 6/36 ≈ 16,7% |
+| 8 | 5 | 5/36 ≈ 13,9% |
+| 9 | 4 | 4/36 ≈ 11,1% |
+| 10 | 3 | 3/36 ≈ 8,3% |
+| 11 | 2 | 2/36 ≈ 5,6% |
+| 12 | 1 | 1/36 ≈ 2,8% |
+
+Angka 7 paling mungkin muncul karena paling banyak kombinasinya, sedangkan 2 dan 12 paling jarang. Tabel inilah distribusi probabilitasnya.
+
+## Contoh Kehidupan Nyata
+
+Waktu tempuh ke kantor setiap hari tidak selalu sama. Jika dicatat selama beberapa bulan, sebagian besar perjalanan mungkin memakan 35–45 menit, sesekali 30 menit, dan kadang-kadang lebih dari satu jam karena hujan atau kecelakaan.
+
+Catatan itu membentuk distribusi. Orang yang hanya melihat rata-ratanya (misalnya 40 menit) bisa sering terlambat. Orang yang melihat distribusinya tahu bahwa untuk rapat penting, ia perlu berangkat lebih awal agar tidak terkena hasil di ujung distribusi.
+
+## Contoh Keuangan
+
+*Ilustrasi.* Sebuah analisis menyusun tiga skenario untuk hasil investasi satu tahun:
+
+| Skenario | Probabilitas | Hasil |
+| --- | --- | --- |
+| Baik | 25% | +20% |
+| Normal | 50% | +5% |
+| Buruk | 25% | −15% |
+
+Tiga baris ini adalah distribusi diskret yang sederhana. Probabilitasnya berjumlah 100%. Distribusi ini langsung memperlihatkan hal yang tidak terlihat dari satu angka rata-rata saja: ada peluang 25% untuk rugi 15%. Rata-rata tertimbangnya dihitung di konsep [Nilai Harapan](/konsep/expected-value/).
+
+Model kontinu yang sering dipakai adalah **distribusi normal**, yang berbentuk lonceng dan simetris. Pada distribusi normal, sekitar 68% hasil berada dalam jarak satu simpangan baku dari rata-rata, dan sekitar 95% dalam jarak dua simpangan baku. Perlu diingat bahwa distribusi normal adalah **model**. Pada data harga, pergerakan ekstrem bisa terjadi lebih sering daripada yang diperkirakan model normal, fenomena yang dikenal sebagai *fat tails*. Karena itu, kecocokan model dengan data perlu selalu diperiksa.
+
+## Contoh Trading
+
+*Ilustrasi, bukan rekomendasi.* Seorang trader mencatat hasil 100 transaksinya dalam satuan **R**, yaitu kelipatan dari risiko yang direncanakan per transaksi (1R = kerugian yang direncanakan):
+
+| Hasil per transaksi | Jumlah transaksi |
+| --- | --- |
+| −1R | 55 |
+| 0R (impas) | 5 |
+| +1R | 15 |
+| +2R | 15 |
+| +3R | 10 |
+
+Distribusi ini lebih informatif daripada sekadar "menang 40%". Distribusi ini menunjukkan seberapa sering transaksi merugi, seberapa besar keuntungan saat menang, dan bahwa keuntungan besar (+3R) relatif jarang. Informasi seperti ini diperlukan untuk menilai apakah sebuah pendekatan layak dilanjutkan.
+
+## Cara Kerja Konsep
+
+Saat membaca sebuah distribusi, perhatikan empat hal:
+
+1. **Pusat**: di mana hasil-hasil cenderung berkumpul? Diukur dengan rata-rata atau nilai tengah.
+2. **Sebaran**: seberapa jauh hasil menyebar dari pusat? Diukur dengan [varians dan volatilitas](/konsep/variance-and-volatility/).
+3. **Kemiringan**: apakah hasil ekstrem lebih sering muncul di satu sisi, misalnya sisi kerugian?
+4. **Ekor**: seberapa sering hasil yang sangat jauh dari pusat terjadi? Bagian ini sering menentukan kerugian terbesar.
+
+Distribusi yang disusun dari data masa lalu hanya menggambarkan masa lalu. Menggunakannya untuk masa depan berarti mengasumsikan kondisi yang mendasarinya tidak banyak berubah. Asumsi itu perlu disadari, sebagaimana dibahas di [Risiko vs Ketidakpastian](/konsep/risk-vs-uncertainty/).

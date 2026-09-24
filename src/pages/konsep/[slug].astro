@@ -1,0 +1,28 @@
+---
+import { render } from 'astro:content';
+import ConceptLayout from '../../layouts/ConceptLayout.astro';
+import { getConcepts, type Concept } from '../../lib/concepts';
+
+export async function getStaticPaths() {
+  const concepts = await getConcepts();
+  return concepts.map((concept) => ({
+    params: { slug: concept.id },
+    props: { concept },
+  }));
+}
+
+interface Props {
+  concept: Concept;
+}
+
+const { concept } = Astro.props;
+const { Content, headings } = await render(concept);
+
+// Daftar isi: override dari frontmatter, bila tidak ada diambil dari heading level 2.
+const sections =
+  concept.data.sections ?? headings.filter((h) => h.depth === 2).map((h) => ({ id: h.slug, title: h.text }));
+---
+
+<ConceptLayout concept={concept} sections={sections}>
+  <Content />
+</ConceptLayout>

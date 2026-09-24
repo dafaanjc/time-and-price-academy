@@ -1,0 +1,76 @@
+---
+// Urutan halaman konsep:
+// header (deskripsi, meta, atribusi, salin tautan) → notis draf → daftar isi →
+// isi MDX → konsep terkait → prasyarat → sumber → navigasi jalur belajar.
+import BaseLayout from './BaseLayout.astro';
+import ConceptHeader from '../components/ConceptHeader.astro';
+import PlaceholderNotice from '../components/PlaceholderNotice.astro';
+import TableOfContents from '../components/TableOfContents.astro';
+import ConceptLinkList from '../components/ConceptLinkList.astro';
+import SourceList from '../components/SourceList.astro';
+import PathNav from '../components/PathNav.astro';
+import { getCategory } from '../data/categories';
+import { getConceptsByIds, getPathContext, type Concept } from '../lib/concepts';
+import { layoutSectionIds } from '../lib/sections';
+import { absoluteUrl } from '../lib/url';
+
+interface Props {
+  concept: Concept;
+  sections: { id: string; title: string }[];
+}
+
+const { concept, sections } = Astro.props;
+const { title, description, category, status, related, prerequisites, sources } = concept.data;
+
+const relatedConcepts = await getConceptsByIds(related);
+const prerequisiteConcepts = await getConceptsByIds(prerequisites);
+const pathContext = await getPathContext(concept.id);
+const shareUrl = absoluteUrl(Astro.url.pathname, Astro.site);
+---
+
+<BaseLayout title={title} description={description} type="article" section={getCategory(category).title}>
+  <article class="concept">
+    <ConceptHeader concept={concept} url={shareUrl} />
+
+    {
+      status === 'draft' && (
+        <PlaceholderNotice>
+          Konsep ini belum melalui peninjauan dan sumbernya belum dipasang. Angka dalam contoh adalah ilustrasi
+          untuk menjelaskan cara berpikir, bukan data pasar nyata atau rekomendasi.
+        </PlaceholderNotice>
+      )
+    }
+
+    <TableOfContents sections={sections} />
+
+    <div class="content">
+      <slot />
+    </div>
+
+    <ConceptLinkList
+      id={layoutSectionIds.related}
+      title="Konsep Terkait"
+      concepts={relatedConcepts}
+      empty="Belum ada konsep terkait."
+    />
+
+    <ConceptLinkList
+      id={layoutSectionIds.prerequisites}
+      title="Prasyarat"
+      concepts={prerequisiteConcepts}
+      empty="Tidak ada prasyarat. Konsep ini bisa dipelajari lebih dulu."
+    />
+
+    <SourceList sources={sources} />
+
+    {pathContext && <PathNav context={pathContext} />}
+  </article>
+</BaseLayout>
+
+<style>
+  .concept {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+  }
+</style>

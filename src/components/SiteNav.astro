@@ -1,0 +1,106 @@
+---
+// Isi navigasi, dipakai bersama oleh Sidebar (desktop) dan MobileNav (dialog).
+import { categories } from '../data/categories';
+import { conceptHref, categoryHref, getConceptsByCategory } from '../lib/concepts';
+
+const grouped = await getConceptsByCategory();
+const current = Astro.url.pathname;
+const aria = (href: string) => (current === href ? 'page' : undefined);
+---
+
+<nav class="site-nav" aria-label="Navigasi konsep">
+  <ul class="site-nav__top">
+    <li><a href="/" aria-current={aria('/')}>Beranda</a></li>
+    <li><a href="/jalur-belajar/" aria-current={aria('/jalur-belajar/')}>Jalur Belajar</a></li>
+    <li><a href="/peta/" aria-current={aria('/peta/')}>Peta Pengetahuan</a></li>
+    <li><a href="/cari/" aria-current={aria('/cari/')}>Cari</a></li>
+  </ul>
+  {
+    categories.map((category) => {
+      const concepts = grouped.get(category.id) ?? [];
+      return (
+        <section class="site-nav__group">
+          <h2 class="site-nav__heading">
+            <a href={categoryHref(category.id)} aria-current={aria(categoryHref(category.id))}>
+              {category.title}
+            </a>
+          </h2>
+          {concepts.length > 0 ? (
+            <ul>
+              {concepts.map((concept) => (
+                <li>
+                  <a href={conceptHref(concept.id)} aria-current={aria(conceptHref(concept.id))}>
+                    {concept.data.title}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p class="site-nav__empty">Segera hadir</p>
+          )}
+        </section>
+      );
+    })
+  }
+</nav>
+
+<style>
+  .site-nav {
+    font-size: 0.9375rem;
+  }
+
+  ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .site-nav__top {
+    margin-bottom: 1.25rem;
+  }
+
+  .site-nav__group + .site-nav__group {
+    margin-top: 1.25rem;
+  }
+
+  .site-nav__heading {
+    margin: 0 0 0.25rem;
+    font-family: var(--font-sans);
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .site-nav__heading a {
+    color: var(--ink-faint);
+    padding-inline: 0.625rem;
+  }
+
+  a {
+    display: block;
+    padding: 0.3rem 0.625rem;
+    border-radius: 6px;
+    color: var(--ink-soft);
+    text-decoration: none;
+  }
+
+  a:hover {
+    color: var(--ink);
+    background: var(--accent-soft);
+  }
+
+  a[aria-current='page'] {
+    color: var(--accent);
+    background: var(--accent-soft);
+    font-weight: 600;
+  }
+
+  .site-nav__empty {
+    margin: 0;
+    padding: 0.2rem 0.625rem;
+    font-size: 0.8125rem;
+    color: var(--ink-faint);
+    font-style: italic;
+  }
+</style>

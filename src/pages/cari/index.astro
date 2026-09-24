@@ -1,0 +1,209 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { siteConfig } from '../../config/site';
+---
+
+<BaseLayout
+  title="Cari"
+  description={`Cari konsep di ${siteConfig.product} berdasarkan judul, istilah asli, atau isi.`}
+>
+  <header class="search-header">
+    <h1>Cari Konsep</h1>
+    <p>Cari berdasarkan judul, istilah asli (bahasa Inggris), deskripsi, atau isi konsep.</p>
+  </header>
+
+  <form class="search-form" role="search" action="/cari/" method="get">
+    <label for="q" class="visually-hidden">Kata kunci</label>
+    <input id="q" name="q" type="search" autocomplete="off" placeholder="mis. volatilitas, expected value" />
+    <button type="submit">Cari</button>
+  </form>
+
+  <p id="search-status" class="search-status" role="status" aria-live="polite"></p>
+  <ol id="search-results" class="search-results"></ol>
+
+  <template id="search-result-template">
+    <li class="search-result">
+      <a class="search-result__title" href=""></a>
+      <p class="search-result__meta"></p>
+      <p class="search-result__desc"></p>
+    </li>
+  </template>
+
+  <noscript>
+    <p class="search-status">
+      Pencarian membutuhkan JavaScript. Anda tetap bisa menjelajah melalui menu kategori di navigasi.
+    </p>
+  </noscript>
+</BaseLayout>
+
+<script>
+  import { search } from '../../lib/search';
+  import type { SearchEntry } from '../../lib/search-index';
+
+  const input = document.querySelector<HTMLInputElement>('#q');
+  const form = document.querySelector<HTMLFormElement>('.search-form');
+  const status = document.querySelector<HTMLElement>('#search-status');
+  const list = document.querySelector<HTMLOListElement>('#search-results');
+  const template = document.querySelector<HTMLTemplateElement>('#search-result-template');
+
+  function renderItem(entry: SearchEntry): Node | undefined {
+    const node = template?.content.firstElementChild?.cloneNode(true);
+    if (!(node instanceof HTMLElement)) return undefined;
+    const link = node.querySelector<HTMLAnchorElement>('.search-result__title');
+    const meta = node.querySelector('.search-result__meta');
+    const desc = node.querySelector('.search-result__desc');
+    if (link) {
+      link.href = entry.href;
+      link.textContent = entry.title;
+    }
+    if (meta) meta.textContent = [entry.termEn, entry.category, entry.difficulty].filter(Boolean).join(' · ');
+    if (desc) desc.textContent = entry.description;
+    return node;
+  }
+
+  function statusText(query: string, count: number): string {
+    if (!query.trim()) return '';
+    if (count === 0) return `Tidak ada konsep yang cocok dengan "${query}".`;
+    return `${count} konsep cocok dengan "${query}".`;
+  }
+
+  async function main(): Promise<void> {
+    if (!input || !form || !status || !list) return;
+
+    let entries: SearchEntry[] = [];
+    try {
+      const response = await fetch('/search-index.json');
+      if (!response.ok) throw new Error(String(response.status));
+      entries = await response.json();
+    } catch {
+      status.textContent = 'Indeks pencarian gagal dimuat. Coba muat ulang halaman.';
+      return;
+    }
+
+    const run = (query: string): void => {
+      const results = search(entries, query);
+      list.replaceChildren(...results.map((r) => renderItem(r.entry)).filter((n): n is Node => n !== undefined));
+      status.textContent = statusText(query, results.length);
+    };
+
+    // Kueri disimpan di URL (?q=) agar hasil pencarian bisa dibagikan.
+    const updateUrl = (query: string): void => {
+      const url = new URL(location.href);
+      if (query.trim()) url.searchParams.set('q', query);
+      else url.searchParams.delete('q');
+      history.replaceState(null, '', url);
+    };
+
+    const initial = new URLSearchParams(location.search).get('q') ?? '';
+    input.value = initial;
+    run(initial);
+
+    input.addEventListener('input', () => {
+      run(input.value);
+      updateUrl(input.value);
+    });
+    form.addEventListener('submit', (event) => {
+      event.preventDefault();
+      run(input.value);
+      updateUrl(input.value);
+    });
+  }
+
+  main();
+</script>
+
+<style>
+  .search-header {
+    max-width: var(--measure);
+  }
+
+  .search-header h1 {
+    margin: 0 0 0.5rem;
+    font-size: clamp(2rem, 5vw, 2.75rem);
+  }
+
+  .search-header p {
+    margin: 0 0 1.5rem;
+    color: var(--ink-soft);
+  }
+
+  .search-form {
+    display: flex;
+    gap: 0.5rem;
+    max-width: var(--measure);
+  }
+
+  input {
+    flex: 1;
+    min-width: 0;
+    min-height: 2.75rem;
+    padding: 0 0.875rem;
+    font: inherit;
+    color: var(--ink);
+    background: var(--surface);
+    /* Batas kolom formulir butuh kontras ≥ 3:1 (WCAG 1.4.11); --line terlalu pucat. */
+    border: 1px solid var(--ink-faint);
+    border-radius: var(--radius);
+  }
+
+  input:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 1px;
+    border-color: var(--accent);
+  }
+
+  button {
+    min-height: 2.75rem;
+    padding: 0 1.125rem;
+    font: inherit;
+    font-weight: 600;
+    color: var(--surface);
+    background: var(--accent);
+    border: 0;
+    border-radius: var(--radius);
+    cursor: pointer;
+  }
+
+  .search-status {
+    max-width: var(--measure);
+    margin: 1.25rem 0 0.75rem;
+    font-size: 0.9375rem;
+    color: var(--ink-soft);
+  }
+
+  .search-results {
+    display: grid;
+    gap: 0.5rem;
+    max-width: var(--measure);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .search-result {
+    padding: 0.875rem 1rem;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+  }
+
+  .search-result p {
+    margin: 0;
+  }
+
+  .search-result__title {
+    font-weight: 600;
+    font-size: 1.0625rem;
+  }
+
+  .search-result__meta {
+    font-size: 0.8125rem;
+    color: var(--ink-faint);
+  }
+
+  .search-result .search-result__desc {
+    margin-top: 0.25rem;
+    font-size: 0.9375rem;
+    color: var(--ink-soft);
+  }
+</style>

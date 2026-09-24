@@ -1,0 +1,84 @@
+---
+// Navigasi "Sebelumnya / Berikutnya" berdasarkan urutan jalur belajar.
+import { conceptHref, type PathContext } from '../lib/concepts';
+
+interface Props {
+  context: PathContext;
+}
+
+const { path, index, prev, next } = Astro.props.context;
+const position = `Langkah ${index + 1} dari ${path.steps.length}`;
+---
+
+<nav class="path-nav" aria-label={`Jalur belajar: ${path.title}`}>
+  <p class="path-nav__position">
+    <a href="/jalur-belajar/">{path.title}</a> · {position}
+  </p>
+  <div class="path-nav__links">
+    {
+      prev && (
+        <a class="path-nav__link path-nav__link--prev" href={conceptHref(prev.id)} rel="prev">
+          <span class="path-nav__label">← Sebelumnya</span>
+          <span class="path-nav__title">{prev.data.title}</span>
+        </a>
+      )
+    }
+    {
+      next && (
+        <a class="path-nav__link path-nav__link--next" href={conceptHref(next.id)} rel="next">
+          <span class="path-nav__label">Berikutnya →</span>
+          <span class="path-nav__title">{next.data.title}</span>
+        </a>
+      )
+    }
+  </div>
+</nav>
+
+<style>
+  .path-nav {
+    max-width: var(--measure);
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--line);
+  }
+
+  .path-nav__position {
+    margin: 0 0 0.75rem;
+    font-size: 0.875rem;
+    color: var(--ink-faint);
+  }
+
+  .path-nav__links {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr));
+    gap: 0.5rem;
+  }
+
+  .path-nav__link {
+    display: flex;
+    flex-direction: column;
+    padding: 0.75rem 1rem;
+    text-decoration: none;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+  }
+
+  .path-nav__link:hover {
+    border-color: var(--accent);
+  }
+
+  /* "Berikutnya" selalu di kolom kanan, meski tidak ada "Sebelumnya". */
+  .path-nav__link--next {
+    grid-column: -2;
+    text-align: right;
+  }
+
+  .path-nav__label {
+    font-size: 0.8125rem;
+    color: var(--ink-faint);
+  }
+
+  .path-nav__title {
+    font-weight: 600;
+  }
+</style>

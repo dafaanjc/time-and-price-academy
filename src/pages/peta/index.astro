@@ -1,0 +1,127 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { siteConfig } from '../../config/site';
+import KnowledgeGraph from '../../components/KnowledgeGraph.astro';
+import { getCategory } from '../../data/categories';
+import { conceptHref, getConcepts, getKnowledgeGraph } from '../../lib/concepts';
+
+const graph = await getKnowledgeGraph();
+const concepts = await getConcepts();
+const titles = new Map(concepts.map((c) => [c.id, c.data.title]));
+const layerOf = new Map(graph.nodes.map((n) => [n.id, n.layer]));
+---
+
+<BaseLayout
+  title="Peta Pengetahuan"
+  description={`Peta hubungan prasyarat antar konsep di ${siteConfig.product}: konsep mana yang menjadi dasar bagi konsep lainnya.`}
+>
+  <header class="map-header">
+    <h1>Peta Pengetahuan</h1>
+    <p>
+      Peta ini menunjukkan konsep mana yang menjadi dasar bagi konsep lainnya.
+      Panah mengarah dari <strong>prasyarat</strong> ke konsep yang membutuhkannya.
+      Klik sebuah kotak untuk membuka konsepnya.
+    </p>
+  </header>
+
+  <KnowledgeGraph graph={graph} idPrefix="peta" />
+
+  <section class="map-table" aria-labelledby="peta-tabel">
+    <h2 id="peta-tabel">Daftar prasyarat</h2>
+    <p>Isi peta yang sama dalam bentuk tabel.</p>
+    <!-- Dapat difokuskan agar pengguna keyboard bisa menggeser tabel di layar sempit. -->
+    <div class="map-table__scroll" tabindex="0" role="region" aria-labelledby="peta-tabel">
+      <table>
+        <thead>
+          <tr>
+            <th scope="col">Tingkat</th>
+            <th scope="col">Konsep</th>
+            <th scope="col">Kategori</th>
+            <th scope="col">Prasyarat</th>
+          </tr>
+        </thead>
+        <tbody>
+          {
+            concepts.map((c) => (
+              <tr>
+                <td>{(layerOf.get(c.id) ?? 0) + 1}</td>
+                <th scope="row">
+                  <a href={conceptHref(c.id)}>{c.data.title}</a>
+                </th>
+                <td>{getCategory(c.data.category).title}</td>
+                <td>{c.data.prerequisites.map((p) => titles.get(p) ?? p).join(', ') || '—'}</td>
+              </tr>
+            ))
+          }
+        </tbody>
+      </table>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .map-header {
+    max-width: var(--measure);
+    margin-bottom: 2rem;
+  }
+
+  .map-header h1 {
+    margin: 0 0 0.75rem;
+    font-size: clamp(2rem, 5vw, 2.75rem);
+  }
+
+  .map-header p {
+    margin: 0;
+    font-size: 1.0625rem;
+    color: var(--ink-soft);
+  }
+
+  .map-table {
+    max-width: var(--measure);
+    margin-top: 3rem;
+  }
+
+  .map-table h2 {
+    margin: 0 0 0.25rem;
+    font-size: 1.375rem;
+  }
+
+  .map-table p {
+    margin: 0 0 1rem;
+    font-size: 0.9375rem;
+    color: var(--ink-soft);
+  }
+
+  .map-table__scroll {
+    overflow-x: auto;
+  }
+
+  .map-table__scroll:focus-visible {
+    outline-offset: 4px;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9375rem;
+  }
+
+  th,
+  td {
+    padding: 0.5rem 0.75rem;
+    text-align: left;
+    vertical-align: top;
+    border-bottom: 1px solid var(--line);
+  }
+
+  thead th {
+    font-size: 0.75rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+  }
+
+  tbody th {
+    font-weight: 600;
+  }
+</style>

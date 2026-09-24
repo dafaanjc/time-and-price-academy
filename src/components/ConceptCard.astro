@@ -1,0 +1,86 @@
+---
+import { getCategory } from '../data/categories';
+import { conceptHref, difficultyLabels, type Concept } from '../lib/concepts';
+import { readingMinutes } from '../lib/reading-time';
+
+interface Props {
+  concept: Concept;
+  /** Tingkat heading judul kartu, sesuai posisinya di halaman. */
+  headingLevel?: 2 | 3;
+}
+
+const { concept, headingLevel = 3 } = Astro.props;
+const Heading = `h${headingLevel}` as const;
+const { title, termEn, description, category, difficulty, status } = concept.data;
+const isDraft = status === 'draft';
+---
+
+<article class="concept-card">
+  <p class="eyebrow">{getCategory(category).title}</p>
+  <Heading class="concept-card__title">
+    <a href={conceptHref(concept.id)}>{title}</a>
+  </Heading>
+  {termEn && <p class="concept-card__term" lang="en">{termEn}</p>}
+  <p class="concept-card__desc">{description}</p>
+  <p class="concept-card__meta">
+    <span class="badge">{difficultyLabels[difficulty]}</span>
+    <span class="badge">{readingMinutes(concept.body)} mnt baca</span>
+    {isDraft && <span class="badge badge--draft">Draf</span>}
+  </p>
+</article>
+
+<style>
+  .concept-card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 0.375rem;
+    padding: 1.25rem;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+  }
+
+  .concept-card:hover {
+    border-color: var(--accent);
+  }
+
+  .concept-card__title {
+    margin: 0;
+    font-size: 1.25rem;
+  }
+
+  .concept-card__title a {
+    color: var(--ink);
+    text-decoration: none;
+  }
+
+  /* Seluruh kartu dapat diklik, tanpa membungkus konten dengan <a>. */
+  .concept-card__title a::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: var(--radius);
+  }
+
+  .concept-card__term {
+    margin: 0;
+    font-size: 0.8125rem;
+    color: var(--ink-faint);
+    font-style: italic;
+  }
+
+  .concept-card__desc {
+    margin: 0.25rem 0 0;
+    font-size: 0.9375rem;
+    color: var(--ink-soft);
+  }
+
+  .concept-card__meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.375rem;
+    margin: auto 0 0;
+    padding-top: 0.5rem;
+  }
+</style>

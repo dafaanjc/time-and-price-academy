@@ -1,0 +1,95 @@
+---
+import { sourceTypeLabels } from '../data/source-types';
+import { sourceHref, type Source } from '../lib/sources';
+
+interface Props {
+  source: Source;
+}
+
+const { source } = Astro.props;
+const href = sourceHref(source);
+const byline = [source.authors.join(', '), source.year].filter(Boolean).join(' · ');
+const identifiers = [
+  source.publisher,
+  source.doi && `DOI: ${source.doi}`,
+  source.isbn && `ISBN: ${source.isbn}`,
+].filter(Boolean);
+---
+
+<article class="source-card">
+  <p class="source-card__type" data-type={source.type}>{sourceTypeLabels[source.type]}</p>
+  <h3 class="source-card__title">
+    {
+      href ? (
+        <a href={href} rel="noopener noreferrer" target="_blank">
+          <cite>{source.title}</cite>
+          <span class="visually-hidden"> (membuka tab baru)</span>
+        </a>
+      ) : (
+        <cite>{source.title}</cite>
+      )
+    }
+  </h3>
+  {byline && <p class="source-card__byline">{byline}</p>}
+  {identifiers.length > 0 && <p class="source-card__ids">{identifiers.join(' · ')}</p>}
+  {source.note && <p class="source-card__note">{source.note}</p>}
+</article>
+
+<style>
+  .source-card {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    padding: 0.875rem 1rem;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-left: 3px solid var(--accent);
+    border-radius: var(--radius);
+  }
+
+  .source-card p {
+    margin: 0;
+  }
+
+  .source-card__type {
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+  }
+
+  .source-card__title {
+    margin: 0;
+    font-family: var(--font-sans);
+    font-size: 1rem;
+    font-weight: 600;
+    line-height: 1.4;
+    overflow-wrap: anywhere;
+  }
+
+  cite {
+    font-style: normal;
+  }
+
+  .source-card__title a {
+    color: var(--ink);
+  }
+
+  .source-card__title a:hover {
+    color: var(--accent);
+  }
+
+  .source-card__byline,
+  .source-card__ids {
+    font-size: 0.875rem;
+    color: var(--ink-soft);
+    overflow-wrap: anywhere;
+  }
+
+  .source-card .source-card__note {
+    margin-top: 0.25rem;
+    font-size: 0.875rem;
+    color: var(--ink-faint);
+  }
+</style>

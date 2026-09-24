@@ -1,0 +1,78 @@
+---
+title: "Probabilitas"
+termEn: "Probability"
+slug: probability
+category: foundations
+order: 3
+difficulty: beginner
+description: "Ukuran seberapa mungkin suatu kejadian terjadi, dinyatakan sebagai angka antara 0 dan 1."
+status: draft
+featured: true
+prerequisites: [risk, risk-vs-uncertainty]
+related: [probability-distribution]
+sources: []
+---
+
+## Mengapa Ini Penting
+
+Probabilitas adalah bahasa dasar untuk membicarakan risiko. Tanpa probabilitas, pernyataan seperti "kemungkinan besar untung" atau "jarang rugi" tidak bisa dibandingkan atau diperiksa. Dengan probabilitas, keyakinan dapat dinyatakan sebagai angka, sehingga bisa dihitung, dibandingkan, dan diperbarui ketika ada data baru.
+
+## Gagasan Utama
+
+**Probabilitas adalah ukuran seberapa mungkin suatu kejadian terjadi, dinyatakan sebagai angka antara 0 dan 1** (atau 0% sampai 100%).
+
+- `P = 0` berarti kejadian itu tidak mungkin terjadi.
+- `P = 1` berarti kejadian itu pasti terjadi.
+- Nilai di antaranya menunjukkan tingkat kemungkinan.
+
+Ada tiga cara umum untuk memperoleh angka probabilitas:
+
+1. **Klasik**: dari hasil yang sama-sama mungkin. Dadu yang adil punya 6 sisi, jadi peluang tiap angka adalah 1/6.
+2. **Frekuensi**: dari seberapa sering sesuatu terjadi dalam banyak percobaan atau data historis.
+3. **Subjektif**: dari tingkat keyakinan seseorang berdasarkan informasi yang dimilikinya.
+
+## Penjelasan Sederhana
+
+Jika Anda melempar koin yang adil, ada dua hasil yang sama-sama mungkin: angka atau gambar. Peluang keluar gambar adalah 1 dari 2, yaitu 0,5 atau 50%.
+
+Probabilitas **tidak** memberi tahu apa yang akan terjadi pada satu lemparan berikutnya. Probabilitas memberi tahu pola yang muncul bila lemparan dilakukan berkali-kali. Dengan 10 lemparan, jumlah gambar bisa saja 7. Dengan ribuan lemparan, proporsinya cenderung makin mendekati 50%. Kecenderungan ini dikenal sebagai **hukum bilangan besar**.
+
+## Contoh Kehidupan Nyata
+
+Prakiraan cuaca menyebut "peluang hujan 70%". Artinya bukan hujan akan turun selama 70% waktu. Artinya, dalam kondisi cuaca serupa, hujan terjadi pada sekitar 70% kasus. Hari ini tetap bisa tidak hujan. Namun membawa payung adalah keputusan yang masuk akal, karena biaya membawa payung kecil dibandingkan akibat kehujanan.
+
+Contoh ini menunjukkan hal penting: **keputusan yang baik mempertimbangkan probabilitas dan dampak sekaligus.**
+
+## Contoh Keuangan
+
+*Ilustrasi.* Sebuah pemberi pinjaman memperkirakan bahwa dari peminjam dengan profil tertentu, sekitar 5 dari 100 tidak mampu melunasi pinjamannya. Dari sudut pandang frekuensi, probabilitas gagal bayar untuk kelompok itu kira-kira 0,05.
+
+Angka itu tidak bisa memberi tahu **siapa** yang akan gagal bayar. Angka itu berguna untuk kelompok besar, misalnya untuk menentukan berapa cadangan dana yang perlu disiapkan dan berapa bunga yang cukup untuk menutup kerugian yang diperkirakan.
+
+## Contoh Trading
+
+*Ilustrasi, bukan rekomendasi.* Seorang trader meninjau 200 kejadian historis dari sebuah pola harga dan mencatat bahwa pada 90 kejadian harga mencapai target tertentu. Frekuensinya `90 / 200 = 0,45`, atau 45%.
+
+Angka ini adalah **perkiraan**, bukan kepastian. Ada beberapa hal yang membatasinya:
+
+- 200 kejadian mungkin belum cukup untuk perkiraan yang stabil.
+- Kondisi pasar saat data dikumpulkan belum tentu sama dengan kondisi sekarang.
+- Cara memilih kejadian dalam data bisa tanpa sengaja membuat hasilnya terlihat lebih baik.
+
+## Cara Kerja Konsep
+
+Beberapa aturan dasar probabilitas:
+
+| Aturan | Rumus | Contoh dengan dadu adil |
+| --- | --- | --- |
+| Batas nilai | `0 ≤ P(A) ≤ 1` | P(keluar 6) = 1/6 ≈ 0,167 |
+| Komplemen | `P(bukan A) = 1 − P(A)` | P(bukan 6) = 5/6 ≈ 0,833 |
+| Penjumlahan (kejadian saling lepas) | `P(A atau B) = P(A) + P(B)` | P(keluar 1 atau 2) = 1/6 + 1/6 = 1/3 |
+| Perkalian (kejadian independen) | `P(A dan B) = P(A) × P(B)` | P(dua lemparan, keduanya 6) = 1/6 × 1/6 = 1/36 ≈ 0,028 |
+
+Dua syarat penting sering terlupa:
+
+- Aturan penjumlahan di atas hanya berlaku bila kedua kejadian **tidak bisa terjadi bersamaan**.
+- Aturan perkalian di atas hanya berlaku bila kedua kejadian **tidak saling memengaruhi**. Di pasar keuangan, banyak kejadian saling terkait, sehingga asumsi independen perlu diperiksa.
+
+Probabilitas satu kejadian saja belum cukup untuk menggambarkan seluruh kemungkinan. Untuk itu kita memerlukan [distribusi probabilitas](/konsep/probability-distribution/).

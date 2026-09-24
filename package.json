@@ -1,0 +1,28 @@
+{
+  "name": "time-and-price-academy",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Risk Lab — Time & Price Academy. Perpustakaan riset dan sistem belajar interaktif tentang risiko dan keputusan.",
+  "author": "Muhamad Daffa",
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "check": "astro check",
+    "check:branding": "node scripts/check-branding.mjs",
+    "validate": "astro check && astro build && node scripts/check-branding.mjs"
+  },
+  "dependencies": {
+    "@astrojs/mdx": "^8.0.2",
+    "astro": "^7.3.4"
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.10",
+    "@types/node": "^24.13.6",
+    "typescript": "^6.0.3"
+  }
+}

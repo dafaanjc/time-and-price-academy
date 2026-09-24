@@ -1,0 +1,106 @@
+---
+// Graf prasyarat sebagai SVG statis. Setiap simpul adalah tautan ke halaman konsep.
+import { NODE_HEIGHT, NODE_WIDTH, type GraphLayout } from '../lib/graph';
+
+interface Props {
+  graph: GraphLayout;
+  /** Awalan ID unik bila komponen dipakai lebih dari sekali di satu halaman. */
+  idPrefix?: string;
+}
+
+const { graph, idPrefix = 'graf' } = Astro.props;
+const titleId = `${idPrefix}-judul`;
+const descId = `${idPrefix}-desk`;
+const markerId = `${idPrefix}-panah`;
+const LINE_HEIGHT = 17;
+
+// Posisi baris teks agar satu atau dua baris tetap di tengah kotak.
+const lineY = (count: number, i: number) => NODE_HEIGHT / 2 + (i - (count - 1) / 2) * LINE_HEIGHT;
+---
+
+<div class="graph">
+  <svg
+    width={graph.width}
+    height={graph.height}
+    viewBox={`0 0 ${graph.width} ${graph.height}`}
+    aria-labelledby={`${titleId} ${descId}`}
+  >
+    <title id={titleId}>Peta pengetahuan: hubungan prasyarat antar konsep</title>
+    <desc id={descId}>
+      Panah mengarah dari konsep prasyarat ke konsep yang membutuhkannya. Setiap kotak adalah tautan ke halaman
+      konsep.
+    </desc>
+    <defs>
+      <marker id={markerId} viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+        <path class="arrow" d="M 0 0 L 10 5 L 0 10 z"></path>
+      </marker>
+    </defs>
+
+    <g class="edges" aria-hidden="true">
+      {graph.edges.map((e) => <path class="edge" d={e.d} marker-end={`url(#${markerId})`} />)}
+    </g>
+
+    <g class="nodes">
+      {
+        graph.nodes.map((n) => (
+          <a href={n.href} class="node" aria-label={n.title}>
+            <g transform={`translate(${n.x} ${n.y})`}>
+              <rect width={NODE_WIDTH} height={NODE_HEIGHT} rx="8" />
+              <text x={NODE_WIDTH / 2} text-anchor="middle" dominant-baseline="central" aria-hidden="true">
+                {n.lines.map((line, i) => (
+                  <tspan x={NODE_WIDTH / 2} y={lineY(n.lines.length, i)}>
+                    {line}
+                  </tspan>
+                ))}
+              </text>
+            </g>
+          </a>
+        ))
+      }
+    </g>
+  </svg>
+</div>
+
+<style>
+  .graph svg {
+    display: block;
+    max-width: 100%;
+    height: auto;
+  }
+
+  .edge {
+    fill: none;
+    stroke: var(--ink-faint);
+    stroke-width: 1.5;
+  }
+
+  .arrow {
+    fill: var(--ink-faint);
+  }
+
+  .node rect {
+    fill: var(--surface);
+    stroke: var(--line);
+    stroke-width: 1.5;
+  }
+
+  .node text {
+    fill: var(--ink);
+    font-family: var(--font-sans);
+    font-size: 14px;
+    font-weight: 600;
+  }
+
+  .node:hover rect {
+    stroke: var(--accent);
+  }
+
+  .node:focus-visible {
+    outline: none;
+  }
+
+  .node:focus-visible rect {
+    stroke: var(--accent);
+    stroke-width: 3;
+  }
+</style>

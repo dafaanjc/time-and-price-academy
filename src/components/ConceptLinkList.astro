@@ -1,0 +1,74 @@
+---
+// Daftar tautan konsep: dipakai untuk "Konsep Terkait" dan "Prasyarat".
+import { conceptHref, type Concept } from '../lib/concepts';
+
+interface Props {
+  id: string;
+  title: string;
+  concepts: Concept[];
+  empty: string;
+}
+
+const { id, title, concepts, empty } = Astro.props;
+---
+
+<section class="concept-links" aria-labelledby={id}>
+  <h2 id={id}>{title}</h2>
+  {
+    concepts.length > 0 ? (
+      <ul>
+        {concepts.map((c) => (
+          <li>
+            <a href={conceptHref(c.id)}>{c.data.title}</a>
+            <span>{c.data.description}</span>
+          </li>
+        ))}
+      </ul>
+    ) : (
+      <p class="concept-links__empty">{empty}</p>
+    )
+  }
+</section>
+
+<style>
+  .concept-links {
+    max-width: var(--measure);
+  }
+
+  h2 {
+    margin: 0 0 0.75rem;
+    font-size: 1.375rem;
+  }
+
+  ul {
+    display: grid;
+    gap: 0.5rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  li {
+    display: flex;
+    flex-direction: column;
+    padding: 0.75rem 1rem;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+  }
+
+  a {
+    font-weight: 600;
+  }
+
+  span {
+    font-size: 0.9375rem;
+    color: var(--ink-soft);
+  }
+
+  .concept-links__empty {
+    margin: 0;
+    font-size: 0.9375rem;
+    color: var(--ink-faint);
+  }
+</style>
