@@ -9,12 +9,12 @@ export const categoryIds = [
 export type CategoryId = (typeof categoryIds)[number];
 
 /**
- * Geometri SVG teknis yang mewakili kategori (digambar oleh components/figures/CategoryMotif.astro):
- * - axes: sumbu + kurva distribusi dengan penanda rata-rata
- * - band: jejak harga di dalam batas atas/bawah, dengan garis batas rugi
+ * Gambar isometrik SVG yang mewakili kategori (digambar oleh components/figures/CategoryMotif.astro):
+ * - axes: kurva distribusi berdiri di bidang waktu × harga, penanda rata-rata di lantai
+ * - band: jejak harga di dalam bidang batas atas, dengan garis batas rugi di bawahnya
  * - oscillation: jejak yang berayun makin lebar setelah satu kejatuhan
- * - kink: kurva nilai dengan patahan di titik acuan (rugi terasa lebih curam)
- * - tree: pohon keputusan (simpul pilihan → simpul peluang → hasil)
+ * - kink: pita kurva nilai dengan patahan di titik acuan (rugi terasa lebih curam)
+ * - tree: pohon keputusan di lantai (simpul pilihan → peluang), tiang setinggi hasil di tiap daun
  */
 export const categoryMotifs = ['axes', 'band', 'oscillation', 'kink', 'tree'] as const;
 export type CategoryMotif = (typeof categoryMotifs)[number];

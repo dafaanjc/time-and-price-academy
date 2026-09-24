@@ -4,6 +4,8 @@
 export interface GraphInput {
   id: string;
   title: string;
+  /** Ringkasan singkat untuk tooltip simpul. */
+  description?: string;
   href: string;
   prerequisites: string[];
 }
@@ -11,6 +13,7 @@ export interface GraphInput {
 export interface GraphNode {
   id: string;
   title: string;
+  description: string;
   href: string;
   /** Tingkat 0 = tanpa prasyarat. */
   layer: number;
@@ -36,6 +39,9 @@ export interface GraphLayout {
 
 export const NODE_WIDTH = 200;
 export const NODE_HEIGHT = 56;
+/** Simpul digambar sebagai lingkaran kecil di tepi kiri sel; garis masuk/keluar di atas/bawahnya, label di kanannya. */
+export const NODE_RADIUS = 6;
+export const NODE_ANCHOR_X = 12;
 const H_GAP = 24;
 const V_GAP = 48;
 const PADDING = 16;
@@ -71,6 +77,26 @@ export function wrapTitle(title: string, max = MAX_LINE_CHARS): string[] {
   return rest.length === 0 ? [truncate(first, max)] : [truncate(first, max), truncate(rest.join(' '), max)];
 }
 
+/** Pecah teks menjadi baris berdasarkan kata (maksimal `maxLines`; sisanya dipotong dengan elipsis). */
+export function wrapText(text: string, max: number, maxLines: number): string[] {
+  const lines: string[] = [];
+  let current = '';
+  for (const word of text.split(/\s+/).filter(Boolean)) {
+    const next = current ? `${current} ${word}` : word;
+    if (next.length > max && current) {
+      lines.push(current);
+      current = word;
+    } else {
+      current = next;
+    }
+  }
+  if (current) lines.push(current);
+  if (lines.length <= maxLines) return lines;
+  const kept = lines.slice(0, maxLines);
+  kept[maxLines - 1] = truncate(`${kept[maxLines - 1]} ${lines.slice(maxLines).join(' ')}`, max);
+  return kept;
+}
+
 /** Tingkat = 1 + tingkat prasyarat terdalam. Input diasumsikan bebas siklus (dijamin validate.ts). */
 export function computeLayers(inputs: GraphInput[]): Map<string, number> {
   const byId = new Map(inputs.map((n) => [n.id, n]));
@@ -93,14 +119,24 @@ export function computeLayers(inputs: GraphInput[]): Map<string, number> {
   return layers;
 }
 
-/** Kurva S dari tepi bawah prasyarat ke tepi atas konsep (tingkat berurutan). */
+/** Titik masuk (atas lingkaran) dan keluar (bawah lingkaran) sebuah simpul. */
+const outPoint = (n: GraphNode): [number, number] => [n.x + NODE_ANCHOR_X, n.y + NODE_HEIGHT / 2 + NODE_RADIUS];
+const inPoint = (n: GraphNode): [number, number] => [n.x + NODE_ANCHOR_X, n.y + NODE_HEIGHT / 2 - NODE_RADIUS];
+
+/** Siku teknis dari prasyarat ke konsep pada tingkat berurutan: turun, belok di tengah celah, turun lagi. */
 function adjacentPath(from: GraphNode, to: GraphNode): string {
-  const x1 = from.x + NODE_WIDTH / 2;
-  const y1 = from.y + NODE_HEIGHT;
-  const x2 = to.x + NODE_WIDTH / 2;
-  const y2 = to.y;
-  const mid = (y1 + y2) / 2;
-  return `M ${x1} ${y1} C ${x1} ${mid}, ${x2} ${mid}, ${x2} ${y2}`;
+  const [x1, y1] = outPoint(from);
+  const [x2, y2] = inPoint(to);
+  if (Math.abs(x2 - x1) < 1) return `M ${x1} ${y1} V ${y2}`;
+  const r = CORNER;
+  const s = Math.sign(x2 - x1);
+  const mid = (from.y + NODE_HEIGHT + to.y) / 2;
+  return [
+    `M ${x1} ${y1}`,
+    `V ${mid - r} Q ${x1} ${mid} ${x1 + s * r} ${mid}`,
+    `H ${x2 - s * r} Q ${x2} ${mid} ${x2} ${mid + r}`,
+    `V ${y2}`,
+  ].join(' ');
 }
 
 /**
@@ -110,17 +146,16 @@ function adjacentPath(from: GraphNode, to: GraphNode): string {
  */
 function lanePath(from: GraphNode, to: GraphNode, laneX: number, lane: number): string {
   const r = CORNER;
-  const x1 = from.x + NODE_WIDTH / 2;
+  const [x1, y1Start] = outPoint(from);
+  const [x2, y2] = inPoint(to);
   const y1 = from.y + NODE_HEIGHT;
-  const x2 = to.x + NODE_WIDTH / 2;
-  const y2 = to.y;
   // Belokan keluar dekat simpul asal, belokan masuk dekat simpul tujuan: bila dua garis jalur
   // berbagi satu celah, segmen keluar dan masuknya tetap terpisah (bukan tampak satu garis).
   const shift = (lane % 3) * 6;
   const yA = y1 + 10 + shift;
-  const yB = y2 - 16 - shift;
+  const yB = to.y - 16 - shift;
   return [
-    `M ${x1} ${y1}`,
+    `M ${x1} ${y1Start}`,
     `V ${yA - r} Q ${x1} ${yA} ${x1 + r} ${yA}`,
     `H ${laneX - r} Q ${laneX} ${yA} ${laneX} ${yA + r}`,
     `V ${yB - r} Q ${laneX} ${yB} ${laneX - r} ${yB}`,
@@ -146,6 +181,7 @@ export function layoutGraph(inputs: GraphInput[]): GraphLayout {
     return row.map((n, i) => ({
       id: n.id,
       title: n.title,
+      description: n.description ?? '',
       href: n.href,
       layer,
       x: offset + i * (NODE_WIDTH + H_GAP),

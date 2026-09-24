@@ -1,5 +1,5 @@
 ---
-// Kategori sebagai "pelat pameran": motif teknis, nomor "01 / 05", judul, deskripsi, dan konsep di dalamnya.
+// Kategori sebagai "pelat pameran": motif isometrik, nomor "01 / 05", judul, deskripsi, dan konsep di dalamnya.
 // Desktop: kategori pertama (Fondasi) menjadi pelat utama di kiri, sisanya kisi 2×2 di kanan — asimetris.
 // Kategori baru cukup ditambahkan di src/data/categories.ts (plus motifnya di CategoryMotif).
 import { categories, categoryIndexLabel } from '../data/categories';
@@ -54,19 +54,57 @@ const grouped = await getConceptsByCategory();
   .category-grid {
     display: grid;
     grid-template-columns: minmax(0, 1fr);
-    gap: 0 var(--grid-gap);
+    gap: var(--space-6) var(--grid-gap);
     margin: 0;
     padding: 0;
     list-style: none;
   }
 
+  /* Pelat pameran: bingkai hairline di atas bidang --surface; seluruh pelat bisa diklik lewat tautan judul. */
   .plate {
+    position: relative;
     display: grid;
     grid-template-columns: 7.5rem minmax(0, 1fr);
     align-content: start;
     gap: var(--space-4) var(--space-6);
-    padding-block: var(--space-6) var(--space-8);
-    border-top: var(--border-hair) solid var(--rule-strong);
+    padding: var(--space-6);
+    background: var(--surface);
+    border: var(--border-hair) solid var(--rule-strong);
+    transition: border-color var(--motion-base) var(--ease);
+  }
+
+  /* Sorotan pilihan: bingkai jadi kuningan + garis kuningan tipis di tepi atas (bukan pendaran). */
+  .plate::before {
+    content: '';
+    position: absolute;
+    inset: calc(-1 * var(--border-hair)) calc(-1 * var(--border-hair)) auto;
+    height: var(--border-mark);
+    background: var(--mark);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform var(--motion-base) var(--ease);
+  }
+
+  .plate:hover,
+  .plate:focus-within {
+    border-color: var(--mark);
+  }
+
+  .plate:hover::before,
+  .plate:focus-within::before {
+    transform: scaleX(1);
+  }
+
+  /* Tautan judul direntangkan menutupi pelat; tautan konsep berada di atasnya. */
+  .plate__title a::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+  }
+
+  .plate__concepts a {
+    position: relative;
+    z-index: 1;
   }
 
   .plate__figure {
@@ -87,9 +125,11 @@ const grouped = await getConceptsByCategory();
     text-decoration: none;
   }
 
-  .plate__title a:hover {
+  .plate:hover .plate__title a {
     text-decoration: underline;
     text-decoration-thickness: 1px;
+    text-decoration-color: var(--mark);
+    text-underline-offset: 0.25em;
   }
 
   .plate__desc {
@@ -171,7 +211,7 @@ const grouped = await getConceptsByCategory();
     .plate--lead {
       grid-column: 1 / span 6;
       grid-row: span 2;
-      padding-right: var(--space-8);
+      padding: var(--space-8);
     }
   }
 </style>

@@ -95,6 +95,7 @@ export async function getKnowledgeGraph(): Promise<GraphLayout> {
     concepts.map((c) => ({
       id: c.id,
       title: c.data.title,
+      description: c.data.description,
       href: conceptHref(c.id),
       prerequisites: c.data.prerequisites,
     })),

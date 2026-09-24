@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { computeLayers, layoutGraph, NODE_HEIGHT, NODE_WIDTH, wrapTitle, type GraphLayout } from '../src/lib/graph';
+import { computeLayers, layoutGraph, NODE_HEIGHT, NODE_WIDTH, wrapText, wrapTitle, type GraphLayout } from '../src/lib/graph';
 
 const n = (id: string, prerequisites: string[] = []) => ({ id, title: id, href: `/${id}`, prerequisites });
 
@@ -93,5 +93,14 @@ describe('graf prasyarat', () => {
     for (const line of wrapTitle('Sangat Panjang Sekali Judul Konsep Yang Tidak Biasa Ini')) {
       expect(line.length).toBeLessThanOrEqual(22);
     }
+  });
+
+  it('wrapText memecah per kata dan memotong sisa dengan elipsis', () => {
+    expect(wrapText('satu dua tiga empat', 9, 3)).toEqual(['satu dua', 'tiga', 'empat']);
+    const cut = wrapText('satu dua tiga empat lima enam', 9, 2);
+    expect(cut).toHaveLength(2);
+    expect(cut[1]!.length).toBeLessThanOrEqual(9);
+    expect(cut[1]!.endsWith('…')).toBe(true);
+    expect(wrapText('', 9, 2)).toEqual([]);
   });
 });
