@@ -27,7 +27,7 @@ const { title, termEn, description } = concept.data;
   .concept-header {
     display: flex;
     flex-direction: column;
-    gap: var(--space-3);
+    gap: var(--space-4);
     max-width: var(--measure);
   }
 
@@ -36,7 +36,9 @@ const { title, termEn, description } = concept.data;
     flex-direction: column;
     gap: var(--space-1);
     margin: 0;
-    font-size: clamp(var(--text-2xl), 5vw, var(--text-3xl));
+    font-size: clamp(var(--text-2xl), 5vw, var(--text-4xl));
+    line-height: var(--leading-display);
+    letter-spacing: var(--tracking-display);
   }
 
   /* Istilah asli sebagai baris kedua judul (bagian dari nama heading bagi pembaca layar). */
@@ -49,6 +51,7 @@ const { title, termEn, description } = concept.data;
 
   .concept-header__desc {
     margin: 0 0 var(--space-2);
+    max-width: var(--measure-narrow);
     font-size: var(--text-lg);
     color: var(--ink-2);
   }

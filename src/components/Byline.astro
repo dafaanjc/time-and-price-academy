@@ -1,5 +1,5 @@
 ---
-// Atribusi penulis + tombol salin tautan. Wajib di setiap halaman konsep.
+// Atribusi penulis dan merek + tombol salin tautan. Wajib di setiap halaman konsep.
 import { siteConfig } from '../config/site';
 import CopyLinkButton from './CopyLinkButton.astro';
 
@@ -11,7 +11,7 @@ const { url } = Astro.props;
 ---
 
 <div class="byline">
-  <p class="byline__text">{siteConfig.attribution}</p>
+  <p class="byline__text">{siteConfig.articleAttribution}</p>
   <CopyLinkButton url={url} />
 </div>
 

@@ -1,5 +1,7 @@
 ---
-// Meta konsep dalam satu baris: "Fondasi · Dasar · 3 menit baca · Draf".
+// Metadata mono di kepala artikel: "FONDASI · TINGKAT DASAR · 3 MENIT BACA · AUTHOR: MUHAMAD DAFFA · TIME & PRICE ACADEMY".
+// Huruf kapital dari CSS (.label), jadi teks di markup tetap terbaca normal oleh pembaca layar.
+import { siteConfig } from '../config/site';
 import { getCategory } from '../data/categories';
 import { categoryHref, difficultyLabels, statusLabels, type Concept } from '../lib/concepts';
 import { readingMinutes } from '../lib/reading-time';
@@ -11,14 +13,28 @@ interface Props {
 const { concept } = Astro.props;
 const { category, difficulty, status } = concept.data;
 const isDraft = status === 'draft';
+const items = [
+  { text: getCategory(category).title, href: categoryHref(category) },
+  { text: `Tingkat ${difficultyLabels[difficulty]}` },
+  { text: `${readingMinutes(concept.body)} menit baca` },
+  { text: `Author: ${siteConfig.author}` },
+  { text: siteConfig.masterBrand },
+];
 ---
 
-<p class="concept-meta">
-  <a href={categoryHref(category)}>{getCategory(category).title}</a>{' '}
-  <span class="concept-meta__sep" aria-hidden="true">·</span>{' '}
-  <span>Tingkat {difficultyLabels[difficulty].toLowerCase()}</span>{' '}
-  <span class="concept-meta__sep" aria-hidden="true">·</span>{' '}
-  <span>{readingMinutes(concept.body)} menit baca</span>{' '}
+<p class="label concept-meta">
+  {
+    items.map((item, i) => (
+      <>
+        {i > 0 && (
+          <>
+            <span class="label__sep" aria-hidden="true">·</span>{' '}
+          </>
+        )}
+        {item.href ? <a href={item.href}>{item.text}</a> : <span>{item.text}</span>}{' '}
+      </>
+    ))
+  }
   {isDraft && <span class="badge badge--draft">{statusLabels[status]}</span>}
 </p>
 
@@ -27,9 +43,9 @@ const isDraft = status === 'draft';
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    gap: var(--space-1) var(--space-2);
-    margin: 0;
-    font-size: var(--text-sm);
+    row-gap: var(--space-1);
+    padding-block: var(--space-2);
+    border-block: 1px solid var(--rule-strong);
     color: var(--ink-2);
   }
 
@@ -38,8 +54,7 @@ const isDraft = status === 'draft';
     font-weight: 600;
   }
 
-  .concept-meta__sep {
-    color: var(--ink-3);
+  .concept-meta .badge {
+    margin-inline-start: var(--space-3);
   }
-
 </style>

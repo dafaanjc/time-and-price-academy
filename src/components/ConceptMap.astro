@@ -1,0 +1,168 @@
+---
+// Mini peta konsep: satu sumbu vertikal (prasyarat → konsep ini → lanjutan, lalu terkait dengan
+// sumbu putus-putus). Simpul konsep ini bertanda kuningan. Gambar teknis, bukan dekorasi:
+// daftar tautan yang sama juga tersedia sebagai teks di sekitarnya.
+import {
+  LOCAL_DOT_X,
+  LOCAL_LABEL_X,
+  LOCAL_LINE_HEIGHT,
+  type LocalGraphLayout,
+  type LocalRole,
+} from '../lib/local-graph';
+
+interface Props {
+  graph: LocalGraphLayout;
+  currentTitle: string;
+}
+
+const { graph, currentTitle } = Astro.props;
+const captionLabels: Record<LocalRole, string> = {
+  prerequisite: 'Prasyarat',
+  current: 'Konsep ini',
+  next: 'Lanjutan',
+  related: 'Terkait',
+};
+const summary = graph.nodes
+  .filter((n) => n.role !== 'current')
+  .map((n) => `${captionLabels[n.role].toLowerCase()}: ${n.title}`)
+  .join('; ');
+---
+
+<figure class="concept-map">
+  <svg
+    width={graph.width}
+    height={graph.height}
+    viewBox={`0 0 ${graph.width} ${graph.height}`}
+    role="group"
+    aria-labelledby="peta-konsep-judul"
+  >
+    <title id="peta-konsep-judul">
+      Peta hubungan {currentTitle}{summary ? ` — ${summary}` : ' — belum ada konsep yang terhubung'}
+    </title>
+    <g aria-hidden="true">
+      {graph.trunks.map((t) => <path class:list={['trunk', { 'trunk--dashed': t.dashed }]} d={t.d} />)}
+      {
+        graph.captions.map((c) => (
+          <text class="caption" x={LOCAL_LABEL_X} y={c.y} dominant-baseline="central">
+            {captionLabels[c.role]}
+          </text>
+        ))
+      }
+    </g>
+    {
+      graph.nodes.map((n) => (
+        <a href={n.role === 'current' ? undefined : n.href} class={`node node--${n.role}`} aria-label={n.title} aria-current={n.role === 'current' ? 'page' : undefined}>
+          <rect class="node__hit" x="0" y={n.y - (n.lines.length * LOCAL_LINE_HEIGHT) / 2 - 6} width={graph.width} height={n.lines.length * LOCAL_LINE_HEIGHT + 12} />
+          {n.role === 'current' && <circle class="node__ring" cx={LOCAL_DOT_X} cy={n.y} r="10" />}
+          <circle class="node__dot" cx={LOCAL_DOT_X} cy={n.y} r="5" />
+          <text x={LOCAL_LABEL_X} aria-hidden="true">
+            {n.lines.map((line, i) => (
+              <tspan x={LOCAL_LABEL_X} y={n.y + (i - (n.lines.length - 1) / 2) * LOCAL_LINE_HEIGHT} dominant-baseline="central">
+                {line}
+              </tspan>
+            ))}
+          </text>
+        </a>
+      ))
+    }
+  </svg>
+  <figcaption class="label">Peta hubungan konsep</figcaption>
+</figure>
+
+<style>
+  .concept-map {
+    margin: 0;
+    padding: var(--space-4);
+    background: var(--surface);
+    background-image:
+      linear-gradient(var(--grid-line) 1px, transparent 1px),
+      linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+    background-size: var(--grid-cell) var(--grid-cell);
+    border: 1px solid var(--rule-strong);
+    border-radius: var(--radius-0);
+    max-width: 22rem;
+  }
+
+  svg {
+    display: block;
+    max-width: 100%;
+    height: auto;
+    overflow: visible;
+  }
+
+  figcaption {
+    margin-top: var(--space-3);
+    padding-top: var(--space-2);
+    border-top: 1px solid var(--rule);
+  }
+
+  .trunk {
+    fill: none;
+    stroke: var(--rule-strong);
+    stroke-width: var(--stroke-hair);
+  }
+
+  .trunk--dashed {
+    stroke-dasharray: var(--dash-guide);
+  }
+
+  .caption {
+    fill: var(--ink-3);
+    font-family: var(--font-label);
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .node__hit {
+    fill: transparent;
+  }
+
+  .node__dot {
+    fill: var(--surface);
+    stroke: var(--ink-3);
+    stroke-width: var(--stroke-trace);
+    transition:
+      fill var(--motion-fast) var(--ease),
+      stroke var(--motion-fast) var(--ease);
+  }
+
+  .node--related .node__dot {
+    stroke-dasharray: 2 2;
+  }
+
+  .node--current .node__dot {
+    fill: var(--mark);
+    stroke: var(--mark);
+  }
+
+  .node__ring {
+    fill: none;
+    stroke: var(--mark);
+    stroke-width: var(--stroke-hair);
+  }
+
+  .node text {
+    fill: var(--ink-2);
+    font-family: var(--font-sans);
+    font-size: var(--text-sm);
+    font-weight: 600;
+    transition: fill var(--motion-fast) var(--ease);
+  }
+
+  .node--current text {
+    fill: var(--ink);
+    font-family: var(--font-serif);
+  }
+
+  a.node:hover .node__dot,
+  a.node:focus-visible .node__dot {
+    fill: var(--mark);
+    stroke: var(--mark);
+  }
+
+  a.node:hover text,
+  a.node:focus-visible text {
+    fill: var(--ink);
+  }
+</style>

@@ -75,7 +75,15 @@ for (const file of pages) {
 
   // Halaman konsep = dist/konsep/<slug>/index.html (bukan indeks dist/konsep/index.html).
   if (/^dist\/konsep\/[^/]+\/index\.html$/.test(page)) {
-    expect(/class="byline__text"[^>]*>([^<]*)</.exec(html)?.[1] === escapeHtml(siteConfig.attribution), 'atribusi byline hilang');
+    expect(
+      /class="byline__text"[^>]*>([^<]*)</.exec(html)?.[1] === escapeHtml(siteConfig.articleAttribution),
+      `atribusi byline "${siteConfig.articleAttribution}" hilang`,
+    );
+    const metaLine = /<p class="label concept-meta[^>]*>[\s\S]*?<\/p>/.exec(html)?.[0] ?? '';
+    expect(
+      metaLine.includes(escapeHtml(siteConfig.author)) && metaLine.includes(escapeHtml(siteConfig.masterBrand)),
+      'baris metadata header harus memuat author dan merek',
+    );
     expect(
       attr(html, /<meta property="article:author" content="([^"]*)"/) === siteConfig.author,
       'article:author salah/hilang',

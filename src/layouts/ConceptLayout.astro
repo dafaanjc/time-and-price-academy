@@ -9,9 +9,11 @@ import TableOfContents from '../components/TableOfContents.astro';
 import ConceptLinkList from '../components/ConceptLinkList.astro';
 import SourceList from '../components/SourceList.astro';
 import PathNav from '../components/PathNav.astro';
+import ConceptMap from '../components/ConceptMap.astro';
 import ProblemList from '../components/ProblemList.astro';
 import { getCategory } from '../data/categories';
-import { getConceptsByIds, getPathContext, type Concept } from '../lib/concepts';
+import { layoutLocalGraph } from '../lib/local-graph';
+import { conceptHref, getConcepts, getConceptsByIds, getPathContext, type Concept } from '../lib/concepts';
 import { getProblemsForConcept } from '../lib/problems';
 import { layoutSectionIds } from '../lib/sections';
 import { absoluteUrl, conceptOgImage } from '../lib/url';
@@ -29,6 +31,15 @@ const prerequisiteConcepts = await getConceptsByIds(prerequisites);
 const pathContext = await getPathContext(concept.id);
 // Tautan balik otomatis: masalah trader yang merujuk konsep ini.
 const relatedProblems = await getProblemsForConcept(concept.id);
+// Mini peta: konsep yang menjadikan konsep ini prasyaratnya = "lanjutan".
+const dependents = (await getConcepts()).filter((c) => c.data.prerequisites.includes(concept.id));
+const toNode = (c: Concept) => ({ id: c.id, title: c.data.title, href: conceptHref(c.id) });
+const localGraph = layoutLocalGraph({
+  current: toNode(concept),
+  prerequisites: prerequisiteConcepts.map(toNode),
+  next: dependents.map(toNode),
+  related: relatedConcepts.map(toNode),
+});
 const shareUrl = absoluteUrl(Astro.url.pathname, Astro.site);
 ---
 
@@ -67,19 +78,24 @@ const shareUrl = absoluteUrl(Astro.url.pathname, Astro.site);
       )
     }
 
-    <ConceptLinkList
-      id={layoutSectionIds.related}
-      title="Konsep Terkait"
-      concepts={relatedConcepts}
-      empty="Belum ada konsep terkait."
-    />
+    <div class="concept-relations">
+      <div class="concept-relations__lists">
+        <ConceptLinkList
+          id={layoutSectionIds.related}
+          title="Konsep Terkait"
+          concepts={relatedConcepts}
+          empty="Belum ada konsep terkait."
+        />
 
-    <ConceptLinkList
-      id={layoutSectionIds.prerequisites}
-      title="Prasyarat"
-      concepts={prerequisiteConcepts}
-      empty="Tidak ada prasyarat. Konsep ini bisa dipelajari lebih dulu."
-    />
+        <ConceptLinkList
+          id={layoutSectionIds.prerequisites}
+          title="Prasyarat"
+          concepts={prerequisiteConcepts}
+          empty="Tidak ada prasyarat. Konsep ini bisa dipelajari lebih dulu."
+        />
+      </div>
+      <ConceptMap graph={localGraph} currentTitle={title} />
+    </div>
 
     <SourceList sources={sources} />
 
@@ -107,6 +123,33 @@ const shareUrl = absoluteUrl(Astro.url.pathname, Astro.site);
     .concept__body > .content {
       grid-column: 1;
       grid-row: 1;
+    }
+  }
+
+  /* Daftar tautan (teks) di kiri, mini peta di kanan pada layar lebar; satu kolom di layar sempit. */
+  .concept-relations {
+    display: grid;
+    gap: var(--space-8);
+    align-items: start;
+    padding-top: var(--space-8);
+    border-top: 1px solid var(--rule-strong);
+  }
+
+  .concept-relations__lists {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-8);
+  }
+
+  @media (min-width: 64rem) {
+    .concept-relations {
+      grid-template-columns: minmax(0, var(--measure)) minmax(0, 22rem);
+      gap: var(--space-12);
+    }
+
+    .concept-relations :global(.concept-map) {
+      position: sticky;
+      top: calc(var(--header-height) + var(--space-8));
     }
   }
 

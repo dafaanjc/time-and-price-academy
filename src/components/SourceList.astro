@@ -16,9 +16,9 @@ const id = layoutSectionIds.sources;
   {
     sources.length > 0 ? (
       <ol>
-        {sources.map((source) => (
+        {sources.map((source, i) => (
           <li>
-            <SourceCard source={source} />
+            <SourceCard source={source} index={i + 1} />
           </li>
         ))}
       </ol>
@@ -31,6 +31,8 @@ const id = layoutSectionIds.sources;
 <style>
   .source-list {
     max-width: var(--measure);
+    padding-top: var(--space-8);
+    border-top: 1px solid var(--rule-strong);
   }
 
   h2 {
@@ -40,7 +42,7 @@ const id = layoutSectionIds.sources;
 
   ol {
     display: grid;
-    gap: 0.5rem;
+    gap: var(--space-3);
     margin: 0;
     padding: 0;
     list-style: none;
