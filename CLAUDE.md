@@ -101,7 +101,12 @@ axis, graph traces, tick marks, dashed guides, measurement annotations.
 ### Motion: restrained
 - Only state changes (hover, focus, open/close) with `--motion-fast` / `--motion-base`, and at most
   one "draw the trace once" reveal per figure with `--motion-slow`.
-- No decorative entrance animations, parallax, looping motion or scroll-jacking.
+- **Scroll reveal (the one sanctioned entrance):** add `data-reveal` to a `<section>` and it fades in
+  with an 8px rise (`--motion-reveal`, `--reveal-shift`) once, when it enters the viewport. Wiring: inline
+  script in `BaseLayout` sets `.js-reveal` on `<html>` + IntersectionObserver; styles in `global.css`.
+  Progressive enhancement: without JS or with reduced motion, content is simply visible. Never put it on
+  the hero or anything above the fold, never stagger children, never re-animate on scroll back.
+- Otherwise no decorative entrance animations, parallax, looping motion or scroll-jacking.
 - All durations collapse to 0 under `prefers-reduced-motion` (handled in the tokens).
 
 ### Content concept order (respect it in navigation, paths and visuals)

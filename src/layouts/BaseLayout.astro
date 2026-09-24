@@ -28,6 +28,31 @@ const { title, description, type, section, image, noindex, sidebar = false } = A
 <html lang={siteConfig.lang}>
   <head>
     <SeoHead title={title} description={description} type={type} section={section} image={image} noindex={noindex} />
+    <!--
+      Scroll reveal (lihat global.css → "Scroll reveal"). Inline di <head> agar kelas .js-reveal terpasang
+      sebelum render pertama (tanpa kedip). Tidak aktif tanpa IntersectionObserver atau bila pengguna
+      memilih gerak dikurangi; setiap section hanya dianimasikan sekali.
+    -->
+    <script is:inline>
+      (() => {
+        if (!('IntersectionObserver' in window)) return;
+        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+        document.documentElement.classList.add('js-reveal');
+        document.addEventListener('DOMContentLoaded', () => {
+          const observer = new IntersectionObserver(
+            (entries) => {
+              for (const entry of entries) {
+                if (!entry.isIntersecting) continue;
+                entry.target.classList.add('is-revealed');
+                observer.unobserve(entry.target);
+              }
+            },
+            { rootMargin: '0px 0px -8% 0px', threshold: 0.06 },
+          );
+          document.querySelectorAll('[data-reveal]').forEach((el) => observer.observe(el));
+        });
+      })();
+    </script>
   </head>
   <body>
     <a class="skip-link" href="#konten">Langsung ke konten</a>

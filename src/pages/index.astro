@@ -38,7 +38,7 @@ const principles = [
   <HomeHero />
   <RiskLabTransition />
 
-  <section class="home-section" id="masalah" aria-labelledby="masalah-title">
+  <section class="home-section" data-reveal id="masalah" aria-labelledby="masalah-title">
     <SectionHeading
       id="masalah-title"
       number="01"
@@ -48,12 +48,12 @@ const principles = [
     <ProblemList problems={problems} headingLevel={3} ruled={false} />
   </section>
 
-  <section class="home-section" aria-labelledby="hitung-title">
+  <section class="home-section" data-reveal aria-labelledby="hitung-title">
     <SectionHeading id="hitung-title" number="02" title="Hitung Dulu" />
     <UkuranPosisi />
   </section>
 
-  <section class="home-section" aria-labelledby="konsep-title">
+  <section class="home-section" data-reveal aria-labelledby="konsep-title">
     <SectionHeading
       id="konsep-title"
       number="03"
@@ -65,7 +65,7 @@ const principles = [
 
   {
     mainPath && (
-      <section class="home-section" aria-labelledby="jalur-title">
+      <section class="home-section" data-reveal aria-labelledby="jalur-title">
         <SectionHeading
           id="jalur-title"
           number="04"
@@ -83,7 +83,7 @@ const principles = [
     )
   }
 
-  <section class="home-section" aria-labelledby="prinsip-title">
+  <section class="home-section" data-reveal aria-labelledby="prinsip-title">
     <SectionHeading id="prinsip-title" number="05" title="Prinsip" />
     <ul class="principles">
       {
