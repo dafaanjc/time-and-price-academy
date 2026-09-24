@@ -6,6 +6,7 @@ import LearningPath from '../components/LearningPath.astro';
 import KnowledgeGraph from '../components/KnowledgeGraph.astro';
 import { siteConfig } from '../config/site';
 import { getConcepts, getKnowledgeGraph, getLearningPaths } from '../lib/concepts';
+import { routes, withBase } from '../lib/url';
 
 const concepts = await getConcepts();
 const featured = concepts.filter((c) => c.data.featured);
@@ -40,7 +41,7 @@ const principles = [
       hingga penerapannya di pasar keuangan.
     </p>
     <p class="hero__actions">
-      <a class="button" href="/jalur-belajar/">Mulai jalur belajar</a>
+      <a class="button" href={withBase(routes.learningPaths)}>Mulai jalur belajar</a>
       <a class="button button--ghost" href="#jelajahi">Jelajahi topik</a>
     </p>
   </section>
@@ -70,7 +71,7 @@ const principles = [
         <p class="prose section-lead">{mainPath.description}</p>
         <LearningPath path={mainPath} />
         <p class="section-more">
-          <a href="/jalur-belajar/">Lihat semua jalur belajar →</a>
+          <a href={withBase(routes.learningPaths)}>Lihat semua jalur belajar →</a>
         </p>
       </section>
     )
@@ -85,7 +86,7 @@ const principles = [
           membutuhkannya, sehingga Anda bisa melihat urutan belajar yang masuk akal.
         </p>
         <p class="section-more">
-          <a href="/peta/">Buka peta lengkap →</a>
+          <a href={withBase(routes.map)}>Buka peta lengkap →</a>
         </p>
       </div>
       <KnowledgeGraph graph={graph} idPrefix="pratinjau" />

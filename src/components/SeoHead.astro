@@ -1,6 +1,7 @@
 ---
 import { siteConfig } from '../config/site';
-import { absoluteUrl } from '../lib/url';
+import { OG_HEIGHT, OG_WIDTH } from '../lib/og-image';
+import { absoluteUrl, routes, withBase } from '../lib/url';
 
 interface Props {
   title?: string;
@@ -8,11 +9,24 @@ interface Props {
   type?: 'website' | 'article';
   /** Nama kategori untuk article:section. */
   section?: string;
+  /** Path gambar OG yang sudah memakai base. Default: gambar pratinjau umum. */
+  image?: string;
+  /** Halaman yang tidak untuk diindeks/dibagikan (mis. 404): tanpa canonical dan og:url. */
+  noindex?: boolean;
 }
 
-const { title, description = siteConfig.description, type = 'website', section } = Astro.props;
+const {
+  title,
+  description = siteConfig.description,
+  type = 'website',
+  section,
+  image = withBase(routes.ogDefault),
+  noindex = false,
+} = Astro.props;
 const fullTitle = title ? `${title} · ${siteConfig.name}` : `${siteConfig.name} · ${siteConfig.tagline}`;
-const canonical = absoluteUrl(Astro.url.pathname, Astro.site);
+const canonical = noindex ? undefined : absoluteUrl(Astro.url.pathname, Astro.site);
+const imageUrl = absoluteUrl(image, Astro.site);
+const imageAlt = `${title ?? siteConfig.tagline} — ${siteConfig.name}`;
 const isArticle = type === 'article';
 ---
 
@@ -21,7 +35,8 @@ const isArticle = type === 'article';
 <title>{fullTitle}</title>
 <meta name="description" content={description} />
 <meta name="author" content={siteConfig.author} />
-<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+<link rel="icon" type="image/svg+xml" href={withBase(routes.favicon)} />
+{noindex && <meta name="robots" content="noindex" />}
 {canonical && <link rel="canonical" href={canonical} />}
 
 <meta property="og:type" content={type} />
@@ -30,9 +45,16 @@ const isArticle = type === 'article';
 <meta property="og:title" content={title ?? siteConfig.name} />
 <meta property="og:description" content={description} />
 {canonical && <meta property="og:url" content={canonical} />}
+{imageUrl && <meta property="og:image" content={imageUrl} />}
+{imageUrl && <meta property="og:image:type" content="image/png" />}
+{imageUrl && <meta property="og:image:width" content={String(OG_WIDTH)} />}
+{imageUrl && <meta property="og:image:height" content={String(OG_HEIGHT)} />}
+{imageUrl && <meta property="og:image:alt" content={imageAlt} />}
 {isArticle && <meta property="article:author" content={siteConfig.author} />}
 {isArticle && section && <meta property="article:section" content={section} />}
 
-<meta name="twitter:card" content="summary" />
+<meta name="twitter:card" content={imageUrl ? 'summary_large_image' : 'summary'} />
 <meta name="twitter:title" content={title ?? siteConfig.name} />
 <meta name="twitter:description" content={description} />
+{imageUrl && <meta name="twitter:image" content={imageUrl} />}
+{imageUrl && <meta name="twitter:image:alt" content={imageAlt} />}

@@ -12,7 +12,7 @@ import PathNav from '../components/PathNav.astro';
 import { getCategory } from '../data/categories';
 import { getConceptsByIds, getPathContext, type Concept } from '../lib/concepts';
 import { layoutSectionIds } from '../lib/sections';
-import { absoluteUrl } from '../lib/url';
+import { absoluteUrl, conceptOgImage } from '../lib/url';
 
 interface Props {
   concept: Concept;
@@ -28,7 +28,13 @@ const pathContext = await getPathContext(concept.id);
 const shareUrl = absoluteUrl(Astro.url.pathname, Astro.site);
 ---
 
-<BaseLayout title={title} description={description} type="article" section={getCategory(category).title}>
+<BaseLayout
+  title={title}
+  description={description}
+  type="article"
+  section={getCategory(category).title}
+  image={conceptOgImage(concept.id)}
+>
   <article class="concept">
     <ConceptHeader concept={concept} url={shareUrl} />
 

@@ -40,7 +40,8 @@ src/
     reading-time.ts     Estimasi waktu baca
     sections.ts         ID bagian layout + ekstraksi/slug heading
     sources.ts          Tipe Source, tautan (URL/DOI), pengurutan
-    url.ts              URL absolut (canonical/OG/salin tautan)
+    url.ts              `routes`, `withBase()`, URL absolut, path gambar OG
+    og-image.ts         Template gambar OpenGraph 1200×630 (sharp + font di src/assets/fonts)
     search-index.ts     Indeks pencarian (dibuat saat build)
     search.ts           Pencocokan dan skor pencarian (fungsi murni)
     graph.ts            Tingkat dan tata letak graf prasyarat (fungsi murni)
@@ -194,9 +195,41 @@ inline pada baris yang sama, atau pecah baris di antara dua kata biasa.
 
 ## Deployment
 
-- `npm run build` menghasilkan situs statis di `dist/`, yang dapat di-host di host statis mana pun
-  (Netlify, Vercel, Cloudflare Pages, GitHub Pages).
-- Set env **`SITE_URL`** (mis. `https://domain-anda`) saat build produksi. Tanpa itu, tag
-  `canonical` dan `og:url` tidak ditulis karena keduanya wajib berupa URL absolut.
-- `npm run validate` menjalankan `astro check`, `astro build`, lalu pemeriksaan merek. Pakai perintah ini di CI.
-- Host belum dipilih.
+**Host: GitHub Pages** → https://dafaanjc.github.io/time-and-price-academy/
+
+- `astro.config.mjs`: `site = https://dafaanjc.github.io`, `base = /time-and-price-academy`.
+  Keduanya bisa ditimpa lewat env `SITE_URL` dan `BASE_PATH`.
+- `.github/workflows/deploy.yml` (panduan resmi Astro: `withastro/action@v6` + `actions/deploy-pages@v5`)
+  berjalan pada setiap push ke `main`. Build memakai `build-cmd: npm run validate`, jadi situs hanya
+  ter-deploy bila seluruh validasi lolos.
+- **Syarat sekali saja di GitHub:** Settings → Pages → Build and deployment → Source: **GitHub Actions**.
+- **Domain khusus (nanti):** tambahkan `public/CNAME`, lalu build dengan `SITE_URL=https://domain` dan
+  `BASE_PATH=/` (atau ubah default di `astro.config.mjs`).
+
+### Sub-path (`base`)
+
+Karena situs berada di sub-path, **semua tautan internal wajib lewat `src/lib/url.ts`**:
+
+- `withBase(path)` menambahkan base, dan `routes` berisi path halaman tetap (`/cari/`, `/peta/`, dst.).
+- `conceptHref()` dan `categoryHref()` sudah memakai `withBase`.
+- Skrip klien memakai `import.meta.env.BASE_URL` melalui `withBase` yang sama.
+- Tautan di isi MDX ditulis **relatif** (`../slug/`), dan `validate.ts` menolak tautan yang diawali `/`.
+
+### Pratinjau tautan (OpenGraph)
+
+- `/og/default.png` (beranda dan halaman umum) dan `/og/konsep/<slug>.png` (satu per konsep) dirender
+  saat build oleh `src/lib/og-image.ts`: 1200×630 PNG, font Source Serif 4 / Source Sans 3 dari
+  `src/assets/fonts` (OFL), warna dari token tema terang.
+- Isi: logo + "RISK LAB · TIME & PRICE ACADEMY", kategori, judul, istilah asli, deskripsi,
+  atribusi `siteConfig.attribution`, dan alamat situs. Judul diperkecil dan deskripsi dipangkas otomatis
+  agar tidak meluber.
+- `SeoHead` menulis `og:image` (+ type/width/height/alt) dan `twitter:card=summary_large_image`.
+- Halaman 404 memakai `noindex`: tanpa canonical dan tanpa `og:url`.
+
+### Pemeriksaan (`npm run validate`)
+
+1. `astro check`: tipe dan template.
+2. `astro build`: termasuk skema konten dan `validate.ts`.
+3. `scripts/check-branding.mjs`: merek dan penulis dari `siteConfig`.
+4. `scripts/check-site.mjs`: semua tautan internal memakai base dan menunjuk ke file yang ada; anchor
+   valid; canonical/`og:url` absolut dan benar; `og:image` menunjuk ke PNG 1200×630 yang ada.

@@ -1,10 +1,11 @@
 ---
 import { siteConfig } from '../config/site';
 import MobileNav from './MobileNav.astro';
+import { routes, withBase } from '../lib/url';
 ---
 
 <header class="site-header">
-  <a class="brand" href="/">
+  <a class="brand" href={withBase(routes.home)}>
     <span class="brand__product">{siteConfig.product}</span>
     <span class="brand__master">{siteConfig.masterBrand}</span>
   </a>

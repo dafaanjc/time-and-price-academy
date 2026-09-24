@@ -13,11 +13,11 @@ npm run validate   # astro check + build (validasi skema & konten) + pemeriksaan
 npm run build      # build statis ke dist/
 ```
 
-Untuk build produksi, set `SITE_URL` agar URL canonical dan OpenGraph ditulis sebagai URL absolut:
+Situs: **https://dafaanjc.github.io/time-and-price-academy/** (GitHub Pages, deploy otomatis dari `main`
+lewat `.github/workflows/deploy.yml`). Server lokal juga memakai sub-path yang sama:
+`http://localhost:4321/time-and-price-academy/`.
 
-```sh
-SITE_URL=https://domain-anda npm run build
-```
+Untuk domain lain: `SITE_URL=https://domain-anda BASE_PATH=/ npm run build`.
 
 ## Dokumentasi
 

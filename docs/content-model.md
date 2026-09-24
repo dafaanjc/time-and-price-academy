@@ -79,7 +79,9 @@ teks yang terdengar akademis tetapi tidak berdasar.
   Rumus pendek di dalam kalimat memakai kode inline, misalnya `` `P(A) = 1/6` ``.
 - **Istilah asing** dimiringkan pada penyebutan pertama, misalnya *expected value* dan *fat tails*.
 - **Desimal memakai koma** (0,45; 3,5%), dan ribuan memakai titik (Rp1.000.000).
-- **Tautan antar-konsep** memakai path `/konsep/<slug>/`. Tautan rusak terdeteksi saat pemeriksaan build.
+- **Tautan antar-konsep** ditulis **relatif**: `[Probabilitas](../probability/)`. Jangan memakai
+  `/konsep/...`, karena situs di-host di sub-path (`/time-and-price-academy/`). Build gagal bila tautan
+  diawali `/` atau merujuk slug yang tidak ada.
 - Jangan menulis tanda `<`, `{`, atau `}` di teks biasa, karena MDX akan memprosesnya sebagai JSX.
   Tulis "kurang dari", atau taruh di dalam kode.
 

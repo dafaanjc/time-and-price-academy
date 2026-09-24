@@ -1,6 +1,7 @@
 ---
 // Navigasi "Sebelumnya / Berikutnya" berdasarkan urutan jalur belajar.
 import { conceptHref, type PathContext } from '../lib/concepts';
+import { routes, withBase } from '../lib/url';
 
 interface Props {
   context: PathContext;
@@ -12,7 +13,7 @@ const position = `Langkah ${index + 1} dari ${path.steps.length}`;
 
 <nav class="path-nav" aria-label={`Jalur belajar: ${path.title}`}>
   <p class="path-nav__position">
-    <a href="/jalur-belajar/">{path.title}</a> · {position}
+    <a href={withBase(routes.learningPaths)}>{path.title}</a> · {position}
   </p>
   <div class="path-nav__links">
     {

@@ -1,6 +1,7 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { siteConfig } from '../../config/site';
+import { routes, withBase } from '../../lib/url';
 ---
 
 <BaseLayout
@@ -12,7 +13,7 @@ import { siteConfig } from '../../config/site';
     <p>Cari berdasarkan judul, istilah asli (bahasa Inggris), deskripsi, atau isi konsep.</p>
   </header>
 
-  <form class="search-form" role="search" action="/cari/" method="get">
+  <form class="search-form" role="search" action={withBase(routes.search)} method="get">
     <label for="q" class="visually-hidden">Kata kunci</label>
     <input id="q" name="q" type="search" autocomplete="off" placeholder="mis. volatilitas, expected value" />
     <button type="submit">Cari</button>
@@ -38,6 +39,7 @@ import { siteConfig } from '../../config/site';
 
 <script>
   import { search } from '../../lib/search';
+  import { routes, withBase } from '../../lib/url';
   import type { SearchEntry } from '../../lib/search-index';
 
   const input = document.querySelector<HTMLInputElement>('#q');
@@ -72,7 +74,7 @@ import { siteConfig } from '../../config/site';
 
     let entries: SearchEntry[] = [];
     try {
-      const response = await fetch('/search-index.json');
+      const response = await fetch(withBase(routes.searchIndex));
       if (!response.ok) throw new Error(String(response.status));
       entries = await response.json();
     } catch {

@@ -11,15 +11,18 @@ interface Props {
   description?: string;
   type?: 'website' | 'article';
   section?: string;
+  /** Path gambar OG (sudah dengan base). */
+  image?: string;
+  noindex?: boolean;
 }
 
-const { title, description, type, section } = Astro.props;
+const { title, description, type, section, image, noindex } = Astro.props;
 ---
 
 <!doctype html>
 <html lang={siteConfig.lang}>
   <head>
-    <SeoHead title={title} description={description} type={type} section={section} />
+    <SeoHead title={title} description={description} type={type} section={section} image={image} noindex={noindex} />
   </head>
   <body>
     <a class="skip-link" href="#konten">Langsung ke konten</a>

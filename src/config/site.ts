@@ -8,6 +8,7 @@ const masterBrand = 'Time & Price Academy';
 const product = 'Risk Lab';
 const author = 'Muhamad Daffa';
 const taglineParts = ['Pahami Risiko.', 'Pahami Keputusan.'] as const;
+const summary = 'Perpustakaan riset dan sistem belajar interaktif tentang risiko, probabilitas, dan pengambilan keputusan.';
 
 export const siteConfig = {
   /** Merek induk. */
@@ -25,5 +26,7 @@ export const siteConfig = {
   /** Dua bagian tagline; hero menampilkannya dalam dua baris. */
   taglineParts,
   tagline: taglineParts.join(' '),
-  description: `${product} dari ${masterBrand}: perpustakaan riset dan sistem belajar interaktif tentang risiko, probabilitas, dan pengambilan keputusan.`,
+  /** Ringkasan platform tanpa nama merek (mis. untuk gambar OG, di mana merek sudah tampil). */
+  summary,
+  description: `${product} dari ${masterBrand}: ${summary.charAt(0).toLowerCase()}${summary.slice(1)}`,
 } as const;

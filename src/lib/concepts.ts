@@ -3,6 +3,7 @@ import { categories, type CategoryId } from '../data/categories';
 import { learningPaths, type LearningPath } from '../data/learning-paths';
 import { validateConcepts } from './validate';
 import { layoutGraph, type GraphLayout } from './graph';
+import { withBase } from './url';
 
 export type Concept = CollectionEntry<'concepts'>;
 
@@ -19,11 +20,11 @@ export const statusLabels: Record<Concept['data']['status'], string> = {
 };
 
 export function conceptHref(id: string): string {
-  return `/konsep/${id}/`;
+  return withBase(`/konsep/${id}/`);
 }
 
 export function categoryHref(id: CategoryId): string {
-  return `/kategori/${id}/`;
+  return withBase(`/kategori/${id}/`);
 }
 
 const categoryOrder = new Map(categories.map((c, i) => [c.id, i]));

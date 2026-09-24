@@ -92,6 +92,23 @@ function checkHeadingIds(concepts: ConceptLike[]): string[] {
   return errors;
 }
 
+// Tautan antar-konsep di body wajib relatif (`../slug/`) agar tetap benar di bawah `base`
+// (mis. GitHub Pages di sub-path). Tautan eksternal (http/https/mailto) dan anchor (#) dibiarkan.
+function checkBodyLinks(concepts: ConceptLike[], ids: Set<string>): string[] {
+  const errors: string[] = [];
+  for (const c of concepts) {
+    for (const [, target = ''] of (c.body ?? '').matchAll(/\]\(([^)\s]+)\)/g)) {
+      if (target.startsWith('/')) {
+        errors.push(`${c.id}: tautan "${target}" harus relatif, mis. "../slug/", agar berfungsi di bawah base`);
+        continue;
+      }
+      const slug = /^\.\.\/([a-z0-9-]+)\/?(?:#.*)?$/.exec(target)?.[1];
+      if (slug && !ids.has(slug)) errors.push(`${c.id}: tautan "${target}" merujuk konsep yang tidak ada`);
+    }
+  }
+  return errors;
+}
+
 function checkLearningPaths(paths: LearningPath[], concepts: ConceptLike[]): string[] {
   const byId = new Map(concepts.map((c) => [c.id, c]));
   const errors: string[] = [];
@@ -120,6 +137,7 @@ export function validateConcepts(concepts: ConceptLike[], paths: LearningPath[])
     ...checkCycles(concepts),
     ...checkSources(concepts),
     ...checkHeadingIds(concepts),
+    ...checkBodyLinks(concepts, ids),
     ...checkLearningPaths(paths, concepts),
   ];
 }

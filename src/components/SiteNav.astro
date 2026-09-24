@@ -2,18 +2,30 @@
 // Isi navigasi, dipakai bersama oleh Sidebar (desktop) dan MobileNav (dialog).
 import { categories } from '../data/categories';
 import { conceptHref, categoryHref, getConceptsByCategory } from '../lib/concepts';
+import { routes, withBase } from '../lib/url';
 
 const grouped = await getConceptsByCategory();
 const current = Astro.url.pathname;
 const aria = (href: string) => (current === href ? 'page' : undefined);
+const topLinks = [
+  { href: withBase(routes.home), label: 'Beranda' },
+  { href: withBase(routes.learningPaths), label: 'Jalur Belajar' },
+  { href: withBase(routes.map), label: 'Peta Pengetahuan' },
+  { href: withBase(routes.search), label: 'Cari' },
+];
 ---
 
 <nav class="site-nav" aria-label="Navigasi konsep">
   <ul class="site-nav__top">
-    <li><a href="/" aria-current={aria('/')}>Beranda</a></li>
-    <li><a href="/jalur-belajar/" aria-current={aria('/jalur-belajar/')}>Jalur Belajar</a></li>
-    <li><a href="/peta/" aria-current={aria('/peta/')}>Peta Pengetahuan</a></li>
-    <li><a href="/cari/" aria-current={aria('/cari/')}>Cari</a></li>
+    {
+      topLinks.map((link) => (
+        <li>
+          <a href={link.href} aria-current={aria(link.href)}>
+            {link.label}
+          </a>
+        </li>
+      ))
+    }
   </ul>
   {
     categories.map((category) => {
