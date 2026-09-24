@@ -1,0 +1,165 @@
+---
+// FIG. 01 — Waktu × Harga, gambar teknik isometrik (SVG inline, tanpa aset luar).
+// Membaca rantai konsep dari kiri ke kanan: jalur harga yang sudah terjadi (risiko nyata) →
+// selubung ±2σ yang melebar ke depan (ketidakpastian) → kurva kepadatan di waktu T
+// (probabilitas & distribusi) → penanda kuningan E[P] (nilai harapan).
+// Geometri dihitung di src/lib/iso.ts; warna & garis dari token (kelas .svg-* di global.css).
+import { buildTimePriceGeometry } from '../../lib/iso';
+
+interface Props {
+  /** Nomor figur untuk keterangan, mis. "01". */
+  number?: string;
+}
+
+const { number = '01' } = Astro.props;
+const g = buildTimePriceGeometry();
+const titleId = `fig-${number}-title`;
+const descId = `fig-${number}-desc`;
+const at = ([x, y]: [number, number], dx = 0, dy = 0) => ({ x: x + dx, y: y + dy });
+---
+
+<figure class="tp-figure">
+  <svg
+    class="tp-figure__svg"
+    viewBox="-84 -276 424 470"
+    role="img"
+    aria-labelledby={`${titleId} ${descId}`}
+    preserveAspectRatio="xMidYMid meet"
+  >
+    <title id={titleId}>Waktu × harga: dari jalur harga ke nilai harapan</title>
+    <desc id={descId}>
+      Gambar isometrik. Sumbu mendatar adalah waktu, sumbu tegak adalah harga. Jalur harga berjalan sampai
+      titik sekarang, lalu selubung plus-minus dua simpangan baku melebar menuju waktu T. Di waktu T, kurva
+      distribusi probabilitas berdiri tegak lurus terhadap waktu, dan penanda E[P] menunjukkan nilai harapannya.
+    </desc>
+
+    <!-- Bidang: kisi dinding (waktu × harga) dan lantai (waktu × kepadatan) -->
+    <path class="svg-grid" d={g.wallGrid}></path>
+    <path class="svg-grid" d={g.floorGrid}></path>
+    <path class="svg-tick" d={g.ticks}></path>
+
+    <!-- Sumbu -->
+    <path class="svg-axis" d={g.axes.time} marker-end="url(#tp-arrow)"></path>
+    <path class="svg-axis" d={g.axes.price} marker-end="url(#tp-arrow)"></path>
+    <path class="svg-axis" d={g.axes.density} marker-end="url(#tp-arrow)"></path>
+
+    <!-- Garis bantu ukur -->
+    <path class="svg-guide" d={g.nowGuide}></path>
+    <path class="svg-guide" d={g.horizonBase}></path>
+    <path class="svg-guide" d={g.evGuide}></path>
+
+    <!-- Ketidakpastian: selubung ±2σ dan median menuju E[P] -->
+    <path class="svg-trace svg-trace--alt" d={g.envelopeUpper}></path>
+    <path class="svg-trace svg-trace--alt" d={g.envelopeLower}></path>
+    <path class="svg-guide" d={g.median}></path>
+
+    <!-- Distribusi di waktu T -->
+    <path class="tp-figure__density-area" d={g.densityArea}></path>
+    <path class="svg-trace" d={g.density}></path>
+
+    <!-- Jalur harga yang sudah terjadi (digambar sekali) -->
+    <path class="svg-trace tp-figure__history" d={g.history} pathLength="1"></path>
+    <circle class="tp-figure__now" cx={g.nowPoint[0]} cy={g.nowPoint[1]} r="3.5"></circle>
+
+    <!-- Nilai harapan: satu-satunya penanda kuningan -->
+    <path class="tp-figure__ev-leader" d={g.evLeader}></path>
+    <circle class="svg-mark" cx={g.evPoint[0]} cy={g.evPoint[1]} r="4"></circle>
+    <path class="tp-figure__ev-tick" d={`M${g.evTick[0] - 6} ${g.evTick[1]} H${g.evTick[0] + 6}`}></path>
+
+    <!-- Label -->
+    <g class="svg-label">
+      <text {...at(g.ends.price, 0, -12)} text-anchor="middle">Harga (P)</text>
+      <text {...at(g.ends.time, 10, 4)}>Waktu (t)</text>
+      <text {...at(g.ends.density, -8, 16)} text-anchor="end">Kepadatan f(P)</text>
+      <text {...at(g.nowTick, 0, 20)} text-anchor="middle">Sekarang</text>
+      <text {...at(g.horizonTick, 0, 20)} text-anchor="middle">T</text>
+      <text class="tp-figure__ev-label" {...at(g.evPoint, 10, 4)}>E[P]</text>
+      <text class="tp-figure__ev-label" {...at(g.evTick, -10, 4)} text-anchor="end">E[P]</text>
+    </g>
+
+    <defs>
+      <marker id="tp-arrow" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+        <path d="M1 1.5 L7 4 L1 6.5" class="svg-axis"></path>
+      </marker>
+    </defs>
+  </svg>
+
+  <figcaption class="tp-figure__caption">
+    <span class="label"><span class="label__index">Fig. {number}</span><span class="label__sep">·</span>Waktu × Harga</span>
+    <span class="tp-figure__caption-text">
+      Masa lalu hanya satu jalur; masa depan adalah sebaran kemungkinan. Risiko diukur di sebaran itu, bukan
+      di satu tebakan.
+    </span>
+  </figcaption>
+</figure>
+
+<style>
+  .tp-figure {
+    margin: 0;
+  }
+
+  .tp-figure__svg {
+    display: block;
+    width: 100%;
+    height: auto;
+    overflow: visible;
+  }
+
+  /* Label di atas kisi: halo sewarna latar agar tetap terbaca. */
+  .svg-label text {
+    paint-order: stroke;
+    stroke: var(--paper);
+    stroke-width: 4px;
+    stroke-linejoin: round;
+  }
+
+  .tp-figure__density-area {
+    fill: var(--mark-soft);
+    fill-opacity: 0.7;
+    stroke: none;
+  }
+
+  .tp-figure__history {
+    stroke-width: var(--stroke-trace-bold);
+    stroke-dasharray: 1;
+    stroke-dashoffset: 0;
+    animation: tp-draw calc(var(--motion-slow) * 3) var(--ease) both;
+  }
+
+  @keyframes tp-draw {
+    from {
+      stroke-dashoffset: 1;
+    }
+  }
+
+  .tp-figure__now {
+    fill: var(--paper);
+    stroke: var(--trace);
+    stroke-width: var(--stroke-trace);
+  }
+
+  .tp-figure__ev-leader,
+  .tp-figure__ev-tick {
+    fill: none;
+    stroke: var(--mark);
+    stroke-width: var(--stroke-trace);
+  }
+
+  .tp-figure__ev-label {
+    fill: var(--mark);
+  }
+
+  .tp-figure__caption {
+    display: grid;
+    gap: var(--space-2);
+    max-width: var(--measure-narrow);
+    margin-top: var(--space-4);
+    padding-top: var(--space-3);
+    border-top: var(--border-hair) solid var(--rule-strong);
+  }
+
+  .tp-figure__caption-text {
+    font-size: var(--text-sm);
+    color: var(--ink-2);
+  }
+</style>

@@ -41,33 +41,61 @@
 }
 
 /* ---------- Token ---------- */
-/* Arah visual "Trading Desk Manual": monokrom mengikuti emblem etsa merek induk (siteConfig.masterBrand).
-   Warna non-netral HANYA untuk makna data (rugi, untung, peringatan), tidak sebagai dekorasi.
-   Semua pasangan teks/latar sudah diverifikasi ≥ 4.5:1 (WCAG AA). */
+/* Arah visual "Modern Digital Museum" (lihat CLAUDE.md → Visual Design System).
+   Galeri yang tenang untuk ide tentang waktu dan harga: kertas galeri, tinta grafit, satu aksen
+   kuningan untuk tanda ukur, dan geometri grafik (sumbu, tick, jejak) sebagai bahasa ilustrasi.
+   Warna non-netral HANYA untuk makna: --mark (tanda ukur/penunjuk), --loss/--gain/--caution (data).
+   Dilarang: biru neon, merah/hijau agresif, gradien berat, glassmorphism.
+   Nama token lama dipertahankan agar komponen tidak perlu diubah.
+   Semua pasangan teks/latar ≥ 4.5:1 (WCAG AA); garis sumbu/tick ≥ 3:1 bila membawa informasi. */
 :root {
-  /* Warna — netral */
-  --paper: #f6f3ec;
-  --surface: #fbf9f4;
-  --ink: #16191d; /* 15.9:1 pada paper */
-  --ink-2: #454c54; /* 7.9:1 */
-  --ink-3: #666d74; /* 4.7:1 — label/meta */
-  --rule: #d6cfc2; /* garis dekoratif; batas input memakai --ink-3 */
-  --tint: #ebe6dc; /* latar lembut: kode inline, item aktif */
+  /* Warna — netral (kertas galeri & tinta grafit) */
+  --paper: #f3f1ec; /* dinding galeri */
+  --surface: #faf9f6; /* bidang terangkat: alat hitung, kartu */
+  --ink: #14171b; /* 15.9:1 pada paper */
+  --ink-2: #40464d; /* 8.5:1 */
+  --ink-3: #5c636a; /* 5.4:1 — label/meta */
+  --rule: #d4d0c7; /* garis dekoratif; batas input memakai --ink-3 */
+  --rule-strong: #7c8187; /* garis bingkai/sumbu yang harus terlihat: 3.5:1 */
+  --tint: #e9e6df; /* latar lembut: kode inline, item aktif */
 
   /* Peran: aksen = tinta. Tautan dibedakan dengan garis bawah, bukan warna. */
   --accent: var(--ink);
   --accent-soft: var(--tint);
 
-  /* Warna — semantik data (hanya di contoh/kalkulasi) */
-  --loss: #9b3a2c; /* 6.2:1 */
-  --gain: #2e6a4e; /* 5.8:1 */
+  /* Tanda ukur — satu-satunya warna ekspresif: kuningan instrumen (jam pasir, pelat museum).
+     Untuk penunjuk, tick utama, nomor indeks, sorotan pilihan. Bukan untuk blok besar. */
+  --mark: #7b5a1f; /* 5.6:1 pada paper */
+  --mark-soft: #ece3cf;
+
+  /* Warna — semantik data (hanya di contoh/kalkulasi). Diredam, bukan merah/hijau terminal. */
+  --loss: #9b3a2c; /* 6.1:1 */
+  --gain: #2e6a4e; /* 5.7:1 */
   --caution: #7a5410; /* 5.5:1 pada --caution-bg */
   --caution-bg: #f2e6c6;
 
-  /* Tipografi */
+  /* Geometri grafik — dipakai oleh SVG inline (stroke="var(--…)") dan bidang koordinat */
+  --axis: var(--ink-2); /* sumbu waktu (x) & harga/nilai (y) */
+  --tick: var(--ink-3);
+  --trace: var(--ink); /* jejak utama */
+  --trace-2: var(--ink-3); /* jejak pembanding (putus-putus) */
+  --grid-line: rgb(20 23 27 / 0.035); /* garis kisi minor */
+  --grid-line-major: rgb(20 23 27 / 0.065); /* garis kisi mayor (tiap 4 sel) */
+  --stroke-hair: 1px;
+  --stroke-axis: 1px;
+  --stroke-trace: 1.5px;
+  --stroke-trace-bold: 2px;
+  --tick-minor: 4px;
+  --tick-major: 8px;
+  --grid-cell: 1.5rem; /* 24px — sel kisi koordinat */
+  --dash-guide: 3 3; /* stroke-dasharray garis bantu */
+  --dash-trace: 6 4; /* stroke-dasharray jejak pembanding */
+
+  /* Tipografi — serif untuk bacaan & judul, sans untuk UI, mono untuk metadata/angka ukur */
   --font-sans: "Source Sans 3", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
   --font-serif: "Source Serif 4", "Iowan Old Style", "Palatino Linotype", Georgia, serif;
-  --font-mono: ui-monospace, "Cascadia Code", Consolas, Menlo, monospace;
+  --font-mono: ui-monospace, "Cascadia Mono", "Cascadia Code", "SF Mono", Consolas, Menlo, monospace;
+  --font-label: var(--font-mono); /* label/metadata: FONDASI · 01 / 06 · 8 MNT BACA */
   /* Skala 1.25, dasar 17px */
   --text-2xs: 0.6875rem; /* 11 — hanya label sangat kecil */
   --text-xs: 0.8125rem; /* 13 */
@@ -78,9 +106,14 @@
   --text-2xl: 2.0625rem; /* 33 */
   --text-3xl: 2.625rem; /* 42 */
   --text-4xl: 3.25rem; /* 52 */
+  --text-5xl: 4.125rem; /* 66 — judul pameran (hero), hanya desktop */
+  --text-label: 0.75rem; /* 12 — label mono; mono tampak lebih besar dari sans di ukuran sama */
   --leading-body: 1.6;
   --leading-tight: 1.15;
-  --tracking-label: 0.08em;
+  --leading-display: 1.04;
+  --tracking-label: 0.08em; /* label sans kapital */
+  --tracking-mono: 0.1em; /* label mono kapital */
+  --tracking-display: -0.022em;
 
   /* Jarak (dasar 4px) */
   --space-1: 0.25rem;
@@ -92,42 +125,52 @@
   --space-12: 3rem;
   --space-16: 4rem;
   --space-24: 6rem;
+  --space-32: 8rem; /* jeda antar-ruang pameran di desktop */
 
-  /* Bentuk: sudut tegas, garis alih-alih bayangan */
+  /* Bentuk: sudut tegas, garis alih-alih bayangan. Tanpa blur, tanpa kaca. */
   --radius-0: 0;
   --radius-1: 2px;
   --border-hair: 1px;
   --border-mark: 3px;
 
-  /* Gerak: hanya untuk perubahan status; tanpa animasi masuk */
+  /* Gerak: tertahan — hanya perubahan status & penampakan jejak; tanpa animasi masuk dekoratif */
   --motion-fast: 120ms;
   --motion-base: 200ms;
+  --motion-slow: 480ms; /* mis. jejak grafik digambar sekali */
   --ease: cubic-bezier(0.2, 0, 0, 1);
 
-  /* Tata letak */
-  --measure: 68ch;
+  /* Tata letak — grid editorial */
+  --measure: 66ch; /* lebar baca teks panjang */
+  --measure-narrow: 52ch; /* lead, keterangan */
   --container: 72rem; /* halaman tanpa sidebar */
   --container-wide: 90rem; /* halaman dengan sidebar */
   --sidebar-width: 17rem;
   --header-height: 3.5rem;
-  --gutter: var(--space-4);
+  --gutter: var(--space-4); /* margin luar halaman */
+  --grid-columns: 12;
+  --grid-gap: var(--space-4);
 
   color-scheme: light;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --paper: #121417;
-    --surface: #191c20;
-    --ink: #ece8e0; /* 15.1:1 */
-    --ink-2: #b7bcc2; /* 9.7:1 */
-    --ink-3: #8d949b; /* 6.0:1 */
-    --rule: #343a41;
-    --tint: #22262b;
+    --paper: #0f1113;
+    --surface: #16191c;
+    --ink: #ebe8e1; /* 15.5:1 */
+    --ink-2: #b4b9bf; /* 9.6:1 */
+    --ink-3: #8b9198; /* 6.0:1 */
+    --rule: #2d3237;
+    --rule-strong: #6a7178; /* 3.8:1 */
+    --tint: #1d2125;
+    --mark: #cfae6b; /* 8.9:1 */
+    --mark-soft: #2a2418;
     --loss: #e08a7a;
     --gain: #7cc3a0;
     --caution: #e3c07a;
     --caution-bg: #2f2718;
+    --grid-line: rgb(235 232 225 / 0.03);
+    --grid-line-major: rgb(235 232 225 / 0.055);
     color-scheme: dark;
   }
 }
@@ -135,6 +178,15 @@
 @media (min-width: 48rem) {
   :root {
     --gutter: var(--space-8);
+    --grid-gap: var(--space-6);
+  }
+}
+
+/* Desktop lebar: margin luar lega. */
+@media (min-width: 80rem) {
+  :root {
+    --gutter: var(--space-12);
+    --grid-gap: var(--space-8);
   }
 }
 
@@ -142,7 +194,16 @@
   :root {
     --motion-fast: 0ms;
     --motion-base: 0ms;
+    --motion-slow: 0ms;
   }
+}
+
+/* ---------- Kategori: perlakuan visual yang dapat dipakai ulang ---------- */
+/* Sumber kebenaran: src/data/categories.ts (urutan → nomor "01 / 05", field `motif` → geometri SVG
+   di components/figures/CategoryMotif.astro). Wadah kategori memakai `data-category="<id>"`; blok
+   [data-category="<id>"] di sini hanya untuk penyesuaian visual khusus kategori, bila memang perlu. */
+[data-category] {
+  --category-accent: var(--mark);
 }
 
 /* ---------- Dasar ---------- */
@@ -157,9 +218,22 @@ html {
   scroll-padding-top: calc(var(--header-height) + 1rem);
 }
 
+/* Latar: bidang koordinat yang sangat samar, seperti kertas gambar teknik di dinding galeri.
+   Garis, bukan gradien warna; kisi mayor tiap 4 sel. Ditempel pada kanvas, tidak ikut bergulir. */
 body {
   margin: 0;
-  background: var(--paper);
+  background-color: var(--paper);
+  background-image:
+    linear-gradient(to right, var(--grid-line-major) var(--stroke-hair), transparent var(--stroke-hair)),
+    linear-gradient(to bottom, var(--grid-line-major) var(--stroke-hair), transparent var(--stroke-hair)),
+    linear-gradient(to right, var(--grid-line) var(--stroke-hair), transparent var(--stroke-hair)),
+    linear-gradient(to bottom, var(--grid-line) var(--stroke-hair), transparent var(--stroke-hair));
+  background-size:
+    calc(var(--grid-cell) * 4) calc(var(--grid-cell) * 4),
+    calc(var(--grid-cell) * 4) calc(var(--grid-cell) * 4),
+    var(--grid-cell) var(--grid-cell),
+    var(--grid-cell) var(--grid-cell);
+  background-attachment: fixed;
   color: var(--ink);
   font-family: var(--font-sans);
   font-size: var(--text-base);
@@ -175,6 +249,10 @@ h3 {
   line-height: var(--leading-tight);
   letter-spacing: -0.01em;
   text-wrap: balance;
+}
+
+h1 {
+  letter-spacing: var(--tracking-display);
 }
 
 p {
@@ -195,6 +273,21 @@ a {
 
 a:hover {
   text-decoration-thickness: 2px;
+}
+
+::selection {
+  background: var(--mark-soft);
+  color: var(--ink);
+}
+
+/* Garis pemisah = penggaris ukur: garis rambut dengan tick tiap satu sel kisi. */
+hr {
+  height: var(--tick-minor);
+  margin: var(--space-12) 0;
+  border: 0;
+  background:
+    linear-gradient(var(--rule-strong), var(--rule-strong)) bottom / 100% var(--stroke-hair) no-repeat,
+    repeating-linear-gradient(to right, var(--rule-strong) 0 var(--stroke-hair), transparent var(--stroke-hair) var(--grid-cell));
 }
 
 :focus-visible {
@@ -240,20 +333,39 @@ svg {
   max-width: var(--measure);
 }
 
+/* ---------- Label & metadata: mono kecil kapital ---------- */
+/* Contoh: FONDASI · 01 / 06 · 8 MNT BACA. Angka ukur, indeks, dan keterangan sumbu memakai gaya ini. */
+.label,
 .eyebrow {
   margin: 0;
-  font-size: var(--text-xs);
-  font-weight: 600;
-  letter-spacing: 0.08em;
+  font-family: var(--font-label);
+  font-size: var(--text-label);
+  font-weight: 400;
+  line-height: 1.4;
+  letter-spacing: var(--tracking-mono);
   text-transform: uppercase;
   color: var(--ink-3);
+}
+
+/* Nomor indeks/penunjuk dalam label (mis. "01"): warna tanda ukur. */
+.label__index {
+  color: var(--mark);
+}
+
+/* Pemisah metadata "·" dengan jarak tetap. */
+.label__sep {
+  margin-inline: 0.6em;
+  color: var(--rule-strong);
 }
 
 .badge {
   display: inline-block;
   padding: 0.1rem 0.5rem;
-  font-size: var(--text-xs);
-  font-weight: 600;
+  font-family: var(--font-label);
+  font-size: var(--text-2xs);
+  font-weight: 400;
+  letter-spacing: var(--tracking-mono);
+  text-transform: uppercase;
   border: 1px solid var(--rule);
   border-radius: var(--radius-1);
   color: var(--ink-2);
@@ -264,6 +376,100 @@ svg {
   background: var(--caution-bg);
   border-color: transparent;
   color: var(--caution);
+}
+
+/* ---------- Grid editorial ---------- */
+/* Mobile: satu kolom. Desktop: 12 kolom; teks mengambil 7 kolom kiri, catatan/ilustrasi 4 kolom
+   kanan dengan satu kolom kosong di antaranya — keseimbangan asimetris, bukan dua kolom sama. */
+.editorial-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-8) var(--grid-gap);
+}
+
+@media (min-width: 64rem) {
+  .editorial-grid {
+    grid-template-columns: repeat(var(--grid-columns), minmax(0, 1fr));
+  }
+
+  .editorial-grid > * {
+    grid-column: 1 / -1;
+  }
+
+  .editorial-grid > .col-text {
+    grid-column: 1 / span 7;
+  }
+
+  .editorial-grid > .col-aside {
+    grid-column: 9 / -1;
+  }
+
+  .editorial-grid > .col-wide {
+    grid-column: 1 / span 10;
+  }
+}
+
+/* ---------- Geometri grafik ---------- */
+/* Bidang koordinat eksplisit (lebih jelas dari latar halaman) untuk ilustrasi & plot. */
+.plot-field {
+  background-color: var(--surface);
+  background-image:
+    linear-gradient(to right, var(--grid-line-major) var(--stroke-hair), transparent var(--stroke-hair)),
+    linear-gradient(to bottom, var(--grid-line-major) var(--stroke-hair), transparent var(--stroke-hair));
+  background-size: var(--grid-cell) var(--grid-cell);
+  border: var(--border-hair) solid var(--rule);
+}
+
+/* Kelas untuk elemen SVG inline agar ilustrasi mengikuti tema tanpa warna tertulis di markup. */
+.svg-grid {
+  fill: none;
+  stroke: var(--rule);
+  stroke-width: var(--stroke-hair);
+}
+
+.svg-axis {
+  fill: none;
+  stroke: var(--axis);
+  stroke-width: var(--stroke-axis);
+}
+
+.svg-tick {
+  fill: none;
+  stroke: var(--tick);
+  stroke-width: var(--stroke-hair);
+}
+
+.svg-guide {
+  fill: none;
+  stroke: var(--rule-strong);
+  stroke-width: var(--stroke-hair);
+  stroke-dasharray: var(--dash-guide);
+}
+
+.svg-trace {
+  fill: none;
+  stroke: var(--trace);
+  stroke-width: var(--stroke-trace);
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+
+.svg-trace--alt {
+  stroke: var(--trace-2);
+  stroke-dasharray: var(--dash-trace);
+}
+
+.svg-mark {
+  fill: var(--mark);
+  stroke: var(--mark);
+}
+
+.svg-label {
+  fill: var(--ink-3);
+  font-family: var(--font-label);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
 }
 
 /* ---------- Isi panjang (body MDX) ---------- */

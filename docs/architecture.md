@@ -31,9 +31,10 @@ src/
   content.config.ts     Definisi koleksi `concepts` + skema Zod
   content/concepts/     Satu file .mdx per konsep; nama file = slug
   data/                 Data terstruktur non-MDX
-    categories.ts       5 kategori (urutan = urutan tampil)
+    categories.ts       5 kategori (urutan = urutan tampil = nomor "01 / 05"; `motif` SVG)
     learning-paths.ts   Jalur belajar (daftar slug, divalidasi)
     source-types.ts     6 jenis sumber + label Indonesia
+    concept-chain.ts    Rantai konsep inti beranda (Risiko → … → Nilai Harapan)
   lib/
     concepts.ts         Akses data: getConcepts(), pengelompokan, jalur, URL helper
     validate.ts         Validasi lintas-entri (fungsi murni)
@@ -46,6 +47,7 @@ src/
     search.ts           Pencocokan dan skor pencarian (fungsi murni)
     nav.ts              Navigasi utama (data) + status aktif per bagian
     graph.ts            Tingkat dan tata letak graf prasyarat (fungsi murni)
+    iso.ts              Proyeksi isometrik & geometri figur Waktu × Harga (fungsi murni)
     calc/                  Rumus alat hitung (fungsi murni, diuji Vitest):
       position-size.ts     ukuran posisi & risiko dari lot tertentu
       margin.ts            margin terpakai/level, jarak ke margin call & stop out
@@ -57,7 +59,7 @@ src/
   layouts/BaseLayout.astro   Kerangka halaman: head/SEO, header, sidebar, footer
   components/           Komponen UI kecil dengan satu tanggung jawab
   pages/                Rute
-  styles/global.css     Token desain + gaya dasar
+  styles/global.css     Token desain + gaya dasar (lihat CLAUDE.md → Visual Design System)
 docs/                   Dokumentasi proyek
 ```
 
@@ -67,7 +69,7 @@ Semua identitas ada di `src/config/site.ts` dan diekspor sebagai `siteConfig`:
 
 | Field | Nilai | Dipakai oleh |
 |---|---|---|
-| `masterBrand` | Time & Price Academy | `SiteHeader` (wordmark), `SiteFooter`, eyebrow hero, alt emblem |
+| `masterBrand` | Time & Price Academy | `SiteHeader` (wordmark), `SiteFooter`, label hero, `RiskLabTransition`, alt emblem |
 | `product` | Risk Lab | `SiteHeader`, `SiteFooter`, hero, deskripsi halaman |
 | `author` | Muhamad Daffa | `<meta name="author">`, `article:author` |
 | `name` | Risk Lab — Time & Price Academy | `<title>`, `og:site_name`, `og:title` default |
@@ -102,7 +104,8 @@ Aturan pakai:
 
 - **Header:** tidak memakai emblem, karena detailnya hilang di 24–32px. Header memakai wordmark
   tipografis dari `siteConfig`. Ini penulisan nama, bukan logo baru.
-- **Emblem maksimal satu kali per halaman:** di hero beranda (300px desktop / 240px mobile) atau di
+- **Emblem maksimal satu kali per halaman:** sebagai objek pameran di bagian transisi beranda
+  (`RiskLabTransition`, varian `exhibit`, 300px desktop / 240px mobile) atau di
   footer halaman lain (96px, `alt=""` karena atribusi sudah tertulis di sebelahnya).
 - **Latar dilebur tanpa kotak** (`BrandEmblem.astro`, `<picture>` per tema):
   - tema gelap: `black logo.png` + `mix-blend-mode: screen`. Hitam murni menjadi transparan tanpa filter;
@@ -116,7 +119,7 @@ Aturan pakai:
 - **Dilarang:** memotong jam pasir menjadi ikon, mewarnai ulang, masker bentuk, watermark, latar
   bagian, atau memakai emblem sebagai dekorasi berulang.
 - `scripts/check-branding.mjs` memeriksa: wordmark ada di header, header tanpa gambar, emblem ≤ 1 per
-  halaman, beranda punya emblem hero, dan `favicon.svg` (ikon buatan lama) tidak kembali.
+  halaman, beranda punya emblem pameran (`emblem--exhibit`), dan `favicon.svg` (ikon buatan lama) tidak kembali.
 
 ## Sistem konten
 
@@ -146,7 +149,7 @@ Detail skema dan cara menambah konsep ada di [`content-model.md`](./content-mode
 | `BaseLayout` | Struktur halaman, `lang="id"`, skip link. Prop `sidebar`: indeks konsep di kiri (hanya halaman konsep/kategori); tanpa itu kontainer di tengah (`--container`) |
 | `SeoHead` | `<title>`, description, canonical, OpenGraph, Twitter card |
 | `SiteHeader` | Wordmark tipografis "TIME & PRICE ACADEMY │ Risk Lab" (dua baris di layar < 30rem) dan tombol menu mobile |
-| `BrandEmblem` | Artwork emblem resmi (varian `hero` / `footer`), dilebur ke tema dengan blend mode |
+| `BrandEmblem` | Artwork emblem resmi (varian `exhibit` / `footer`), dilebur ke tema dengan blend mode |
 | `PrimaryNav` | Navigasi utama dari `src/lib/nav.ts` (Konsep / Jalur Belajar / Peta): baris di header desktop, kolom di menu mobile |
 | `ConceptNav` | Indeks konsep bergaya daftar isi bernomor; kategori kosong digabung jadi satu baris "Segera hadir" |
 | `ConceptIndex` | Indeks semua kategori untuk `/konsep/`; tiap kategori memakai `ConceptRows` |
@@ -158,7 +161,11 @@ Detail skema dan cara menambah konsep ada di [`content-model.md`](./content-mode
 | `SiteFooter` | Atribusi "By Muhamad Daffa - Time & Price Academy" dan disclaimer |
 | `LearningPath` | Langkah bernomor dengan deskripsi (`/jalur-belajar/`) |
 | `SectionHeading` | Judul bagian bernomor bergaya dokumen cetak ("01 MASALAH TRADER ─ Semua →") |
-| `ConceptIndexCompact` | Indeks konsep ringkas per kategori untuk beranda |
+| `HomeHero` | Hero beranda: label merek, tagline, tombol, baris spesifikasi (angka dari data) + `figures/TimePriceFigure` |
+| `RiskLabTransition` | Transisi merek induk → produk: emblem sebagai objek pameran + rantai konsep (`src/data/concept-chain.ts`) di atas sumbu waktu |
+| `CategoryGrid` | Pelat kategori ("01 / 05", motif, judul, deskripsi, konsep); pelat pertama utama, asimetris di desktop |
+| `figures/TimePriceFigure` | FIG. 01, gambar teknik isometrik Waktu × Harga (SVG inline; geometri dari `src/lib/iso.ts`) |
+| `figures/CategoryMotif` | Motif SVG teknis per kategori (`motif` di `categories.ts`: axes, band, oscillation, kink, tree) |
 | `LearningPathStrip` | Jalur belajar ringkas satu alur untuk beranda |
 | `tools/ToolFrame` | Kerangka alat hitung: label, judul, input, hasil, ringkasan `aria-live`, catatan "bukan rekomendasi" |
 | `tools/UkuranPosisi` | Risiko per transaksi → ukuran posisi; risiko sebenarnya dari "lot yang biasa dipakai" |

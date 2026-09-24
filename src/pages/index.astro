@@ -1,11 +1,13 @@
 ---
-// Beranda: MASALAH TRADER → HITUNG DULU → KONSEP INTI → JALUR BELAJAR (+ prinsip).
+// Beranda: HERO (figur Waktu × Harga) → TRANSISI RISK LAB (emblem + rantai konsep) → MASALAH TRADER →
+// HITUNG DULU → KATEGORI → JALUR BELAJAR (+ prinsip).
 // Pintu masuk utama adalah masalah dalam bahasa trader; teori tetap tersedia lewat indeks dan jalur.
 import BaseLayout from '../layouts/BaseLayout.astro';
-import BrandEmblem from '../components/BrandEmblem.astro';
-import ConceptIndexCompact from '../components/ConceptIndexCompact.astro';
+import CategoryGrid from '../components/CategoryGrid.astro';
+import HomeHero from '../components/HomeHero.astro';
 import LearningPathStrip from '../components/LearningPathStrip.astro';
 import ProblemList from '../components/ProblemList.astro';
+import RiskLabTransition from '../components/RiskLabTransition.astro';
 import SectionHeading from '../components/SectionHeading.astro';
 import UkuranPosisi from '../components/tools/UkuranPosisi.astro';
 import { siteConfig } from '../config/site';
@@ -33,23 +35,8 @@ const principles = [
 ---
 
 <BaseLayout>
-  <section class="hero" aria-labelledby="hero-title">
-    <div class="hero__text">
-      <p class="eyebrow">{siteConfig.product} · Bagian dari {siteConfig.masterBrand}</p>
-      <h1 id="hero-title" class="hero__title">
-        {siteConfig.taglineParts.map((part) => <span>{`${part} `}</span>)}
-      </h1>
-      <p class="hero__lead">
-        Mulai dari masalah yang Anda alami saat trading, lalu pahami konsep risiko di baliknya: definisinya,
-        contoh hitungannya, dan cara menerapkannya.
-      </p>
-      <p class="hero__actions">
-        <a class="button" href="#masalah">Mulai dari masalah</a>
-        <a class="hero__secondary" href={withBase(routes.learningPaths)}>Ikuti jalur belajar →</a>
-      </p>
-    </div>
-    <BrandEmblem variant="hero" />
-  </section>
+  <HomeHero />
+  <RiskLabTransition />
 
   <section class="home-section" id="masalah" aria-labelledby="masalah-title">
     <SectionHeading
@@ -70,10 +57,10 @@ const principles = [
     <SectionHeading
       id="konsep-title"
       number="03"
-      title="Konsep Inti Risiko"
+      title="Kategori"
       more={{ href: withBase(routes.concepts), label: 'Indeks konsep' }}
     />
-    <ConceptIndexCompact />
+    <CategoryGrid />
   </section>
 
   {
@@ -112,67 +99,6 @@ const principles = [
 </BaseLayout>
 
 <style>
-  .hero {
-    display: grid;
-    gap: var(--space-8);
-    align-items: center;
-    padding-block: var(--space-4) var(--space-8);
-  }
-
-  /* Desktop: teks kiri, artwork kanan. Mobile: artwork di bawah tombol. */
-  @media (min-width: 64rem) {
-    .hero {
-      grid-template-columns: minmax(0, 1fr) auto;
-      gap: var(--space-12);
-    }
-  }
-
-  .hero__title {
-    display: flex;
-    flex-direction: column;
-    margin: var(--space-3) 0 var(--space-4);
-    font-size: clamp(var(--text-2xl), 6vw, var(--text-4xl));
-    letter-spacing: -0.02em;
-  }
-
-  .hero__lead {
-    max-width: 52ch;
-    margin: 0;
-    font-size: var(--text-lg);
-    color: var(--ink-2);
-  }
-
-  .hero__actions {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: var(--space-3) var(--space-6);
-    margin: var(--space-8) 0 0;
-  }
-
-  .button {
-    display: inline-flex;
-    align-items: center;
-    min-height: 2.75rem;
-    padding: 0 var(--space-6);
-    font-weight: 600;
-    color: var(--paper);
-    background: var(--ink);
-    border: var(--border-hair) solid var(--ink);
-    border-radius: var(--radius-1);
-    text-decoration: none;
-  }
-
-  .button:hover {
-    color: var(--ink);
-    background: transparent;
-  }
-
-  .hero__secondary {
-    font-weight: 600;
-    color: var(--ink);
-  }
-
   .home-section {
     padding-top: var(--space-16);
   }

@@ -1,0 +1,113 @@
+---
+// Motif teknis kategori (SVG inline 160×96, dekoratif: judul kategori selalu tertulis di sebelahnya).
+// Nama motif dari `motif` di src/data/categories.ts. Motif baru = satu cabang di sini + nilai di
+// `categoryMotifs`. Maksimal satu penanda kuningan (.svg-mark) per motif.
+import type { CategoryMotif } from '../../data/categories';
+import { normalPdf, steps } from '../../lib/iso';
+
+interface Props {
+  motif: CategoryMotif;
+}
+
+const { motif } = Astro.props;
+
+const line = (pts: [number, number][]) =>
+  pts.map(([x, y], i) => `${i === 0 ? 'M' : 'L'}${Math.round(x * 10) / 10} ${Math.round(y * 10) / 10}`).join(' ');
+
+// Sumbu standar: asal (16, 82), waktu ke kanan, nilai ke atas.
+const axes = 'M12 82 H152 M16 86 V8';
+const xTicks = steps(32, 144, 7)
+  .map((x) => `M${x} 82 V86`)
+  .join(' ');
+
+// axes — kurva normal, rata-rata di x = 84.
+const bell = line(steps(20, 148, 64).map((x) => [x, 82 - normalPdf(x, 84, 18) * 18 * 2.5066 * 56]));
+
+// band — jejak harga di dalam selubung, garis batas rugi di bawahnya.
+const bandTrace = line([
+  [16, 48], [28, 42], [40, 50], [52, 38], [64, 46], [76, 34],
+  [88, 44], [100, 40], [112, 52], [124, 44], [136, 36], [148, 42],
+]);
+
+// oscillation — tenang, lalu satu kejatuhan di x = 60 membuat ayunan makin lebar.
+const swing = line(
+  steps(16, 148, 132).map((x) => {
+    const amp = x < 60 ? 4 : Math.min(34, 4 + (x - 60) * 0.36);
+    return [x, 48 + Math.sin((x - 16) / 5.5) * amp];
+  }),
+);
+
+// kink — fungsi nilai: cekung untuk untung, lebih curam untuk rugi, patah di titik acuan (80, 48).
+const value = line(
+  steps(-68, 72, 70).map((x) => [80 + x, 48 - (x >= 0 ? 30 * (1 - Math.exp(-x / 30)) : -40 * (1 - Math.exp(x / 22)))]),
+);
+---
+
+<svg class="motif" viewBox="0 0 160 96" aria-hidden="true" focusable="false">
+  {
+    motif === 'axes' && (
+      <>
+        <path class="svg-axis" d={axes} />
+        <path class="svg-tick" d={xTicks} />
+        <path class="svg-guide" d="M84 82 V26" />
+        <path class="svg-trace" d={bell} />
+        <circle class="svg-mark" cx="84" cy="82" r="3" />
+      </>
+    )
+  }
+  {
+    motif === 'band' && (
+      <>
+        <path class="svg-axis" d={axes} />
+        <path class="svg-tick" d={xTicks} />
+        <path class="svg-guide" d="M16 28 H152 M16 60 H152" />
+        <path class="svg-trace" d={bandTrace} />
+        <path class="svg-trace svg-trace--alt" d="M16 70 H152" />
+        <rect class="svg-mark" x="12" y="68" width="8" height="4" />
+      </>
+    )
+  }
+  {
+    motif === 'oscillation' && (
+      <>
+        <path class="svg-axis" d={axes} />
+        <path class="svg-tick" d={xTicks} />
+        <path class="svg-guide" d="M16 48 H152" />
+        <path class="svg-trace" d={swing} />
+        <circle class="svg-mark" cx="60" cy={48 + Math.sin(44 / 5.5) * 4} r="3" />
+      </>
+    )
+  }
+  {
+    motif === 'kink' && (
+      <>
+        <path class="svg-axis" d="M8 48 H152 M80 88 V8" />
+        <path class="svg-tick" d="M40 46 V50 M120 46 V50 M78 28 H82 M78 68 H82" />
+        <path class="svg-guide" d="M12 86 L148 10" />
+        <path class="svg-trace" d={value} />
+        <circle class="svg-mark" cx="80" cy="48" r="3" />
+      </>
+    )
+  }
+  {
+    motif === 'tree' && (
+      <>
+        <path class="svg-axis" d="M26 48 L66 26 M26 48 L66 70" />
+        <path class="svg-trace" d="M74 26 L138 12 M74 26 L138 40 M74 70 L138 56 M74 70 L138 84" />
+        <path class="svg-tick" d="M142 8 V16 M142 36 V44 M142 52 V60 M142 80 V88" />
+        <circle class="svg-axis" cx="70" cy="26" r="4" />
+        <circle class="svg-axis" cx="70" cy="70" r="4" />
+        <rect class="svg-mark" x="14" y="42" width="12" height="12" />
+      </>
+    )
+  }
+</svg>
+
+<style>
+  .motif {
+    display: block;
+    width: 100%;
+    height: auto;
+    overflow: visible;
+  }
+</style>

@@ -11,15 +11,15 @@ import emblemDark from '../assets/Logo/black logo.png';
 import emblemLight from '../assets/Logo/logos.jpeg';
 
 interface Props {
-  /** `hero`: artwork utama beranda; `footer`: tanda kecil di footer halaman lain. */
-  variant: 'hero' | 'footer';
+  /** `exhibit`: objek pameran di bagian transisi beranda; `footer`: tanda kecil di footer halaman lain. */
+  variant: 'exhibit' | 'footer';
 }
 
 const { variant } = Astro.props;
 
 // Lebar tampil (CSS px). Versi terang hanya 433px, jadi dibatasi agar tidak diperbesar.
-const displayWidth = variant === 'hero' ? 300 : 96;
-const sizes = variant === 'hero' ? '(min-width: 64rem) 300px, 240px' : '96px';
+const displayWidth = variant === 'exhibit' ? 300 : 96;
+const sizes = variant === 'exhibit' ? '(min-width: 64rem) 300px, 240px' : '96px';
 const widths = (max: number) => [displayWidth, displayWidth * 2].map((w) => Math.min(w, max));
 
 const [dark, light] = await Promise.all([
@@ -37,8 +37,8 @@ const height = Math.round((displayWidth * emblemLight.height) / emblemLight.widt
     sizes={sizes}
     width={displayWidth}
     height={height}
-    alt={variant === 'hero' ? siteConfig.emblemAlt : ''}
-    loading={variant === 'hero' ? 'eager' : 'lazy'}
+    alt={variant === 'exhibit' ? siteConfig.emblemAlt : ''}
+    loading={variant === 'exhibit' ? 'eager' : 'lazy'}
     decoding="async"
   />
 </picture>
@@ -58,7 +58,7 @@ const height = Math.round((displayWidth * emblemLight.height) / emblemLight.widt
     mix-blend-mode: multiply;
   }
 
-  .emblem--hero {
+  .emblem--exhibit {
     width: min(300px, 70vw);
   }
 
@@ -67,7 +67,7 @@ const height = Math.round((displayWidth * emblemLight.height) / emblemLight.widt
   }
 
   @media (max-width: 63.99rem) {
-    .emblem--hero {
+    .emblem--exhibit {
       width: min(240px, 70vw);
     }
   }

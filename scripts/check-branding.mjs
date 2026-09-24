@@ -3,7 +3,7 @@
 //    Semua harus lewat `siteConfig` (src/config/site.ts).
 // 2. Setiap halaman hasil build wajib memuat author, og:site_name, lang, dan atribusi footer.
 //    Halaman konsep juga wajib memuat atribusi di byline dan article:author.
-//    Header memuat wordmark tipografis; emblem maksimal satu per halaman (beranda: di hero).
+//    Header memuat wordmark tipografis; emblem maksimal satu per halaman (beranda: objek pameran di bagian transisi).
 // 3. package.json harus mencantumkan author yang sama.
 import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
 import { join, relative, sep } from 'node:path';
@@ -66,12 +66,12 @@ for (const file of pages) {
     header.includes(escapeHtml(siteConfig.masterBrand)) && header.includes(escapeHtml(siteConfig.product)),
     'wordmark header (induk │ produk) hilang',
   );
-  expect(!/<img\b/.test(header), 'header tidak boleh memuat gambar (emblem hanya di hero/footer)');
+  expect(!/<img\b/.test(header), 'header tidak boleh memuat gambar (emblem hanya di beranda/footer)');
 
-  // Emblem resmi: maksimal satu per halaman; beranda wajib menampilkannya di hero.
+  // Emblem resmi: maksimal satu per halaman; beranda wajib menampilkannya sebagai objek pameran.
   const emblems = (html.match(/<picture class="emblem\b/g) ?? []).length;
   expect(emblems <= 1, `emblem muncul ${emblems}× (maksimal 1 per halaman)`);
-  if (page === 'dist/index.html') expect(/class="emblem emblem--hero"/.test(html), 'emblem hero hilang di beranda');
+  if (page === 'dist/index.html') expect(/class="emblem emblem--exhibit"/.test(html), 'emblem pameran hilang di beranda');
 
   // Halaman konsep = dist/konsep/<slug>/index.html (bukan indeks dist/konsep/index.html).
   if (/^dist\/konsep\/[^/]+\/index\.html$/.test(page)) {
