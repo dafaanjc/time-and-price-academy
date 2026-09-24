@@ -1,0 +1,45 @@
+---
+title: "Kenapa gue full margin?"
+slug: sering-full-margin
+order: 3
+decision: "Seberapa besar margin yang dipakai, dan berapa ruang gerak harga sebelum margin call atau stop out."
+description: "Full margin berarti jarak ke margin call sangat pendek. Masalahnya bukan leverage-nya, tetapi ukuran posisi yang dibuka."
+status: draft
+concepts: [leverage-and-margin, position-sizing, risk-of-ruin]
+keywords: [full margin, margin call, MC, stop out, SO, free margin, margin level, leverage, akun habis]
+sources: []
+---
+
+## Situasi
+
+Anda membuka posisi yang memakai hampir seluruh margin yang tersedia, atau menumpuk beberapa posisi sekaligus. Free margin tinggal sedikit. Harga bergerak sedikit melawan posisi, lalu muncul peringatan margin call, dan tidak lama kemudian posisi ditutup paksa oleh broker (stop out), sering dengan kerugian yang jauh lebih besar dari yang pernah Anda rencanakan.
+
+## Konsep di Baliknya
+
+- [Leverage & Margin](../../konsep/leverage-and-margin/): leverage membuat posisi besar bisa dibuka dengan jaminan kecil, tetapi tidak mengubah kerugian per poin. Margin level menunjukkan seberapa dekat akun dengan batas darurat broker.
+- [Ukuran Posisi](../../konsep/position-sizing/): kerugian per poin ditentukan oleh ukuran posisi. Full margin hampir selalu berarti posisinya terlalu besar untuk akun tersebut.
+- [Risiko Kehancuran](../../konsep/risk-of-ruin/): stop out adalah bentuk kehancuran kecil. Semakin sering akun mendekati batas margin, semakin besar peluang modal tidak pernah pulih.
+
+## Teori dan Bukti
+
+*Ilustrasi.* Ekuitas Rp10.000.000, margin per 1 lot Rp5.000.000, nilai per poin per 1 lot Rp10.000, margin call di margin level 100%, stop out di 50%. Spesifikasi sebenarnya berbeda tiap broker.
+
+| Ukuran posisi | Margin level | Jarak ke margin level 100% | Rugi saat stop out |
+| --- | --- | --- | --- |
+| 0,2 lot | 1.000% | ±4.500 poin | Rp9.500.000 (95%) |
+| 1 lot | 200% | ±500 poin | Rp7.500.000 (75%) |
+| 1,8 lot | 111% | ±56 poin | Rp5.500.000 (55%) |
+
+Pada 1,8 lot, pergerakan sekitar 56 poin sudah membawa akun ke margin level 100%. Rencana stop loss 1% tidak pernah ada; yang menghentikan posisi adalah habisnya jaminan.
+
+Sumber rujukan untuk halaman ini belum dipasang.
+
+## Penerapan Praktis
+
+1. **Hitung ukuran posisi dari risiko per transaksi dan stop loss**, bukan dari free margin yang tersedia.
+2. **Periksa margin level setelah posisi dihitung.** Bila posisi yang sesuai rencana ternyata memakai sebagian besar margin, ukurannya terlalu besar untuk akun ini.
+3. **Jumlahkan semua posisi terbuka.** Beberapa posisi kecil pada instrumen yang bergerak searah bisa berperilaku seperti satu posisi besar.
+4. **Pasang stop loss di setiap posisi.** Margin call dan stop out adalah batas darurat broker, bukan rencana risiko.
+5. **Kenali spesifikasi broker Anda:** margin per lot, level margin call, dan level stop out.
+
+<SimulasiMargin />

@@ -1,9 +1,9 @@
 ---
-import SiteNav from './SiteNav.astro';
+import ConceptNav from './ConceptNav.astro';
 ---
 
 <aside class="sidebar">
-  <SiteNav />
+  <ConceptNav />
 </aside>
 
 <style>
@@ -18,8 +18,8 @@ import SiteNav from './SiteNav.astro';
       top: var(--header-height);
       height: calc(100dvh - var(--header-height));
       overflow-y: auto;
-      padding: 1.5rem 1rem 2rem;
-      border-right: 1px solid var(--line);
+      padding: var(--space-8) var(--space-6) var(--space-12) var(--gutter);
+      border-right: var(--border-hair) solid var(--rule);
     }
   }
 </style>

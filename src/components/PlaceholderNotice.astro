@@ -1,34 +1,31 @@
 ---
-interface Props {
-  title?: string;
-}
-
-const { title = 'Konsep ini masih draf' } = Astro.props;
+// Pita tipis untuk halaman berstatus draf: tidak mendominasi, tetapi tetap jelas.
 ---
 
-<aside class="placeholder-notice" role="note">
-  <p class="placeholder-notice__title">{title}</p>
-  <p class="placeholder-notice__body"><slot /></p>
-</aside>
+<p class="draft-ribbon" role="note">
+  <span class="draft-ribbon__tag">Draf</span>{' '}
+  <span><slot /></span>
+</p>
 
 <style>
-  .placeholder-notice {
+  .draft-ribbon {
+    display: flex;
+    align-items: baseline;
+    gap: var(--space-3);
     max-width: var(--measure);
-    padding: 0.875rem 1.125rem;
-    color: var(--warn-ink);
-    background: var(--warn-bg);
-    border-radius: var(--radius);
-  }
-
-  .placeholder-notice p {
     margin: 0;
+    padding: var(--space-2) var(--space-3);
+    font-size: var(--text-sm);
+    color: var(--caution);
+    background: var(--caution-bg);
+    border-left: var(--border-mark) solid var(--caution);
   }
 
-  .placeholder-notice__title {
-    font-weight: 700;
-  }
-
-  .placeholder-notice__body {
-    font-size: 0.9375rem;
+  .draft-ribbon__tag {
+    flex: none;
+    font-size: var(--text-xs);
+    font-weight: 600;
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
   }
 </style>

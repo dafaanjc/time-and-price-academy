@@ -67,13 +67,13 @@ const layerOf = new Map(graph.nodes.map((n) => [n.id, n.layer]));
 
   .map-header h1 {
     margin: 0 0 0.75rem;
-    font-size: clamp(2rem, 5vw, 2.75rem);
+    font-size: clamp(var(--text-2xl), 5vw, var(--text-3xl));
   }
 
   .map-header p {
     margin: 0;
-    font-size: 1.0625rem;
-    color: var(--ink-soft);
+    font-size: var(--text-base);
+    color: var(--ink-2);
   }
 
   .map-table {
@@ -83,13 +83,13 @@ const layerOf = new Map(graph.nodes.map((n) => [n.id, n.layer]));
 
   .map-table h2 {
     margin: 0 0 0.25rem;
-    font-size: 1.375rem;
+    font-size: var(--text-xl);
   }
 
   .map-table p {
     margin: 0 0 1rem;
-    font-size: 0.9375rem;
-    color: var(--ink-soft);
+    font-size: var(--text-sm);
+    color: var(--ink-2);
   }
 
   .map-table__scroll {
@@ -103,7 +103,7 @@ const layerOf = new Map(graph.nodes.map((n) => [n.id, n.layer]));
   table {
     width: 100%;
     border-collapse: collapse;
-    font-size: 0.9375rem;
+    font-size: var(--text-sm);
   }
 
   th,
@@ -111,14 +111,14 @@ const layerOf = new Map(graph.nodes.map((n) => [n.id, n.layer]));
     padding: 0.5rem 0.75rem;
     text-align: left;
     vertical-align: top;
-    border-bottom: 1px solid var(--line);
+    border-bottom: 1px solid var(--rule);
   }
 
   thead th {
-    font-size: 0.75rem;
+    font-size: var(--text-xs);
     letter-spacing: 0.06em;
     text-transform: uppercase;
-    color: var(--ink-faint);
+    color: var(--ink-3);
   }
 
   tbody th {

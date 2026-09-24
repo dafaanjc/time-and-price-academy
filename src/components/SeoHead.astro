@@ -2,6 +2,9 @@
 import { siteConfig } from '../config/site';
 import { OG_HEIGHT, OG_WIDTH } from '../lib/og-image';
 import { absoluteUrl, routes, withBase } from '../lib/url';
+// Dua font yang terlihat di layar pertama di-preload; sisanya dimuat lewat @font-face di global.css.
+import sansRegular from '../assets/fonts/web/source-sans-3-latin-400-normal.woff2?url';
+import serifSemibold from '../assets/fonts/web/source-serif-4-latin-600-normal.woff2?url';
 
 interface Props {
   title?: string;
@@ -35,7 +38,10 @@ const isArticle = type === 'article';
 <title>{fullTitle}</title>
 <meta name="description" content={description} />
 <meta name="author" content={siteConfig.author} />
-<link rel="icon" type="image/svg+xml" href={withBase(routes.favicon)} />
+<link rel="icon" type="image/png" sizes="32x32" href={withBase(routes.favicon)} />
+<link rel="apple-touch-icon" sizes="180x180" href={withBase(routes.appleTouchIcon)} />
+<link rel="preload" href={sansRegular} as="font" type="font/woff2" crossorigin />
+<link rel="preload" href={serifSemibold} as="font" type="font/woff2" crossorigin />
 {noindex && <meta name="robots" content="noindex" />}
 {canonical && <link rel="canonical" href={canonical} />}
 

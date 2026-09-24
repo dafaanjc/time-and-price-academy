@@ -1,21 +1,22 @@
 // Template gambar OpenGraph (1200×630 PNG), dirender saat build dengan sharp.
 // Teks dirender dari font TTF di src/assets/fonts agar hasilnya identik di semua mesin.
-import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import sharp, { type OverlayOptions } from 'sharp';
 import { siteConfig } from '../config/site';
+import { EMBLEM_LIGHT_ASPECT, emblemFiles, LIGHT_EMBLEM_BRIGHTNESS } from './brand-assets';
 
 export const OG_WIDTH = 1200;
 export const OG_HEIGHT = 630;
 
 // Salinan token tema terang dari src/styles/global.css (:root). Gambar OG selalu bertema terang.
+// Monokrom: aksen = tinta (arah visual mengikuti emblem etsa merek induk (siteConfig.masterBrand)).
 const theme = {
-  paper: '#f7f4ee',
-  ink: '#1c2126',
-  inkSoft: '#4a525a',
-  inkFaint: '#686f76',
-  line: '#e2ddd3',
-  accent: '#1f5873',
+  paper: '#f6f3ec',
+  ink: '#16191d',
+  inkSoft: '#454c54',
+  inkFaint: '#666d74',
+  line: '#d6cfc2',
+  accent: '#16191d',
 };
 
 // Build selalu dijalankan dari root proyek (npm scripts), jadi path relatif ke cwd.
@@ -29,9 +30,13 @@ const fonts = {
 type Font = (typeof fonts)[keyof typeof fonts];
 
 const PAD_X = 88;
-const TEXT_WIDTH = OG_WIDTH - PAD_X * 2;
 const HEADER_Y = 64;
 const RULE_Y = 530;
+const RULE_WIDTH = OG_WIDTH - PAD_X * 2;
+// Emblem resmi di kanan (versi terang, dilebur ke kertas); teks mendapat sisa lebar di kiri.
+const EMBLEM_HEIGHT = 360;
+const EMBLEM_WIDTH = Math.round(EMBLEM_HEIGHT * EMBLEM_LIGHT_ASPECT);
+const TEXT_WIDTH = RULE_WIDTH - EMBLEM_WIDTH - 40;
 
 export interface OgImageContent {
   /** Label kecil di atas judul, mis. nama kategori. */
@@ -79,14 +84,23 @@ async function renderText(
   return { data, width: info.width, height: info.height };
 }
 
-/** Judul sebesar mungkin yang muat dalam `maxHeight` (maks. ~3 baris). */
+const TITLE_SIZES = [84, 76, 68, 60, 52];
+
+/**
+ * Judul sebesar mungkin yang (1) muat dalam `maxHeight` dan (2) tidak lebih dari
+ * max(2, jumlah baris eksplisit) baris, agar kalimat pendek tidak terpecah janggal.
+ * Bila tidak ada yang memenuhi, dipakai ukuran terkecil.
+ */
 async function fitTitle(title: string, maxHeight: number): Promise<TextImage> {
-  let image = await renderText(title, fonts.serif, 84, theme.ink, { width: TEXT_WIDTH });
-  for (const size of [76, 68, 60, 52]) {
-    if (image.height <= maxHeight) break;
+  const maxLines = Math.max(2, title.split('\n').length);
+  let image: TextImage | undefined;
+  for (const size of TITLE_SIZES) {
     image = await renderText(title, fonts.serif, size, theme.ink, { width: TEXT_WIDTH });
+    const lineHeight = (await renderText('Ag', fonts.serif, size, theme.ink)).height;
+    const lines = Math.round(image.height / lineHeight);
+    if (image.height <= maxHeight && lines <= maxLines) return image;
   }
-  return image;
+  return image as TextImage;
 }
 
 /** Deskripsi maksimal `maxHeight`; kata di akhir dipangkas dengan elipsis bila terlalu panjang. */
@@ -107,13 +121,18 @@ function frameSvg(): Buffer {
     `<svg xmlns="http://www.w3.org/2000/svg" width="${OG_WIDTH}" height="${OG_HEIGHT}">
       <rect width="100%" height="100%" fill="${theme.paper}"/>
       <rect width="14" height="100%" fill="${theme.accent}"/>
-      <rect x="${PAD_X}" y="${RULE_Y}" width="${TEXT_WIDTH}" height="2" fill="${theme.line}"/>
+      <rect x="${PAD_X}" y="${RULE_Y}" width="${RULE_WIDTH}" height="2" fill="${theme.line}"/>
     </svg>`,
   );
 }
 
 export async function renderOgImage(content: OgImageContent): Promise<Buffer> {
-  const logo = await sharp(readFileSync(resolve('public/favicon.svg'))).resize(48, 48).png().toBuffer();
+  // Sama dengan CSS BrandEmblem: kecerahan dinaikkan agar latar menjadi putih, lalu `multiply`.
+  const emblem = await sharp(emblemFiles.light)
+    .linear(LIGHT_EMBLEM_BRIGHTNESS, 0)
+    .resize({ height: EMBLEM_HEIGHT })
+    .png()
+    .toBuffer();
   const eyebrow = await renderText(
     `${siteConfig.product} · ${siteConfig.masterBrand}`.toUpperCase(),
     fonts.sansBold,
@@ -127,7 +146,7 @@ export async function renderOgImage(content: OgImageContent): Promise<Buffer> {
   // Blok tengah: kicker, judul, subjudul, deskripsi, dipusatkan vertikal di antara header dan garis.
   // Elemen pendukung dirender dulu; judul mendapat sisa ruang sehingga blok tidak pernah meluber.
   const GAP = 18;
-  const areaTop = HEADER_Y + 48 + 24;
+  const areaTop = HEADER_Y + eyebrow.height + 32;
   const areaHeight = RULE_Y - 24 - areaTop;
   const kicker = content.kicker
     ? await renderText(content.kicker.toUpperCase(), fonts.sansBold, 24, theme.accent, { letterSpacing: 1536 })
@@ -145,8 +164,13 @@ export async function renderOgImage(content: OgImageContent): Promise<Buffer> {
   let y = Math.max(areaTop, Math.round(areaTop + (areaHeight - blockHeight) / 2));
 
   const layers: OverlayOptions[] = [
-    { input: logo, left: PAD_X, top: HEADER_Y },
-    { input: eyebrow.data, left: PAD_X + 48 + 18, top: HEADER_Y + Math.round((48 - eyebrow.height) / 2) },
+    {
+      input: emblem,
+      left: OG_WIDTH - PAD_X - EMBLEM_WIDTH,
+      top: Math.round((HEADER_Y + RULE_Y - EMBLEM_HEIGHT) / 2),
+      blend: 'multiply',
+    },
+    { input: eyebrow.data, left: PAD_X, top: HEADER_Y },
   ];
   for (const img of block) {
     layers.push({ input: img.data, left: PAD_X, top: y });

@@ -49,7 +49,7 @@ const stepNumber = (i: number) => String(i + 1).padStart(2, '0');
     top: 2.5rem;
     bottom: 0;
     width: 1px;
-    background: var(--line);
+    background: var(--rule);
   }
 
   .learning-path__number {
@@ -58,10 +58,10 @@ const stepNumber = (i: number) => String(i + 1).padStart(2, '0');
     width: 2.5rem;
     height: 2.5rem;
     font-family: var(--font-mono);
-    font-size: 0.8125rem;
+    font-size: var(--text-xs);
     color: var(--accent);
     background: var(--accent-soft);
-    border-radius: 50%;
+    border-radius: var(--radius-1);
   }
 
   .learning-path__link {
@@ -82,7 +82,7 @@ const stepNumber = (i: number) => String(i + 1).padStart(2, '0');
   }
 
   .learning-path__desc {
-    font-size: 0.9375rem;
-    color: var(--ink-soft);
+    font-size: var(--text-sm);
+    color: var(--ink-2);
   }
 </style>

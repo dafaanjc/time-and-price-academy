@@ -1,0 +1,44 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import ProblemList from '../../components/ProblemList.astro';
+import { siteConfig } from '../../config/site';
+import { getProblems } from '../../lib/problems';
+import { routes, withBase } from '../../lib/url';
+
+const problems = await getProblems();
+---
+
+<BaseLayout
+  title="Masalah Trader"
+  description={`Mulai dari masalah yang sering dialami trader, lalu pahami konsep risiko di baliknya — ${siteConfig.product}.`}
+>
+  <header class="page-header">
+    <p class="eyebrow">Mulai dari sini</p>
+    <h1>Masalah Trader</h1>
+    <p class="page-header__lead">
+      Setiap masalah dibahas dengan alur yang sama: situasinya, keputusan yang sebenarnya dipertaruhkan, konsep
+      yang menjelaskannya, teori dan bukti, lalu penerapan praktisnya.
+      Teori lengkapnya ada di <a href={withBase(routes.concepts)}>indeks konsep</a>.
+    </p>
+  </header>
+
+  <ProblemList problems={problems} />
+</BaseLayout>
+
+<style>
+  .page-header {
+    max-width: var(--measure);
+    margin-bottom: var(--space-12);
+  }
+
+  .page-header h1 {
+    margin: var(--space-2) 0 var(--space-4);
+    font-size: clamp(var(--text-2xl), 5vw, var(--text-3xl));
+  }
+
+  .page-header__lead {
+    margin: 0;
+    font-size: var(--text-lg);
+    color: var(--ink-2);
+  }
+</style>

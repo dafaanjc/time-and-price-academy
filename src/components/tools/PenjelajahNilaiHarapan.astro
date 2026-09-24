@@ -1,0 +1,189 @@
+---
+// Alat: nilai harapan (R) + simulasi rangkaian transaksi. Menunjukkan bahwa nilai harapan positif
+// tetap bisa rugi dalam jangka pendek (varians). Simulasi deterministik per seed, berlabel "Simulasi".
+import ToolFrame from './ToolFrame.astro';
+import { describeExpectancy } from '../../lib/calc/describe';
+import { breakevenWinRate, expectancyR, simulatePaths, summarize } from '../../lib/calc/expected-value';
+import { lineChart } from '../../lib/chart';
+import { formatNumber } from '../../lib/format';
+
+interface Props {
+  /** Awalan ID (harus unik bila alat ini dipakai lebih dari sekali di satu halaman). */
+  id?: string;
+}
+
+// <label for> harus menunjuk slider secara eksplisit, bukan <output> di dekatnya.
+const { id: uid = 'nilai-harapan' } = Astro.props;
+
+const PATHS = 20;
+const TRADES = 100;
+const defaults = { winRate: 40, avgWinR: 2, seed: 1 };
+const ev = expectancyR(defaults);
+const breakeven = breakevenWinRate(defaults.avgWinR);
+const paths = simulatePaths(defaults, PATHS, TRADES, defaults.seed);
+const chart = lineChart(paths, ev);
+const signed = (v: number) => `${v >= 0 ? '+' : '−'}${formatNumber(Math.abs(Math.round(v * 100) / 100))}R`;
+---
+
+<ToolFrame
+  tool="expectancy"
+  title="Nilai harapan dan 20 rangkaian simulasi"
+  description="Atur peluang menang dan rata-rata untung (dalam R; rugi saat kalah = 1R). Grafik menunjukkan 20 rangkaian 100 transaksi acak dengan karakteristik yang sama."
+  summary={describeExpectancy(ev, breakeven, PATHS, TRADES, summarize(paths))}
+>
+  <Fragment slot="inputs">
+    <div class="field">
+      <span>
+        <label for={`${uid}-winRate`}>Peluang menang</label>:{' '}
+        <output for={`${uid}-winRate`} data-out="winRateLabel">{defaults.winRate}%</output>
+      </span>
+      <input id={`${uid}-winRate`} name="winRate" type="range" min="10" max="90" step="1" value={defaults.winRate} />
+    </div>
+    <div class="field">
+      <span>
+        <label for={`${uid}-avgWinR`}>Rata-rata untung saat menang</label>:{' '}
+        <output for={`${uid}-avgWinR`} data-out="avgWinLabel">{formatNumber(defaults.avgWinR)}R</output>
+      </span>
+      <input id={`${uid}-avgWinR`} name="avgWinR" type="range" min="0.5" max="5" step="0.1" value={defaults.avgWinR} />
+    </div>
+  </Fragment>
+  <Fragment slot="results">
+    <dl class="readout">
+      <div><dt>Nilai harapan</dt><dd data-out="ev" class:list={[{ 'is-gain': ev > 0, 'is-loss': ev < 0 }]}>{signed(ev)} / transaksi</dd></div>
+      <div><dt>Titik impas</dt><dd data-out="breakeven">{formatNumber(Math.round(breakeven * 10) / 10)}% menang</dd></div>
+    </dl>
+    <figure class="sim">
+      <figcaption class="sim__caption">
+        <span class="sim__tag">Simulasi</span> Hasil kumulatif (R) per rangkaian. Garis putus-putus: nilai harapan.
+      </figcaption>
+      <svg class="sim__chart" viewBox={`0 0 ${chart.width} ${chart.height}`} role="img" aria-label="Grafik simulasi; ringkasannya ada di bawah grafik">
+        <line class="sim__zero" data-out="zero" x1="0" x2={chart.width} y1={chart.zeroY} y2={chart.zeroY}></line>
+        <g data-out="lines">{chart.lines.map((points) => <polyline class="sim__line" points={points} />)}</g>
+        <polyline class="sim__expected" data-out="expected" points={chart.expected}></polyline>
+      </svg>
+      <button class="sim__again" type="button" data-action="reseed">Simulasi ulang</button>
+    </figure>
+  </Fragment>
+</ToolFrame>
+
+<script>
+  import { describeExpectancy } from '../../lib/calc/describe';
+  import { breakevenWinRate, expectancyR, simulatePaths, summarize } from '../../lib/calc/expected-value';
+  import { lineChart } from '../../lib/chart';
+  import { formatNumber } from '../../lib/format';
+
+  const PATHS = 20;
+  const TRADES = 100;
+  const signed = (v: number) => `${v >= 0 ? '+' : '−'}${formatNumber(Math.abs(Math.round(v * 100) / 100))}R`;
+
+  for (const form of document.querySelectorAll<HTMLFormElement>('form[data-tool="expectancy"]')) {
+    const value = (name: string) => (form.elements.namedItem(name) as HTMLInputElement).valueAsNumber;
+    const out = <T extends Element = HTMLElement>(name: string) => form.querySelector<T>(`[data-out="${name}"]`)!;
+    const summary = form.querySelector<HTMLElement>('[data-summary]')!;
+    // Kelas scoped (data-astro-cid) diambil dari polyline server agar garis baru tetap bergaya.
+    const lineTemplate = out<SVGPolylineElement>('lines').querySelector('polyline')!.cloneNode() as SVGPolylineElement;
+    let seed = 1;
+
+    const update = (): void => {
+      const input = { winRate: value('winRate'), avgWinR: value('avgWinR') };
+      const ev = expectancyR(input);
+      const breakeven = breakevenWinRate(input.avgWinR);
+      const paths = simulatePaths(input, PATHS, TRADES, seed);
+      const chart = lineChart(paths, ev);
+
+      out('winRateLabel').textContent = `${input.winRate}%`;
+      out('avgWinLabel').textContent = `${formatNumber(input.avgWinR)}R`;
+      out('ev').textContent = `${signed(ev)} / transaksi`;
+      out('ev').classList.toggle('is-gain', ev > 0);
+      out('ev').classList.toggle('is-loss', ev < 0);
+      out('breakeven').textContent = `${formatNumber(Math.round(breakeven * 10) / 10)}% menang`;
+
+      const zero = out<SVGLineElement>('zero');
+      zero.setAttribute('y1', String(chart.zeroY));
+      zero.setAttribute('y2', String(chart.zeroY));
+      out<SVGPolylineElement>('expected').setAttribute('points', chart.expected);
+      out<SVGGElement>('lines').replaceChildren(
+        ...chart.lines.map((points) => {
+          const line = lineTemplate.cloneNode() as SVGPolylineElement;
+          line.setAttribute('points', points);
+          return line;
+        }),
+      );
+      summary.textContent = describeExpectancy(ev, breakeven, PATHS, TRADES, summarize(paths));
+    };
+
+    form.addEventListener('input', update);
+    form.addEventListener('submit', (event) => event.preventDefault());
+    form.querySelector('[data-action="reseed"]')?.addEventListener('click', () => {
+      seed += 1;
+      update();
+    });
+  }
+</script>
+
+<style>
+  .sim {
+    margin: var(--space-6) 0 0;
+  }
+
+  .sim__caption {
+    margin-bottom: var(--space-2);
+    font-size: var(--text-xs);
+    color: var(--ink-3);
+  }
+
+  .sim__tag {
+    margin-right: var(--space-2);
+    padding: 0 var(--space-2);
+    font-weight: 600;
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+    color: var(--caution);
+    background: var(--caution-bg);
+  }
+
+  .sim__chart {
+    display: block;
+    width: 100%;
+    height: auto;
+    background: var(--paper);
+    border: var(--border-hair) solid var(--rule);
+  }
+
+  .sim__line {
+    fill: none;
+    stroke: var(--ink-3);
+    stroke-width: 1;
+    stroke-opacity: 0.55;
+  }
+
+  .sim__zero {
+    stroke: var(--ink-2);
+    stroke-width: 1;
+  }
+
+  .sim__expected {
+    fill: none;
+    stroke: var(--ink);
+    stroke-width: 2;
+    stroke-dasharray: 6 4;
+  }
+
+  .sim__again {
+    margin-top: var(--space-3);
+    min-height: 2.5rem;
+    padding: 0 var(--space-4);
+    font: inherit;
+    font-size: var(--text-sm);
+    font-weight: 600;
+    color: var(--ink);
+    background: transparent;
+    border: var(--border-hair) solid var(--ink-3);
+    border-radius: var(--radius-1);
+    cursor: pointer;
+  }
+
+  .sim__again:hover {
+    border-color: var(--ink);
+  }
+</style>

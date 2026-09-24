@@ -16,7 +16,7 @@ function tokens(query: string): string[] {
 }
 
 // Bobot per field: kecocokan di judul lebih penting daripada di isi.
-const weights = { title: 10, termEn: 8, description: 4, category: 2, body: 1 } as const;
+const weights = { title: 10, termEn: 8, keywords: 6, description: 4, category: 2, body: 1 } as const;
 type Field = keyof typeof weights;
 const fields = Object.keys(weights) as Field[];
 

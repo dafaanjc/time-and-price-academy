@@ -1,0 +1,112 @@
+---
+title: "Risiko Kehancuran"
+termEn: "Risk of Ruin"
+slug: risk-of-ruin
+category: risk-management
+order: 3
+difficulty: intermediate
+description: "Kemungkinan modal turun sampai titik di mana Anda tidak bisa atau tidak sanggup lagi melanjutkan, bahkan bila pendekatan Anda punya nilai harapan positif."
+status: draft
+featured: false
+prerequisites: [expected-value, position-sizing]
+related: [variance-and-volatility, leverage-and-margin, loss-aversion]
+keywords: [drawdown, DD, kalah beruntun, losing streak, margin call, akun habis, martingale, ruin]
+sources: []
+---
+
+## Mengapa Ini Penting
+
+[Nilai harapan](../expected-value/) yang positif hanya berguna bila Anda masih bisa terus bermain cukup lama sampai rata-rata itu terwujud. Rangkaian kekalahan yang wajar secara statistik bisa menghabiskan modal lebih dulu bila risiko per transaksi terlalu besar. Risiko kehancuran menjawab pertanyaan: **seberapa mungkin saya berhenti di tengah jalan?**
+
+## Gagasan Utama
+
+<Definisi>
+
+**Risiko kehancuran adalah kemungkinan modal turun sampai batas di mana Anda tidak bisa, atau tidak sanggup, melanjutkan.** Batas itu tidak harus nol: bagi banyak orang, turun 50% sudah cukup untuk berhenti atau mengubah rencana secara drastis.
+
+</Definisi>
+
+Risiko kehancuran dipengaruhi oleh empat hal:
+
+1. **Nilai harapan** per transaksi. Nilai harapan negatif menuju kehancuran dalam jangka panjang, berapa pun ukuran posisinya.
+2. **Risiko per transaksi** dibandingkan modal. Ini faktor yang paling bisa Anda kendalikan.
+3. **Sebaran hasil** ([varians](../variance-and-volatility/)): semakin lebar, semakin panjang rangkaian kekalahan yang mungkin terjadi.
+4. **Batas kehancuran** yang Anda tetapkan.
+
+## Penjelasan Sederhana
+
+Kerugian dan pemulihan tidak simetris. Bila modal turun 50%, Anda membutuhkan kenaikan 100% hanya untuk kembali ke titik awal:
+
+| Turun | Kenaikan yang dibutuhkan untuk pulih |
+| --- | --- |
+| 10% | 11,1% |
+| 20% | 25% |
+| 30% | 42,9% |
+| 50% | 100% |
+| 75% | 300% |
+| 90% | 900% |
+
+Semakin dalam penurunan, semakin berat jalan kembalinya. Karena itu, menjaga agar penurunan tidak terlalu dalam jauh lebih mudah daripada memulihkannya.
+
+## Contoh Kehidupan Nyata
+
+<Contoh jenis="kehidupan">
+
+Seorang pemain sepak bola berbakat tetap bisa gagal berkarier bila cedera parah di usia muda. Bakatnya (nilai harapan) tinggi, tetapi satu kejadian buruk yang cukup besar menghentikan semuanya. Menghindari cedera parah sama pentingnya dengan berlatih keterampilan.
+
+</Contoh>
+
+## Contoh Keuangan
+
+<Contoh jenis="keuangan">
+
+*Ilustrasi.* Bayangkan terjadi 10 kekalahan berturut-turut, dengan risiko per transaksi yang tetap berupa persentase dari modal yang tersisa:
+
+| Risiko per transaksi | Sisa modal setelah 10 kalah | Kenaikan yang dibutuhkan untuk pulih |
+| --- | --- | --- |
+| 1% | 90,4% | 10,6% |
+| 2% | 81,7% | 22,4% |
+| 5% | 59,9% | 67,0% |
+| 10% | 34,9% | 186,8% |
+
+Rangkaian kekalahan yang sama berdampak sangat berbeda tergantung risiko per transaksinya.
+
+</Contoh>
+
+## Contoh Trading
+
+<Contoh jenis="trading">
+
+*Ilustrasi, bukan rekomendasi.* Seorang trader yang memiliki peluang kalah 60% per transaksi. Peluang kalah beruntun pada **satu rangkaian tertentu** adalah:
+
+| Kalah beruntun | Peluang |
+| --- | --- |
+| 3 kali | 21,6% |
+| 5 kali | 7,8% |
+| 8 kali | 1,7% |
+| 10 kali | 0,6% |
+
+Angka-angka ini terlihat kecil, tetapi dalam ratusan transaksi, kesempatan munculnya rangkaian kekalahan panjang di suatu titik menjadi jauh lebih besar. Rangkaian kalah beruntun bukan tanda ada yang salah; itu bagian normal dari hasil yang acak.
+
+Bandingkan dua cara menghadapi kekalahan beruntun, dimulai dari risiko 1% modal awal:
+
+- **Risiko tetap 1%:** setelah 6 kali kalah, modal tersisa sekitar 94,1%.
+- **Menggandakan risiko setiap kali kalah** (1%, 2%, 4%, 8%, 16%, 32% dari modal awal): setelah 6 kali kalah, modal tersisa 37%.
+
+Pola menggandakan ukuran setelah rugi (sering disebut *martingale*) terlihat masuk akal karena "cepat balik modal" saat akhirnya menang, tetapi pola ini mempercepat kehancuran saat kekalahan beruntun datang.
+
+</Contoh>
+
+## Cara Kerja Konsep
+
+Beberapa hal yang menurunkan risiko kehancuran:
+
+1. **Risiko per transaksi yang kecil** dibandingkan modal (lihat [Ukuran Posisi](../position-sizing/)).
+2. **Risiko yang tidak dinaikkan setelah rugi.** Setiap transaksi berdiri sendiri; kekalahan sebelumnya tidak membuat kemenangan berikutnya lebih mungkin.
+3. **Tidak mendekati batas margin** (lihat [Leverage & Margin](../leverage-and-margin/)).
+4. **Batas kerugian harian atau mingguan**, sehingga satu hari yang buruk tidak berubah menjadi penurunan yang dalam.
+5. **Memeriksa nilai harapan secara jujur.** Tanpa nilai harapan positif, ukuran posisi yang kecil hanya memperlambat kerugian, bukan mencegahnya.
+
+Rumus risiko kehancuran yang tepat bergantung pada asumsi tentang distribusi hasil dan definisi "hancur", sehingga lebih aman dipahami melalui simulasi dan tabel seperti di atas daripada satu angka pasti.
+
+<TabelKalahBeruntun />

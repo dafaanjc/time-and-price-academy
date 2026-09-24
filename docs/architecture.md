@@ -44,7 +44,16 @@ src/
     og-image.ts         Template gambar OpenGraph 1200×630 (sharp + font di src/assets/fonts)
     search-index.ts     Indeks pencarian (dibuat saat build)
     search.ts           Pencocokan dan skor pencarian (fungsi murni)
+    nav.ts              Navigasi utama (data) + status aktif per bagian
     graph.ts            Tingkat dan tata letak graf prasyarat (fungsi murni)
+    calc/                  Rumus alat hitung (fungsi murni, diuji Vitest):
+      position-size.ts     ukuran posisi & risiko dari lot tertentu
+      margin.ts            margin terpakai/level, jarak ke margin call & stop out
+      drawdown.ts          kalah beruntun (tetap vs digandakan) & pemulihan
+      expected-value.ts    nilai harapan (R), titik impas, simulasi ber-seed
+      describe.ts          kalimat ringkasan hasil (dipakai server & browser)
+    chart.ts            Koordinat SVG grafik simulasi
+    format.ts           Format angka Indonesia (Rp1.000.000; 0,5)
   layouts/BaseLayout.astro   Kerangka halaman: head/SEO, header, sidebar, footer
   components/           Komponen UI kecil dengan satu tanggung jawab
   pages/                Rute
@@ -58,7 +67,7 @@ Semua identitas ada di `src/config/site.ts` dan diekspor sebagai `siteConfig`:
 
 | Field | Nilai | Dipakai oleh |
 |---|---|---|
-| `masterBrand` | Time & Price Academy | `SiteHeader`, `SiteFooter`, eyebrow hero |
+| `masterBrand` | Time & Price Academy | `SiteHeader` (wordmark), `SiteFooter`, eyebrow hero, alt emblem |
 | `product` | Risk Lab | `SiteHeader`, `SiteFooter`, hero, deskripsi halaman |
 | `author` | Muhamad Daffa | `<meta name="author">`, `article:author` |
 | `name` | Risk Lab — Time & Price Academy | `<title>`, `og:site_name`, `og:title` default |
@@ -79,6 +88,35 @@ Namanya sengaja `siteConfig`, bukan `site`, agar tidak tertukar dengan `Astro.si
 
 Nilai diambil langsung dari `src/config/site.ts` (Node menjalankan TypeScript secara native), sehingga
 tidak ada salinan kedua yang bisa berbeda.
+
+### Aset merek (emblem)
+
+Aset resmi ada di `src/assets/Logo/` dan **tidak diubah**:
+
+| File | Isi | Latar |
+|---|---|---|
+| `black logo.png` | 1024×1024, figur klasik + jam pasir, gaya etsa | Hitam murni (0–1) |
+| `logos.jpeg` | 433×453, versi terang (resolusi rendah) | Abu-abu ±221–231 |
+
+Aturan pakai:
+
+- **Header:** tidak memakai emblem, karena detailnya hilang di 24–32px. Header memakai wordmark
+  tipografis dari `siteConfig`. Ini penulisan nama, bukan logo baru.
+- **Emblem maksimal satu kali per halaman:** di hero beranda (300px desktop / 240px mobile) atau di
+  footer halaman lain (96px, `alt=""` karena atribusi sudah tertulis di sebelahnya).
+- **Latar dilebur tanpa kotak** (`BrandEmblem.astro`, `<picture>` per tema):
+  - tema gelap: `black logo.png` + `mix-blend-mode: screen`. Hitam murni menjadi transparan tanpa filter;
+  - tema terang: `logos.jpeg` + `filter: brightness(1.16)` + `mix-blend-mode: multiply`. Kecerahan
+    menaikkan latar terendah (221) menjadi putih, lalu `multiply` membuat putih transparan di atas kertas.
+    Garis etsa hampir tidak berubah; hanya sorotan paling terang yang terpotong ke putih.
+- **Gambar OG:** versi terang dengan teknik yang sama (sharp `linear(1.16)` + composite `multiply`) di
+  sisi kanan. Faktor 1,16 didefinisikan sekali di `src/lib/brand-assets.ts`.
+- **Favicon (sementara):** `favicon-32.png` dan `apple-touch-icon.png` (180px) dibuat saat build dari
+  `black logo.png`, hanya diperkecil. Di 32px emblem tidak terbaca; ganti bila ada ikon kecil resmi.
+- **Dilarang:** memotong jam pasir menjadi ikon, mewarnai ulang, masker bentuk, watermark, latar
+  bagian, atau memakai emblem sebagai dekorasi berulang.
+- `scripts/check-branding.mjs` memeriksa: wordmark ada di header, header tanpa gambar, emblem ≤ 1 per
+  halaman, beranda punya emblem hero, dan `favicon.svg` (ikon buatan lama) tidak kembali.
 
 ## Sistem konten
 
@@ -105,23 +143,37 @@ Detail skema dan cara menambah konsep ada di [`content-model.md`](./content-mode
 
 | Komponen | Tanggung jawab |
 |---|---|
-| `BaseLayout` | Struktur halaman, `lang="id"`, skip link, grid sidebar + konten |
+| `BaseLayout` | Struktur halaman, `lang="id"`, skip link. Prop `sidebar`: indeks konsep di kiri (hanya halaman konsep/kategori); tanpa itu kontainer di tengah (`--container`) |
 | `SeoHead` | `<title>`, description, canonical, OpenGraph, Twitter card |
-| `SiteHeader` | Merek (Risk Lab + Time & Price Academy) dan tombol menu mobile |
-| `SiteNav` | Isi navigasi, dipakai bersama oleh sidebar dan menu mobile |
-| `Sidebar` | Navigasi desktop (≥ 64rem), sticky |
+| `SiteHeader` | Wordmark tipografis "TIME & PRICE ACADEMY │ Risk Lab" (dua baris di layar < 30rem) dan tombol menu mobile |
+| `BrandEmblem` | Artwork emblem resmi (varian `hero` / `footer`), dilebur ke tema dengan blend mode |
+| `PrimaryNav` | Navigasi utama dari `src/lib/nav.ts` (Konsep / Jalur Belajar / Peta): baris di header desktop, kolom di menu mobile |
+| `ConceptNav` | Indeks konsep bergaya daftar isi bernomor; kategori kosong digabung jadi satu baris "Segera hadir" |
+| `ConceptIndex` | Indeks semua kategori untuk `/konsep/`; tiap kategori memakai `ConceptRows` |
+| `ConceptRows` | Baris konsep bernomor (judul, istilah asli, tingkat, deskripsi); juga dipakai halaman kategori |
+| `ProblemList` | Daftar masalah trader sebagai baris editorial: kutipan, keputusan, konsep (di `/masalah/` dan tautan balik halaman konsep) |
+| `ProblemLayout` | Halaman masalah: kutipan → keputusan → atribusi → isi (4 bagian wajib) → konsep yang terlibat → baca dulu → sumber |
+| `Sidebar` | `ConceptNav` di kiri (≥ 64rem), sticky; hanya bila `BaseLayout sidebar` |
 | `MobileNav` | Navigasi mobile dengan `<dialog>` native (fokus terkunci, Esc/backdrop menutup) |
 | `SiteFooter` | Atribusi "By Muhamad Daffa - Time & Price Academy" dan disclaimer |
-| `CategoryGrid` | Kartu kategori beserta jumlah konsep |
-| `ConceptCard` | Ringkasan konsep: kategori, judul, istilah asli, deskripsi, lencana |
-| `LearningPath` | Langkah bernomor, masing-masing menaut ke halaman konsep |
-| `ConceptLayout` | Urutan halaman konsep: header → notis draf → daftar isi → isi MDX → terkait → prasyarat → sumber → navigasi jalur |
-| `ConceptHeader` | Kategori, judul, istilah asli, deskripsi, meta, dan byline |
-| `ConceptMeta` | Kategori, tingkat, waktu baca, dan status (`<dl>`) |
+| `LearningPath` | Langkah bernomor dengan deskripsi (`/jalur-belajar/`) |
+| `SectionHeading` | Judul bagian bernomor bergaya dokumen cetak ("01 MASALAH TRADER ─ Semua →") |
+| `ConceptIndexCompact` | Indeks konsep ringkas per kategori untuk beranda |
+| `LearningPathStrip` | Jalur belajar ringkas satu alur untuk beranda |
+| `tools/ToolFrame` | Kerangka alat hitung: label, judul, input, hasil, ringkasan `aria-live`, catatan "bukan rekomendasi" |
+| `tools/UkuranPosisi` | Risiko per transaksi → ukuran posisi; risiko sebenarnya dari "lot yang biasa dipakai" |
+| `tools/SimulasiMargin` | Margin level dan jarak (poin) ke margin call / stop out |
+| `tools/TabelKalahBeruntun` | Sisa modal saat kalah beruntun: risiko tetap vs digandakan |
+| `tools/PenjelajahNilaiHarapan` | Nilai harapan (R), titik impas, 20 rangkaian simulasi 100 transaksi (SVG) |
+| `ConceptLayout` | Urutan halaman konsep: header → pita draf → [isi MDX + daftar isi] → masalah terkait → konsep terkait → prasyarat → sumber → navigasi jalur. Di ≥ 80rem daftar isi menjadi kolom kanan sticky |
+| `ConceptHeader` | Pembuka padat: meta satu baris, judul + istilah asli, deskripsi, byline |
+| `ConceptMeta` | Satu baris: kategori · tingkat · waktu baca · lencana Draf |
 | `Byline` | Atribusi "By Muhamad Daffa - Time & Price Academy" + `CopyLinkButton` |
 | `CopyLinkButton` | Menyalin URL canonical (atau `location.href`) dan mengumumkan hasilnya lewat `role="status"` |
-| `PlaceholderNotice` | Notis untuk konsep berstatus `draft` |
-| `TableOfContents` | "Di halaman ini", dari heading `##` MDX atau override `sections` |
+| `PlaceholderNotice` | Pita tipis "DRAF" untuk konsep/masalah berstatus `draft` |
+| `TableOfContents` | "Di halaman ini", dari heading `##` MDX atau override `sections`. Kolom kanan sticky (≥ 80rem), dua kolom (tablet), sebaris membungkus (mobile) |
+| `mdx/Contoh` | Kotak contoh di isi konsep: `<Contoh jenis="kehidupan|keuangan|trading">` (trading bergaris peringatan) |
+| `mdx/Definisi` | Kotak definisi utama di "Gagasan Utama" |
 | `ConceptLinkList` | Daftar tautan konsep (dipakai untuk Konsep Terkait dan Prasyarat) |
 | `SourceList` | Bagian "Sumber": urutan per jenis dan keadaan kosong |
 | `SourceCard` | Satu sumber: label jenis, judul (tautan URL/DOI, tab baru), penulis · tahun, publisher/DOI/ISBN, catatan |
@@ -135,7 +187,10 @@ ID bagian yang dirender layout (`konsep-terkait`, `prasyarat`, `sumber`) didefin
 
 | Rute | Sumber |
 |---|---|
-| `/` | `pages/index.astro` |
+| `/` | `pages/index.astro`: Masalah Trader → Hitung Dulu → Konsep Inti → Jalur Belajar → Prinsip |
+| `/masalah/` | `pages/masalah/index.astro`, semua masalah trader |
+| `/masalah/<slug>/` | `pages/masalah/[slug].astro`, satu halaman per masalah |
+| `/konsep/` | `pages/konsep/index.astro`, indeks semua konsep per kategori |
 | `/konsep/<slug>/` | `pages/konsep/[slug].astro`, satu halaman per konsep |
 | `/kategori/<id>/` | `pages/kategori/[category].astro`, satu halaman per kategori (termasuk yang masih kosong) |
 | `/jalur-belajar/` | `pages/jalur-belajar/index.astro`, semua jalur dari `src/data/learning-paths.ts` |
@@ -150,6 +205,14 @@ Prinsip:
 - JavaScript klien hanya ada tiga skrip kecil: menu mobile, salin tautan, dan pencarian.
 - Lebar baca teks panjang dibatasi `--measure: 68ch` (kelas `.prose`).
 - Tema terang/gelap mengikuti `prefers-color-scheme` melalui token CSS di `:root`.
+- **Token desain** (`src/styles/global.css`, arah "Trading Desk Manual"): warna monokrom (`--paper`, `--surface`,
+  `--ink`, `--ink-2`, `--ink-3`, `--rule`, `--tint`; `--accent` = tinta), warna semantik data saja
+  (`--loss`, `--gain`, `--caution`), skala teks `--text-xs`…`--text-4xl` (rasio 1,25, dasar 17px), jarak
+  `--space-1`…`--space-24` (dasar 4px), bentuk `--radius-0`/`--radius-1` (0/2px, tanpa bayangan), dan gerak
+  `--motion-fast`/`--motion-base` (0 bila `prefers-reduced-motion`). Komponen tidak menulis ukuran font
+  atau radius secara manual.
+- **Font:** Source Sans 3 (teks) dan Source Serif 4 (judul) disajikan sendiri dari `src/assets/fonts/web/`
+  (lihat README di sana); dua di antaranya di-preload di `SeoHead`.
 
 ## Pencarian
 
@@ -178,7 +241,11 @@ SVG statis saat build, tanpa library dan tanpa JavaScript klien.
    dipilih agar graf terbaca di mobile tanpa diperkecil.
 4. **Garis.** Hanya relasi prasyarat (konsep terkait tampil di halaman konsep):
    - antar tingkat berurutan: kurva S dari bawah prasyarat ke atas konsep;
-   - melompati tingkat: kurva yang dibelokkan ke kanan, agar tidak menembus simpul di antaranya.
+   - melompati tingkat: garis siku di **jalur (lane) khusus di kanan semua simpul**. Garis turun dari
+     bawah simpul asal, belok di celah antar-tingkat (yang tidak berisi simpul), turun di jalurnya, lalu
+     masuk ke atas simpul tujuan. Setiap garis mendapat jalur sendiri (garis terpendek paling dekat), dan
+     belokan keluar/masuk dipisah agar dua garis di satu celah tidak tampak menyatu. Tidak ada garis yang
+     menembus simpul lain; ini diuji secara geometris.
 5. **Judul.** Maksimal dua baris × 22 karakter. Sisanya dipotong dengan elipsis.
 6. **Aksesibilitas.** SVG punya `<title>` dan `<desc>`. Setiap simpul adalah `<a>` dengan
    `aria-label` judul lengkap, bisa difokuskan dengan Tab dan punya cincin fokus. Halaman `/peta/`
@@ -226,8 +293,23 @@ Karena situs berada di sub-path, **semua tautan internal wajib lewat `src/lib/ur
 - `SeoHead` menulis `og:image` (+ type/width/height/alt) dan `twitter:card=summary_large_image`.
 - Halaman 404 memakai `noindex`: tanpa canonical dan tanpa `og:url`.
 
+### Alat hitung
+
+- Rumus ada di `src/lib/calc/*` (fungsi murni). Komponen `src/components/tools/*` merender **hasil awal di
+  server** dari nilai default (tetap berguna tanpa JavaScript), lalu skrip kecil menghitung ulang saat input
+  berubah dengan fungsi yang sama. Kalimat ringkasan juga dari satu sumber (`calc/describe.ts`).
+- Tidak ada data yang disimpan atau dikirim; semua dihitung di browser.
+- Simulasi nilai harapan memakai PRNG ber-seed (`mulberry32`): hasil sama untuk seed yang sama, dan diberi
+  label "Simulasi".
+- Dipasang di MDX tanpa import lewat `src/components/tools/index.ts` (prop `components` di halaman konsep
+  dan masalah), serta langsung di beranda ("Hitung Dulu").
+
 ### Pemeriksaan (`npm run validate`)
 
+1. `vitest run`: uji fungsi murni di `tests/` (rumus kalkulator beserta angka yang muncul di konten,
+   validasi konten, pencarian, graf, kalimat ringkasan).
+1. `scripts/check-source.mjs`: menolak teks dan elemen inline yang dipisah baris baru di template
+   `.astro` (Astro 7 membuang spasinya saat render, mis. "dipeta").
 1. `astro check`: tipe dan template.
 2. `astro build`: termasuk skema konten dan `validate.ts`.
 3. `scripts/check-branding.mjs`: merek dan penulis dari `siteConfig`.

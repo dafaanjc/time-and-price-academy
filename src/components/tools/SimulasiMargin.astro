@@ -1,0 +1,81 @@
+---
+// Alat: status margin dan jarak ke margin call / stop out. Menjawab: "kenapa gue full margin?".
+import ToolFrame from './ToolFrame.astro';
+import { describeMargin } from '../../lib/calc/describe';
+import { marginStatus } from '../../lib/calc/margin';
+import { formatNumber, formatRupiah } from '../../lib/format';
+
+const defaults = {
+  equity: 10_000_000,
+  lots: 1.8,
+  marginPerLot: 5_000_000,
+  valuePerPointPerLot: 10_000,
+  marginCallLevel: 100,
+  stopOutLevel: 50,
+};
+const r = marginStatus(defaults);
+const pct = (v: number) => `${formatNumber(Math.round((v / defaults.equity) * 100))}%`;
+---
+
+<ToolFrame
+  tool="margin"
+  title="Simulasi margin: seberapa dekat dengan margin call?"
+  description="Isi ekuitas, ukuran posisi, dan spesifikasi broker. Lihat berapa poin pergerakan melawan posisi yang cukup untuk margin call dan stop out."
+  summary={describeMargin(defaults, r)}
+>
+  <Fragment slot="inputs">
+    <label class="field"><span>Ekuitas (Rp)</span><input name="equity" type="number" inputmode="decimal" min="0" step="any" value={defaults.equity} /></label>
+    <label class="field"><span>Ukuran posisi (lot)</span><input name="lots" type="number" inputmode="decimal" min="0" step="0.01" value={defaults.lots} /></label>
+    <label class="field"><span>Margin per 1 lot (Rp)</span><input name="marginPerLot" type="number" inputmode="decimal" min="0" step="any" value={defaults.marginPerLot} /></label>
+    <label class="field"><span>Nilai per poin per 1 lot (Rp)</span><input name="valuePerPointPerLot" type="number" inputmode="decimal" min="0" step="any" value={defaults.valuePerPointPerLot} /></label>
+    <label class="field"><span>Level margin call (%)</span><input name="marginCallLevel" type="number" inputmode="decimal" min="0" step="1" value={defaults.marginCallLevel} /></label>
+    <label class="field"><span>Level stop out (%)</span><input name="stopOutLevel" type="number" inputmode="decimal" min="0" step="1" value={defaults.stopOutLevel} /></label>
+  </Fragment>
+  <Fragment slot="results">
+    <dl class="readout">
+      <div><dt>Margin terpakai</dt><dd data-out="usedMargin">{formatRupiah(r.usedMargin)}</dd></div>
+      <div><dt>Free margin</dt><dd data-out="freeMargin">{formatRupiah(r.freeMargin)}</dd></div>
+      <div><dt>Margin level</dt><dd data-out="marginLevel">{formatNumber(Math.round(r.marginLevel))}%</dd></div>
+      <div><dt>Ke margin call</dt><dd data-out="toMc">±{formatNumber(Math.round(r.pointsToMarginCall))} poin</dd></div>
+      <div><dt>Ke stop out</dt><dd data-out="toSo">±{formatNumber(Math.round(r.pointsToStopOut))} poin</dd></div>
+      <div><dt>Rugi saat stop out</dt><dd class="is-loss" data-out="loss">{formatRupiah(r.lossAtStopOut)} ({pct(r.lossAtStopOut)})</dd></div>
+    </dl>
+  </Fragment>
+</ToolFrame>
+
+<script>
+  import { describeMargin } from '../../lib/calc/describe';
+  import { marginStatus } from '../../lib/calc/margin';
+  import { formatNumber, formatRupiah } from '../../lib/format';
+
+  const FIELDS = ['equity', 'lots', 'marginPerLot', 'valuePerPointPerLot', 'marginCallLevel', 'stopOutLevel'] as const;
+
+  for (const form of document.querySelectorAll<HTMLFormElement>('form[data-tool="margin"]')) {
+    const value = (name: string) => (form.elements.namedItem(name) as HTMLInputElement).valueAsNumber;
+    const out = (name: string) => form.querySelector<HTMLElement>(`[data-out="${name}"]`)!;
+    const summary = form.querySelector<HTMLElement>('[data-summary]')!;
+    const points = (v: number) => (Number.isFinite(v) ? `±${formatNumber(Math.round(v))} poin` : '—');
+
+    const update = (): void => {
+      const input = Object.fromEntries(FIELDS.map((f) => [f, value(f)])) as Record<(typeof FIELDS)[number], number>;
+      const valid = FIELDS.every((f) => Number.isFinite(input[f]) && input[f] >= 0) && input.equity > 0;
+      if (!valid) {
+        for (const key of ['usedMargin', 'freeMargin', 'marginLevel', 'toMc', 'toSo', 'loss']) out(key).textContent = '—';
+        summary.textContent = 'Isi semua kolom dengan angka 0 atau lebih (ekuitas lebih dari 0).';
+        return;
+      }
+      const r = marginStatus(input);
+      out('usedMargin').textContent = formatRupiah(r.usedMargin);
+      out('freeMargin').textContent = formatRupiah(r.freeMargin);
+      out('marginLevel').textContent = Number.isFinite(r.marginLevel) ? `${formatNumber(Math.round(r.marginLevel))}%` : '—';
+      out('toMc').textContent = points(r.pointsToMarginCall);
+      out('toSo').textContent = points(r.pointsToStopOut);
+      out('loss').textContent = `${formatRupiah(r.lossAtStopOut)} (${formatNumber(Math.round((r.lossAtStopOut / input.equity) * 100))}%)`;
+      summary.textContent = describeMargin(input, r);
+    };
+
+    form.addEventListener('input', update);
+    form.addEventListener('submit', (event) => event.preventDefault());
+    update();
+  }
+</script>

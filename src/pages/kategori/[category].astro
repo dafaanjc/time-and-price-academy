@@ -1,8 +1,10 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import ConceptCard from '../../components/ConceptCard.astro';
+import ConceptRows from '../../components/ConceptRows.astro';
+import ProblemList from '../../components/ProblemList.astro';
 import { categories, type Category } from '../../data/categories';
 import { getConceptsByCategory } from '../../lib/concepts';
+import { getProblems } from '../../lib/problems';
 
 export function getStaticPaths() {
   return categories.map((category) => ({
@@ -17,24 +19,28 @@ interface Props {
 
 const { category } = Astro.props;
 const concepts = (await getConceptsByCategory()).get(category.id) ?? [];
+const conceptIds = new Set(concepts.map((c) => c.id));
+// Masalah trader yang merujuk setidaknya satu konsep di kategori ini.
+const problems = (await getProblems()).filter((p) => p.data.concepts.some((id) => conceptIds.has(id)));
 ---
 
-<BaseLayout title={category.title} description={category.description}>
+<BaseLayout title={category.title} description={category.description} sidebar>
   <header class="category-header">
     <p class="eyebrow">Kategori</p>
     <h1>{category.title}</h1>
     <p class="category-header__desc">{category.description}</p>
+    <p class="category-header__count">{concepts.length > 0 ? `${concepts.length} konsep` : 'Segera hadir'}</p>
   </header>
 
+  {concepts.length > 0 && <ConceptRows concepts={concepts} />}
+  {concepts.length === 0 && <p class="empty">Konsep untuk kategori ini sedang disiapkan.</p>}
+
   {
-    concepts.length > 0 ? (
-      <div class="card-grid">
-        {concepts.map((concept) => (
-          <ConceptCard concept={concept} headingLevel={2} />
-        ))}
-      </div>
-    ) : (
-      <p class="empty">Konsep untuk kategori ini sedang disiapkan.</p>
+    problems.length > 0 && (
+      <section class="category-problems" aria-labelledby="kategori-masalah">
+        <h2 id="kategori-masalah">Masalah Trader Terkait</h2>
+        <ProblemList problems={problems} headingLevel={3} />
+      </section>
     )
   }
 </BaseLayout>
@@ -42,25 +48,43 @@ const concepts = (await getConceptsByCategory()).get(category.id) ?? [];
 <style>
   .category-header {
     max-width: var(--measure);
-    margin-bottom: 2rem;
+    margin-bottom: var(--space-8);
+    padding-bottom: var(--space-4);
+    border-bottom: var(--border-mark) solid var(--ink);
   }
 
   .category-header h1 {
-    margin: 0.5rem 0 0.75rem;
-    font-size: clamp(2rem, 5vw, 2.75rem);
+    margin: var(--space-2) 0 var(--space-3);
+    font-size: clamp(var(--text-2xl), 5vw, var(--text-3xl));
   }
 
   .category-header__desc {
     margin: 0;
-    font-size: 1.125rem;
-    color: var(--ink-soft);
+    font-size: var(--text-lg);
+    color: var(--ink-2);
+  }
+
+  .category-header__count {
+    margin: var(--space-3) 0 0;
+    font-size: var(--text-xs);
+    font-weight: 600;
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+    color: var(--ink-3);
   }
 
   .empty {
     max-width: var(--measure);
-    padding: 1rem 1.25rem;
-    color: var(--ink-faint);
-    border: 1px dashed var(--line);
-    border-radius: var(--radius);
+    margin: 0;
+    color: var(--ink-3);
+  }
+
+  .category-problems {
+    margin-top: var(--space-16);
+  }
+
+  .category-problems h2 {
+    margin: 0 0 var(--space-4);
+    font-size: var(--text-xl);
   }
 </style>

@@ -21,6 +21,8 @@ export const siteConfig = {
   name: `${product} — ${masterBrand}`,
   /** Atribusi wajib di setiap halaman konsep dan footer. */
   attribution: `By ${author} - ${masterBrand}`,
+  /** Teks alternatif artwork emblem merek induk (figur klasik dengan jam pasir). */
+  emblemAlt: `Emblem ${masterBrand}: figur klasik memegang jam pasir`,
   lang: 'id',
   locale: 'id_ID',
   /** Dua bagian tagline; hero menampilkannya dalam dua baris. */

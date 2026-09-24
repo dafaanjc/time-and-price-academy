@@ -1,0 +1,41 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import ConceptIndex from '../../components/ConceptIndex.astro';
+import { siteConfig } from '../../config/site';
+import { routes, withBase } from '../../lib/url';
+---
+
+<BaseLayout
+  title="Indeks Konsep"
+  description={`Semua konsep risiko di ${siteConfig.product}, dikelompokkan per kategori.`}
+>
+  <header class="page-header">
+    <p class="eyebrow">Indeks</p>
+    <h1>Konsep Inti Risiko</h1>
+    <p class="page-header__lead">
+      Setiap konsep adalah satu satuan pengetahuan: definisi, penjelasan, contoh, dan cara kerjanya. Ingin
+      belajar berurutan? Ikuti <a href={withBase(routes.learningPaths)}>jalur belajar</a>,
+      atau lihat hubungannya di <a href={withBase(routes.map)}>peta pengetahuan</a>.
+    </p>
+  </header>
+
+  <ConceptIndex />
+</BaseLayout>
+
+<style>
+  .page-header {
+    max-width: var(--measure);
+    margin-bottom: var(--space-12);
+  }
+
+  .page-header h1 {
+    margin: var(--space-2) 0 var(--space-4);
+    font-size: clamp(var(--text-2xl), 5vw, var(--text-3xl));
+  }
+
+  .page-header__lead {
+    margin: 0;
+    font-size: var(--text-lg);
+    color: var(--ink-2);
+  }
+</style>

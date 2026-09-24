@@ -1,0 +1,159 @@
+---
+// Kerangka bersama alat hitung: label, judul, input (slot "inputs"), hasil (slot "results"),
+// ringkasan untuk pembaca layar (aria-live), dan catatan bahwa ini alat bantu, bukan rekomendasi.
+// Tanpa JavaScript, hasil awal (dihitung di server dari nilai default) tetap tampil.
+interface Props {
+  /** Nama alat untuk skrip (data-tool). */
+  tool: string;
+  title: string;
+  description: string;
+  /** Ringkasan hasil awal (juga diperbarui skrip). */
+  summary: string;
+}
+
+const { tool, title, description, summary } = Astro.props;
+---
+
+<form class="tool" data-tool={tool} novalidate>
+  <header class="tool__header">
+    <p class="tool__label">Alat hitung</p>
+    <h3 class="tool__title">{title}</h3>
+    <p class="tool__desc">{description}</p>
+  </header>
+  <div class="tool__inputs">
+    <slot name="inputs" />
+  </div>
+  <div class="tool__results">
+    <slot name="results" />
+  </div>
+  <p class="tool__summary" data-summary aria-live="polite">{summary}</p>
+  <p class="tool__note">
+    Alat bantu hitung untuk belajar, bukan rekomendasi. Spesifikasi (nilai per poin, margin, level stop out)
+    berbeda tiap instrumen dan broker.
+  </p>
+  <noscript><p class="tool__note">Aktifkan JavaScript untuk menghitung dengan angka Anda sendiri.</p></noscript>
+</form>
+
+<style>
+  .tool {
+    max-width: var(--measure);
+    margin: var(--space-8) 0;
+    padding: var(--space-6) clamp(var(--space-4), 4vw, var(--space-6));
+    background: var(--surface);
+    border: var(--border-hair) solid var(--rule);
+    border-top: var(--border-mark) solid var(--ink);
+  }
+
+  .tool__header {
+    margin-bottom: var(--space-4);
+  }
+
+  .tool__label {
+    margin: 0;
+    font-size: var(--text-xs);
+    font-weight: 600;
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+    color: var(--ink-3);
+  }
+
+  .tool__title {
+    margin: var(--space-1) 0 var(--space-2);
+    font-size: var(--text-lg);
+  }
+
+  .tool__desc {
+    margin: 0;
+    font-size: var(--text-sm);
+    color: var(--ink-2);
+  }
+
+  /* Dua kolom sudah muncul di ponsel (≥ ~19rem) agar alat dengan banyak input tidak terlalu panjang. */
+  .tool__inputs {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 9rem), 1fr));
+    gap: var(--space-4) var(--space-3);
+    align-items: end;
+  }
+
+  .tool__results {
+    margin-top: var(--space-6);
+    padding-top: var(--space-4);
+    border-top: var(--border-hair) solid var(--rule);
+  }
+
+  .tool__summary {
+    margin: var(--space-4) 0 0;
+    font-weight: 600;
+  }
+
+  .tool__note {
+    margin: var(--space-3) 0 0;
+    font-size: var(--text-xs);
+    color: var(--ink-3);
+  }
+
+  /* Gaya bersama untuk isi slot (input & hasil) di semua alat. */
+  .tool :global(.field) {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+    font-size: var(--text-sm);
+  }
+
+  .tool :global(.field span) {
+    color: var(--ink-2);
+  }
+
+  .tool :global(.field input) {
+    min-height: 2.5rem;
+    padding: 0 var(--space-3);
+    font: inherit;
+    font-variant-numeric: tabular-nums;
+    color: var(--ink);
+    background: var(--paper);
+    border: var(--border-hair) solid var(--ink-3);
+    border-radius: var(--radius-1);
+  }
+
+  .tool :global(.field input[type='range']) {
+    padding: 0;
+    border: 0;
+    background: transparent;
+    accent-color: var(--ink);
+  }
+
+  .tool :global(.field input:focus-visible) {
+    outline: 2px solid var(--ink);
+    outline-offset: 1px;
+  }
+
+  .tool :global(.readout) {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 9rem), 1fr));
+    gap: var(--space-3) var(--space-6);
+    margin: 0;
+  }
+
+  .tool :global(.readout dt) {
+    font-size: var(--text-xs);
+    font-weight: 600;
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+    color: var(--ink-3);
+  }
+
+  .tool :global(.readout dd) {
+    margin: var(--space-1) 0 0;
+    font-size: var(--text-lg);
+    font-weight: 600;
+  }
+
+  .tool :global(.is-loss) {
+    color: var(--loss);
+  }
+
+  .tool :global(.is-gain) {
+    color: var(--gain);
+  }
+</style>

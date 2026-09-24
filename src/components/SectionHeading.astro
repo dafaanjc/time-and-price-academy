@@ -1,0 +1,55 @@
+---
+// Judul bagian bernomor bergaya dokumen cetak: "01  MASALAH TRADER ────── Semua →".
+interface Props {
+  id: string;
+  number: string;
+  title: string;
+  /** Tautan opsional di kanan, mis. ke halaman lengkap bagian ini. */
+  more?: { href: string; label: string };
+}
+
+const { id, number, title, more } = Astro.props;
+---
+
+<div class="section-heading">
+  <h2 id={id}>
+    <span class="section-heading__number" aria-hidden="true">{number}</span>{' '}
+    {title}
+  </h2>
+  {more && <a class="section-heading__more" href={more.href}>{more.label} →</a>}
+</div>
+
+<style>
+  .section-heading {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--space-2) var(--space-6);
+    margin-bottom: var(--space-6);
+    padding-top: var(--space-3);
+    border-top: var(--border-mark) solid var(--ink);
+  }
+
+  h2 {
+    display: flex;
+    align-items: baseline;
+    gap: var(--space-4);
+    margin: 0;
+    font-family: var(--font-sans);
+    font-size: var(--text-sm);
+    font-weight: 600;
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+  }
+
+  .section-heading__number {
+    color: var(--ink-3);
+  }
+
+  .section-heading__more {
+    font-size: var(--text-sm);
+    font-weight: 600;
+    color: var(--ink);
+  }
+</style>

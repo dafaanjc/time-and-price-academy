@@ -42,9 +42,9 @@ const identifiers = [
     gap: 0.25rem;
     padding: 0.875rem 1rem;
     background: var(--surface);
-    border: 1px solid var(--line);
+    border: 1px solid var(--rule);
     border-left: 3px solid var(--accent);
-    border-radius: var(--radius);
+    border-radius: var(--radius-1);
   }
 
   .source-card p {
@@ -52,17 +52,17 @@ const identifiers = [
   }
 
   .source-card__type {
-    font-size: 0.75rem;
-    font-weight: 700;
+    font-size: var(--text-xs);
+    font-weight: 600;
     letter-spacing: 0.06em;
     text-transform: uppercase;
-    color: var(--ink-faint);
+    color: var(--ink-3);
   }
 
   .source-card__title {
     margin: 0;
     font-family: var(--font-sans);
-    font-size: 1rem;
+    font-size: var(--text-base);
     font-weight: 600;
     line-height: 1.4;
     overflow-wrap: anywhere;
@@ -82,14 +82,14 @@ const identifiers = [
 
   .source-card__byline,
   .source-card__ids {
-    font-size: 0.875rem;
-    color: var(--ink-soft);
+    font-size: var(--text-sm);
+    color: var(--ink-2);
     overflow-wrap: anywhere;
   }
 
   .source-card .source-card__note {
     margin-top: 0.25rem;
-    font-size: 0.875rem;
-    color: var(--ink-faint);
+    font-size: var(--text-sm);
+    color: var(--ink-3);
   }
 </style>

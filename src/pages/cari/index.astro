@@ -10,7 +10,7 @@ import { routes, withBase } from '../../lib/url';
 >
   <header class="search-header">
     <h1>Cari Konsep</h1>
-    <p>Cari berdasarkan judul, istilah asli (bahasa Inggris), deskripsi, atau isi konsep.</p>
+    <p>Cari konsep dan masalah trader berdasarkan judul, istilah asli (bahasa Inggris), istilah trading sehari-hari, atau isinya.</p>
   </header>
 
   <form class="search-form" role="search" action={withBase(routes.search)} method="get">
@@ -58,7 +58,7 @@ import { routes, withBase } from '../../lib/url';
       link.href = entry.href;
       link.textContent = entry.title;
     }
-    if (meta) meta.textContent = [entry.termEn, entry.category, entry.difficulty].filter(Boolean).join(' · ');
+    if (meta) meta.textContent = [entry.kind, entry.termEn, entry.category, entry.difficulty].filter(Boolean).join(' · ');
     if (desc) desc.textContent = entry.description;
     return node;
   }
@@ -121,12 +121,12 @@ import { routes, withBase } from '../../lib/url';
 
   .search-header h1 {
     margin: 0 0 0.5rem;
-    font-size: clamp(2rem, 5vw, 2.75rem);
+    font-size: clamp(var(--text-2xl), 5vw, var(--text-3xl));
   }
 
   .search-header p {
     margin: 0 0 1.5rem;
-    color: var(--ink-soft);
+    color: var(--ink-2);
   }
 
   .search-form {
@@ -144,8 +144,8 @@ import { routes, withBase } from '../../lib/url';
     color: var(--ink);
     background: var(--surface);
     /* Batas kolom formulir butuh kontras ≥ 3:1 (WCAG 1.4.11); --line terlalu pucat. */
-    border: 1px solid var(--ink-faint);
-    border-radius: var(--radius);
+    border: 1px solid var(--ink-3);
+    border-radius: var(--radius-1);
   }
 
   input:focus-visible {
@@ -162,15 +162,15 @@ import { routes, withBase } from '../../lib/url';
     color: var(--surface);
     background: var(--accent);
     border: 0;
-    border-radius: var(--radius);
+    border-radius: var(--radius-1);
     cursor: pointer;
   }
 
   .search-status {
     max-width: var(--measure);
     margin: 1.25rem 0 0.75rem;
-    font-size: 0.9375rem;
-    color: var(--ink-soft);
+    font-size: var(--text-sm);
+    color: var(--ink-2);
   }
 
   .search-results {
@@ -185,8 +185,8 @@ import { routes, withBase } from '../../lib/url';
   .search-result {
     padding: 0.875rem 1rem;
     background: var(--surface);
-    border: 1px solid var(--line);
-    border-radius: var(--radius);
+    border: 1px solid var(--rule);
+    border-radius: var(--radius-1);
   }
 
   .search-result p {
@@ -195,17 +195,17 @@ import { routes, withBase } from '../../lib/url';
 
   .search-result__title {
     font-weight: 600;
-    font-size: 1.0625rem;
+    font-size: var(--text-base);
   }
 
   .search-result__meta {
-    font-size: 0.8125rem;
-    color: var(--ink-faint);
+    font-size: var(--text-xs);
+    color: var(--ink-3);
   }
 
   .search-result .search-result__desc {
     margin-top: 0.25rem;
-    font-size: 0.9375rem;
-    color: var(--ink-soft);
+    font-size: var(--text-sm);
+    color: var(--ink-2);
   }
 </style>

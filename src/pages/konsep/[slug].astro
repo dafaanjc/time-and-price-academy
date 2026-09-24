@@ -1,6 +1,9 @@
 ---
 import { render } from 'astro:content';
 import ConceptLayout from '../../layouts/ConceptLayout.astro';
+import Contoh from '../../components/mdx/Contoh.astro';
+import Definisi from '../../components/mdx/Definisi.astro';
+import { toolComponents } from '../../components/tools';
 import { getConcepts, type Concept } from '../../lib/concepts';
 
 export async function getStaticPaths() {
@@ -24,5 +27,5 @@ const sections =
 ---
 
 <ConceptLayout concept={concept} sections={sections}>
-  <Content />
+  <Content components={{ Contoh, Definisi, ...toolComponents }} />
 </ConceptLayout>

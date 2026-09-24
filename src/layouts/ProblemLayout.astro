@@ -1,0 +1,120 @@
+---
+// Halaman masalah trader: MASALAH → KEPUTUSAN → KONSEP → TEORI/BUKTI → PENERAPAN.
+// Urutan: header (kutipan, keputusan, atribusi) → notis draf → isi MDX (4 bagian wajib) →
+// konsep yang terlibat → baca dulu → sumber.
+import BaseLayout from './BaseLayout.astro';
+import Byline from '../components/Byline.astro';
+import ConceptLinkList from '../components/ConceptLinkList.astro';
+import PlaceholderNotice from '../components/PlaceholderNotice.astro';
+import SourceList from '../components/SourceList.astro';
+import { getProblemConcepts, getReadFirst, type Problem } from '../lib/problems';
+import { problemSectionIds } from '../lib/sections';
+import { absoluteUrl, problemOgImage, routes, withBase } from '../lib/url';
+
+interface Props {
+  problem: Problem;
+}
+
+const { problem } = Astro.props;
+const { title, decision, description, status, sources } = problem.data;
+const concepts = await getProblemConcepts(problem);
+const readFirst = await getReadFirst(problem);
+const shareUrl = absoluteUrl(Astro.url.pathname, Astro.site);
+---
+
+<BaseLayout
+  title={title}
+  description={description}
+  type="article"
+  section="Masalah Trader"
+  image={problemOgImage(problem.id)}
+>
+  <article class="problem">
+    <header class="problem__header">
+      <p class="eyebrow"><a href={withBase(routes.problems)}>Masalah trader</a></p>
+      <h1 class="problem__quote">“{title}”</h1>
+      <p class="problem__decision">
+        <span class="problem__label">Keputusan yang dipertaruhkan</span>{' '}
+        {decision}
+      </p>
+      <Byline url={shareUrl} />
+    </header>
+
+    {
+      status === 'draft' && (
+        <PlaceholderNotice>
+          Belum ditinjau dan belum bersumber. Angka dalam contoh adalah ilustrasi, bukan data pasar atau rekomendasi.
+        </PlaceholderNotice>
+      )
+    }
+
+    <div class="content">
+      <slot />
+    </div>
+
+    <ConceptLinkList
+      id={problemSectionIds.concepts}
+      title="Konsep yang Terlibat"
+      concepts={concepts}
+      empty="Belum ada konsep yang dirujuk."
+    />
+
+    <ConceptLinkList
+      id={problemSectionIds.readFirst}
+      title="Baca Dulu"
+      concepts={readFirst}
+      empty="Tidak ada prasyarat. Konsep di atas bisa langsung dipelajari."
+    />
+
+    <SourceList sources={sources} />
+  </article>
+</BaseLayout>
+
+<style>
+  .problem {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-8);
+  }
+
+  .problem__header {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+    max-width: var(--measure);
+  }
+
+  .eyebrow a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .eyebrow a:hover {
+    color: var(--ink);
+    text-decoration: underline;
+  }
+
+  .problem__quote {
+    margin: 0;
+    padding-left: var(--space-4);
+    font-size: clamp(var(--text-xl), 4.5vw, var(--text-3xl));
+    line-height: 1.2;
+    border-left: var(--border-mark) solid var(--ink);
+  }
+
+  .problem__decision {
+    display: grid;
+    gap: var(--space-1);
+    margin: 0;
+    font-size: var(--text-lg);
+    color: var(--ink-2);
+  }
+
+  .problem__label {
+    font-size: var(--text-xs);
+    font-weight: 600;
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+    color: var(--ink-3);
+  }
+</style>

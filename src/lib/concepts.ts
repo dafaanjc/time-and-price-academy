@@ -1,5 +1,5 @@
 import { getCollection, type CollectionEntry } from 'astro:content';
-import { categories, type CategoryId } from '../data/categories';
+import { categories, type Category, type CategoryId } from '../data/categories';
 import { learningPaths, type LearningPath } from '../data/learning-paths';
 import { validateConcepts } from './validate';
 import { layoutGraph, type GraphLayout } from './graph';
@@ -99,4 +99,20 @@ export async function getKnowledgeGraph(): Promise<GraphLayout> {
       prerequisites: c.data.prerequisites,
     })),
   );
+}
+
+export interface CategoryIndex {
+  /** Kategori yang sudah punya konsep, dalam urutan tampil. */
+  active: { category: Category; concepts: Concept[] }[];
+  /** Kategori yang belum punya konsep; ditampilkan ringkas sebagai "Segera hadir". */
+  upcoming: Category[];
+}
+
+export async function getCategoryIndex(): Promise<CategoryIndex> {
+  const grouped = await getConceptsByCategory();
+  const withConcepts = categories.map((category) => ({ category, concepts: grouped.get(category.id) ?? [] }));
+  return {
+    active: withConcepts.filter((c) => c.concepts.length > 0),
+    upcoming: withConcepts.filter((c) => c.concepts.length === 0).map((c) => c.category),
+  };
 }

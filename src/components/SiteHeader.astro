@@ -1,15 +1,37 @@
 ---
+// Wordmark tipografis "MEREK INDUK │ Produk" dari siteConfig. Ini penulisan nama, bukan logo:
+// artwork emblem terlalu detail untuk ukuran header dan hanya tampil di hero/footer.
+// Desktop: wordmark · navigasi utama · cari. Mobile: wordmark · cari · menu.
 import { siteConfig } from '../config/site';
 import MobileNav from './MobileNav.astro';
+import PrimaryNav from './PrimaryNav.astro';
 import { routes, withBase } from '../lib/url';
+
+const searchHref = withBase(routes.search);
+const onSearch = Astro.url.pathname === searchHref;
 ---
 
 <header class="site-header">
-  <a class="brand" href={withBase(routes.home)}>
-    <span class="brand__product">{siteConfig.product}</span>
-    <span class="brand__master">{siteConfig.masterBrand}</span>
+  <a class="wordmark" href={withBase(routes.home)} aria-label={`${siteConfig.name} — Beranda`}>
+    <span class="wordmark__master">{siteConfig.masterBrand}</span>
+    <span class="wordmark__divider" aria-hidden="true"></span>
+    <span class="wordmark__product">{siteConfig.product}</span>
   </a>
-  <MobileNav />
+
+  <nav class="site-header__nav" aria-label="Navigasi utama">
+    <PrimaryNav layout="row" />
+  </nav>
+
+  <div class="site-header__actions">
+    <a class="site-header__search" href={searchHref} aria-label="Cari konsep" aria-current={onSearch ? 'page' : undefined}>
+      <svg aria-hidden="true" width="20" height="20" viewBox="0 0 20 20">
+        <circle cx="8.5" cy="8.5" r="5.25" fill="none" stroke="currentColor" stroke-width="1.75"></circle>
+        <path d="M12.5 12.5L17 17" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"></path>
+      </svg>
+      <span class="site-header__search-label">Cari</span>
+    </a>
+    <MobileNav />
+  </div>
 </header>
 
 <style>
@@ -19,42 +41,109 @@ import { routes, withBase } from '../lib/url';
     z-index: 10;
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    gap: 1rem;
+    gap: var(--space-6);
     height: var(--header-height);
     padding-inline: var(--gutter);
-    background: color-mix(in srgb, var(--paper) 92%, transparent);
-    backdrop-filter: blur(8px);
-    border-bottom: 1px solid var(--line);
+    background: var(--paper);
+    border-bottom: var(--border-hair) solid var(--rule);
   }
 
-  .brand {
+  .wordmark {
     display: flex;
-    align-items: baseline;
-    gap: 0.625rem;
+    align-items: center;
+    gap: var(--space-3);
     min-width: 0;
+    margin-right: auto;
     color: var(--ink);
     text-decoration: none;
   }
 
-  .brand__product {
+  .wordmark__master {
+    font-size: var(--text-xs);
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  .wordmark__divider {
+    width: var(--border-hair);
+    height: 1.25rem;
+    background: var(--ink-3);
+  }
+
+  .wordmark__product {
     font-family: var(--font-serif);
-    font-size: 1.1875rem;
-    font-weight: 700;
-    letter-spacing: 0.01em;
+    font-size: var(--text-lg);
+    font-weight: 600;
+    line-height: 1;
     white-space: nowrap;
   }
 
-  .brand__master {
-    font-size: 0.8125rem;
-    color: var(--ink-faint);
-    white-space: nowrap;
+  /* Navigasi utama hanya di desktop; di mobile ada di menu. */
+  .site-header__nav {
+    display: none;
   }
 
-  /* Layar sangat sempit: nama master brand tetap tampil di hero dan footer. */
-  @media (max-width: 22.5rem) {
-    .brand__master {
+  .site-header__actions {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+  }
+
+  .site-header__search {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    min-height: 2.5rem;
+    padding: 0 var(--space-2);
+    color: var(--ink-2);
+    font-weight: 600;
+    text-decoration: none;
+  }
+
+  .site-header__search:hover,
+  .site-header__search[aria-current] {
+    color: var(--ink);
+  }
+
+  .site-header__search-label {
+    display: none;
+  }
+
+  @media (min-width: 64rem) {
+    .site-header__nav {
+      display: block;
+    }
+
+    .site-header__search-label {
+      display: inline;
+    }
+  }
+
+  /* Layar sempit: dua baris (induk di atas, produk di bawah) agar tetap utuh tanpa dipotong. */
+  @media (max-width: 29.99rem) {
+    .site-header {
+      gap: var(--space-3);
+    }
+
+    .wordmark {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: var(--space-1);
+    }
+
+    .wordmark__master {
+      font-size: var(--text-2xs);
+      letter-spacing: 0.12em;
+    }
+
+    .wordmark__divider {
       display: none;
+    }
+
+    .wordmark__product {
+      font-size: var(--text-base);
     }
   }
 </style>

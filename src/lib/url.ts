@@ -4,11 +4,14 @@
 /** Path halaman tetap, TANPA base. Gunakan bersama `withBase()`. */
 export const routes = {
   home: '/',
+  problems: '/masalah/',
+  concepts: '/konsep/',
   learningPaths: '/jalur-belajar/',
   map: '/peta/',
   search: '/cari/',
   searchIndex: '/search-index.json',
-  favicon: '/favicon.svg',
+  favicon: '/favicon-32.png',
+  appleTouchIcon: '/apple-touch-icon.png',
   ogDefault: '/og/default.png',
 } as const;
 
@@ -29,6 +32,11 @@ export function displayUrl(site: URL | undefined): string {
   if (!site) return '';
   const url = new URL(withBase(routes.home), site);
   return `${url.host}${url.pathname.replace(/\/$/, '')}`;
+}
+
+/** Path gambar OG (sudah dengan base) untuk sebuah masalah trader. */
+export function problemOgImage(id: string): string {
+  return withBase(`/og/masalah/${id}.png`);
 }
 
 /** Path gambar OG (sudah dengan base) untuk sebuah konsep. */

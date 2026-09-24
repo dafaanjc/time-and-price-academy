@@ -1,0 +1,48 @@
+---
+title: "Gue nggak ngerti berapa yang sebenarnya gue risikokan."
+slug: tidak-tahu-berapa-yang-dirisikokan
+order: 1
+decision: "Berapa rupiah dan berapa persen modal yang siap hilang bila transaksi ini salah, sebelum entry."
+description: "Risiko baru bisa dikendalikan setelah bisa diukur. Ubah 'feeling' menjadi angka: rupiah, persen modal, dan satuan R."
+status: draft
+concepts: [risk, position-sizing, expected-value]
+keywords: [risiko per transaksi, risk per trade, R, stop loss, SL, berapa rugi, money management]
+sources: []
+---
+
+## Situasi
+
+Anda membuka posisi karena setup terlihat bagus, tetapi tidak bisa menjawab dengan pasti: **kalau analisis ini salah, berapa rupiah yang hilang?** Kadang stop loss belum dipasang, kadang dipasang tetapi ukuran lotnya asal. Hasilnya, satu transaksi rugi kecil, transaksi lain rugi sangat besar, padahal analisisnya sama-sama "salah sedikit".
+
+## Konsep di Baliknya
+
+- [Risiko](../../konsep/risk/) selalu punya dua komponen: seberapa mungkin sesuatu terjadi dan seberapa besar dampaknya. Dalam satu transaksi, dampak terburuk yang direncanakan adalah jarak ke stop loss dikali ukuran posisi.
+- [Ukuran Posisi](../../konsep/position-sizing/) mengubah batas risiko menjadi jumlah lot. Satuan **R** (1R = kerugian yang direncanakan) membuat semua transaksi bisa dibandingkan.
+- [Nilai Harapan](../../konsep/expected-value/) hanya bisa dihitung bila setiap transaksi punya risiko yang terukur; tanpa itu, catatan untung-rugi tidak bisa dievaluasi dengan jujur.
+
+## Teori dan Bukti
+
+Bukti paling sederhana adalah hitungan. *Ilustrasi:* modal Rp50.000.000, stop loss 100 poin, nilai per poin per 1 lot Rp10.000.
+
+| Ukuran posisi | Rugi bila stop loss tersentuh | % modal |
+| --- | --- | --- |
+| 0,5 lot | Rp500.000 | 1% |
+| 1 lot | Rp1.000.000 | 2% |
+| 2 lot | Rp2.000.000 | 4% |
+
+Analisis yang sama bisa berarti rugi 1% atau 4% modal, hanya tergantung ukuran posisi. Tanpa angka ini, Anda sebenarnya tidak tahu seberapa besar taruhan yang sedang dipasang.
+
+Sumber rujukan untuk halaman ini belum dipasang.
+
+## Penerapan Praktis
+
+Sebelum setiap entry, jawab empat pertanyaan ini secara tertulis:
+
+1. **Di mana analisis saya dinyatakan salah?** Itu titik stop loss. Ukur jaraknya dalam poin.
+2. **Berapa persen modal yang siap hilang?** Ubah ke rupiah.
+3. **Berapa nilai per poin per 1 lot** untuk instrumen ini? Cek spesifikasi kontrak broker.
+4. **Berapa ukuran posisinya?** Risiko rupiah ÷ (jarak stop loss × nilai per poin per lot), dibulatkan ke bawah.
+
+Bila salah satu pertanyaan belum bisa dijawab, transaksi belum siap dibuka.
+
+<UkuranPosisi />

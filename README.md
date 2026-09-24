@@ -9,7 +9,8 @@ By Muhamad Daffa - Time & Price Academy
 ```sh
 npm install
 npm run dev        # server pengembangan
-npm run validate   # astro check + build (validasi skema & konten) + pemeriksaan merek
+npm test           # uji Vitest (rumus kalkulator, validasi, pencarian, graf)
+npm run validate   # pemeriksaan sumber + uji + astro check + build + pemeriksaan merek & situs
 npm run build      # build statis ke dist/
 ```
 

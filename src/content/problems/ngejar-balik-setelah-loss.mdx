@@ -1,0 +1,46 @@
+---
+title: "Kenapa habis loss gue malah ngejar balik?"
+slug: ngejar-balik-setelah-loss
+order: 4
+decision: "Setelah rugi: berhenti, lanjut dengan ukuran normal sesuai rencana, atau memperbesar posisi untuk balik modal."
+description: "Dorongan 'balik modal' setelah rugi itu manusiawi. Yang berbahaya adalah membiarkannya menentukan ukuran dan waktu transaksi berikutnya."
+status: draft
+concepts: [loss-aversion, expected-value, risk-of-ruin]
+keywords: [revenge trading, balas dendam, ngejar loss, balik modal, tilt, emosi, overtrading, martingale, averaging]
+sources: []
+---
+
+## Situasi
+
+Anda baru saja kena stop loss, mungkin dua kali berturut-turut. Muncul rasa "harus balik hari ini". Anda membuka posisi baru tanpa setup yang sesuai rencana, sering dengan lot lebih besar, atau menambah posisi yang sedang rugi supaya harga rata-ratanya lebih baik. Kalau berhasil, rasanya lega. Kalau gagal, kerugian hari itu menjadi jauh lebih besar dari batas yang pernah Anda tetapkan.
+
+## Konsep di Baliknya
+
+- [Aversi Kerugian](../../konsep/loss-aversion/): kerugian terasa lebih berat daripada keuntungan yang sama besarnya, sehingga dorongan untuk menghapus rugi terasa sangat kuat.
+- [Nilai Harapan](../../konsep/expected-value/): setiap transaksi berdiri sendiri. Dua kali kalah tidak membuat transaksi ketiga lebih mungkin menang.
+- [Risiko Kehancuran](../../konsep/risk-of-ruin/): memperbesar ukuran setelah rugi mempercepat habisnya modal saat rangkaian kekalahan berlanjut.
+
+## Teori dan Bukti
+
+*Ilustrasi.* Dua cara menghadapi 6 kali kalah beruntun, dimulai dari risiko 1% modal awal:
+
+| Cara | Risiko per transaksi | Sisa modal setelah 6 kali kalah |
+| --- | --- | --- |
+| Risiko tetap | 1% dari modal berjalan | ±94,1% |
+| Menggandakan setelah rugi | 1%, 2%, 4%, 8%, 16%, 32% dari modal awal | 37% |
+
+Dan karena pemulihan tidak simetris, penurunan yang lebih dalam membutuhkan kenaikan yang jauh lebih besar: turun 50% membutuhkan naik 100% hanya untuk kembali ke titik awal.
+
+Gagasan aversi kerugian dikenal luas melalui *prospect theory* (Kahneman & Tversky, 1979). Sumber rujukannya belum dipasang di halaman ini dan menunggu verifikasi.
+
+## Penerapan Praktis
+
+Aturan paling efektif dibuat **sebelum** rugi terjadi, saat kepala masih dingin:
+
+1. **Ukuran posisi tidak pernah dinaikkan setelah rugi.** Ukuran hanya berasal dari rencana risiko.
+2. **Jeda setelah dua kali stop loss dalam sehari.** Tutup platform, catat apa yang terjadi, lanjut di sesi berikutnya.
+3. **Batas kerugian harian.** Bila tercapai, hari trading selesai, apa pun kondisi pasarnya.
+4. **Tidak menambah posisi yang sedang rugi** kecuali memang bagian dari rencana tertulis sebelum entry, dengan total risiko yang tetap dalam batas.
+5. **Catat alasan setiap entry.** Bila alasannya "biar balik", itu bukan setup.
+
+<TabelKalahBeruntun />

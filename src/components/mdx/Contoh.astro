@@ -1,0 +1,48 @@
+---
+// Kotak contoh di isi konsep. Dipakai di MDX tanpa import: <Contoh jenis="trading">…</Contoh>
+// (disediakan lewat prop `components` di halaman konsep).
+interface Props {
+  jenis: 'kehidupan' | 'keuangan' | 'trading';
+}
+
+const labels: Record<Props['jenis'], string> = {
+  kehidupan: 'Kehidupan nyata',
+  keuangan: 'Keuangan',
+  trading: 'Trading',
+};
+
+const { jenis } = Astro.props;
+---
+
+<div class={`contoh contoh--${jenis}`}>
+  <p class="contoh__label" aria-hidden="true">Contoh · {labels[jenis]}</p>
+  <slot />
+</div>
+
+<style>
+  .contoh {
+    margin: 0 0 var(--space-6);
+    padding: var(--space-4) var(--space-6) var(--space-2);
+    background: var(--surface);
+    border: var(--border-hair) solid var(--rule);
+    border-left: var(--border-mark) solid var(--ink);
+  }
+
+  .contoh :global(> :last-child) {
+    margin-bottom: var(--space-3);
+  }
+
+  .contoh__label {
+    margin: 0 0 var(--space-3);
+    font-size: var(--text-xs);
+    font-weight: 600;
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+    color: var(--ink-3);
+  }
+
+  /* Trading diberi garis peringatan: contoh ini paling mudah disalahartikan sebagai saran. */
+  .contoh--trading {
+    border-left-color: var(--caution);
+  }
+</style>

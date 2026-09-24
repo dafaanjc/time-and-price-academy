@@ -1,0 +1,33 @@
+---
+// Definisi utama sebuah konsep. Dipakai di MDX tanpa import: <Definisi>…</Definisi>.
+---
+
+<div class="definisi">
+  <p class="definisi__label" aria-hidden="true">Definisi</p>
+  <slot />
+</div>
+
+<style>
+  .definisi {
+    margin: 0 0 var(--space-6);
+    padding: var(--space-4) 0 var(--space-4) var(--space-6);
+    border-left: var(--border-mark) solid var(--ink);
+    font-family: var(--font-serif);
+    font-size: var(--text-lg);
+    line-height: 1.45;
+  }
+
+  .definisi :global(p:last-child) {
+    margin-bottom: 0;
+  }
+
+  .definisi__label {
+    margin: 0 0 var(--space-2);
+    font-family: var(--font-sans);
+    font-size: var(--text-xs);
+    font-weight: 600;
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+    color: var(--ink-3);
+  }
+</style>

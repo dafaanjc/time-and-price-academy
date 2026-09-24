@@ -1,4 +1,5 @@
 ---
+// Meta konsep dalam satu baris: "Fondasi · Dasar · 3 menit baca · Draf".
 import { getCategory } from '../data/categories';
 import { categoryHref, difficultyLabels, statusLabels, type Concept } from '../lib/concepts';
 import { readingMinutes } from '../lib/reading-time';
@@ -9,46 +10,36 @@ interface Props {
 
 const { concept } = Astro.props;
 const { category, difficulty, status } = concept.data;
-const statusClass = status === 'draft' ? 'badge badge--draft' : 'badge';
+const isDraft = status === 'draft';
 ---
 
-<dl class="concept-meta">
-  <div>
-    <dt>Kategori</dt>
-    <dd><a href={categoryHref(category)}>{getCategory(category).title}</a></dd>
-  </div>
-  <div>
-    <dt>Tingkat</dt>
-    <dd>{difficultyLabels[difficulty]}</dd>
-  </div>
-  <div>
-    <dt>Waktu baca</dt>
-    <dd>{readingMinutes(concept.body)} menit</dd>
-  </div>
-  <div>
-    <dt>Status</dt>
-    <dd><span class={statusClass}>{statusLabels[status]}</span></dd>
-  </div>
-</dl>
+<p class="concept-meta">
+  <a href={categoryHref(category)}>{getCategory(category).title}</a>{' '}
+  <span class="concept-meta__sep" aria-hidden="true">·</span>{' '}
+  <span>Tingkat {difficultyLabels[difficulty].toLowerCase()}</span>{' '}
+  <span class="concept-meta__sep" aria-hidden="true">·</span>{' '}
+  <span>{readingMinutes(concept.body)} menit baca</span>{' '}
+  {isDraft && <span class="badge badge--draft">{statusLabels[status]}</span>}
+</p>
 
 <style>
   .concept-meta {
     display: flex;
     flex-wrap: wrap;
-    gap: 0.75rem 1.75rem;
+    align-items: center;
+    gap: var(--space-1) var(--space-2);
     margin: 0;
+    font-size: var(--text-sm);
+    color: var(--ink-2);
   }
 
-  dt {
-    font-size: 0.75rem;
+  .concept-meta a {
+    color: var(--ink);
     font-weight: 600;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-    color: var(--ink-faint);
   }
 
-  dd {
-    margin: 0.125rem 0 0;
-    font-size: 0.9375rem;
+  .concept-meta__sep {
+    color: var(--ink-3);
   }
+
 </style>

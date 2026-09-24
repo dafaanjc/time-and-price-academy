@@ -1,0 +1,53 @@
+---
+title: "Kenapa lot gue selalu kebesaran?"
+slug: lot-selalu-kebesaran
+order: 2
+decision: "Berapa ukuran posisi yang sesuai dengan batas risiko per transaksi dan jarak stop loss."
+description: "Lot kebesaran biasanya terjadi karena lot dipilih lebih dulu, lalu risikonya menyesuaikan. Balik urutannya: risiko dulu, lot terakhir."
+status: draft
+concepts: [position-sizing, variance-and-volatility, risk-of-ruin]
+keywords: [lot, lot size, overlot, over lot, lot besar, ukuran lot, overtrading]
+sources: []
+---
+
+## Situasi
+
+Anda terbiasa memakai ukuran lot yang "biasanya", misalnya 1 lot, di semua kondisi. Saat pasar tenang tidak terasa masalah. Saat pasar bergejolak, stop loss harus lebih jauh, tetapi lot tetap sama, sehingga satu kali rugi langsung memakan porsi modal yang besar. Setelah itu muncul dorongan untuk memperbesar lot lagi agar cepat balik.
+
+## Konsep di Baliknya
+
+- [Ukuran Posisi](../../konsep/position-sizing/) adalah **hasil** dari batas risiko dan jarak stop loss, bukan angka yang dipilih lebih dulu.
+- [Varians & Volatilitas](../../konsep/variance-and-volatility/) menentukan jarak stop loss yang wajar. Semakin volatil, semakin jauh stop loss, semakin kecil lot yang boleh dipakai.
+- [Risiko Kehancuran](../../konsep/risk-of-ruin/) menjelaskan mengapa lot yang terlalu besar tidak hanya memperbesar rugi, tetapi juga membuat rangkaian kekalahan biasa berubah menjadi penurunan yang dalam.
+
+## Teori dan Bukti
+
+*Ilustrasi.* Dengan risiko tetap Rp500.000 per transaksi dan nilai per poin per 1 lot Rp10.000, ukuran lot yang sesuai bergantung pada jarak stop loss:
+
+| Jarak stop loss | Ukuran posisi yang sesuai |
+| --- | --- |
+| 50 poin | 1 lot |
+| 100 poin | 0,5 lot |
+| 200 poin | 0,25 lot |
+
+Bila Anda tetap memakai 1 lot saat stop loss 200 poin, risiko transaksi itu menjadi Rp2.000.000, empat kali lipat dari rencana.
+
+Dampaknya pada rangkaian kekalahan (10 kali kalah beruntun, risiko sebagai persen modal berjalan):
+
+| Risiko per transaksi | Sisa modal |
+| --- | --- |
+| 1% | 90,4% |
+| 5% | 59,9% |
+| 10% | 34,9% |
+
+Sumber rujukan untuk halaman ini belum dipasang.
+
+## Penerapan Praktis
+
+1. **Hapus "lot biasa" dari kebiasaan.** Hitung ulang lot di setiap transaksi dari rumus [ukuran posisi](../../konsep/position-sizing/).
+2. **Tentukan stop loss dari analisis dan kondisi volatilitas**, bukan dari berapa lot yang ingin dipakai.
+3. **Bulatkan lot ke bawah**, tidak pernah ke atas.
+4. **Periksa ulang saat pasar bergejolak.** Stop loss yang lebih jauh berarti lot yang lebih kecil.
+5. **Jangan menaikkan lot setelah rugi.** Lihat [Aversi Kerugian](../../konsep/loss-aversion/).
+
+<UkuranPosisi />

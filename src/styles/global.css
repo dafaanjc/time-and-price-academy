@@ -1,48 +1,147 @@
+/* ---------- Font (self-hosted, subset latin; OFL — lihat src/assets/fonts/README.md) ---------- */
+@font-face {
+  font-family: "Source Sans 3";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("../assets/fonts/web/source-sans-3-latin-400-normal.woff2") format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: "Source Sans 3";
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: url("../assets/fonts/web/source-sans-3-latin-400-italic.woff2") format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: "Source Sans 3";
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("../assets/fonts/web/source-sans-3-latin-600-normal.woff2") format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: "Source Serif 4";
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("../assets/fonts/web/source-serif-4-latin-600-normal.woff2") format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: "Source Serif 4";
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: url("../assets/fonts/web/source-serif-4-latin-400-italic.woff2") format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
 /* ---------- Token ---------- */
+/* Arah visual "Trading Desk Manual": monokrom mengikuti emblem etsa merek induk (siteConfig.masterBrand).
+   Warna non-netral HANYA untuk makna data (rugi, untung, peringatan), tidak sebagai dekorasi.
+   Semua pasangan teks/latar sudah diverifikasi ≥ 4.5:1 (WCAG AA). */
 :root {
-  --paper: #f7f4ee;
-  --surface: #fffdf9;
-  --ink: #1c2126;
-  --ink-soft: #4a525a;
-  --ink-faint: #686f76; /* ≥ 4.5:1 pada --paper dan --surface (WCAG AA) */
-  --line: #e2ddd3;
-  --accent: #1f5873;
-  --accent-soft: #e3edf1;
-  --warn-bg: #fbf1dc;
-  --warn-ink: #6b4a0f;
+  /* Warna — netral */
+  --paper: #f6f3ec;
+  --surface: #fbf9f4;
+  --ink: #16191d; /* 15.9:1 pada paper */
+  --ink-2: #454c54; /* 7.9:1 */
+  --ink-3: #666d74; /* 4.7:1 — label/meta */
+  --rule: #d6cfc2; /* garis dekoratif; batas input memakai --ink-3 */
+  --tint: #ebe6dc; /* latar lembut: kode inline, item aktif */
 
-  --font-sans: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-  --font-serif: 'Iowan Old Style', 'Palatino Linotype', Palatino, Georgia, 'Times New Roman', serif;
-  --font-mono: ui-monospace, 'Cascadia Code', Consolas, Menlo, monospace;
+  /* Peran: aksen = tinta. Tautan dibedakan dengan garis bawah, bukan warna. */
+  --accent: var(--ink);
+  --accent-soft: var(--tint);
 
+  /* Warna — semantik data (hanya di contoh/kalkulasi) */
+  --loss: #9b3a2c; /* 6.2:1 */
+  --gain: #2e6a4e; /* 5.8:1 */
+  --caution: #7a5410; /* 5.5:1 pada --caution-bg */
+  --caution-bg: #f2e6c6;
+
+  /* Tipografi */
+  --font-sans: "Source Sans 3", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  --font-serif: "Source Serif 4", "Iowan Old Style", "Palatino Linotype", Georgia, serif;
+  --font-mono: ui-monospace, "Cascadia Code", Consolas, Menlo, monospace;
+  /* Skala 1.25, dasar 17px */
+  --text-2xs: 0.6875rem; /* 11 — hanya label sangat kecil */
+  --text-xs: 0.8125rem; /* 13 */
+  --text-sm: 0.9375rem; /* 15 */
+  --text-base: 1.0625rem; /* 17 */
+  --text-lg: 1.3125rem; /* 21 */
+  --text-xl: 1.6875rem; /* 27 */
+  --text-2xl: 2.0625rem; /* 33 */
+  --text-3xl: 2.625rem; /* 42 */
+  --text-4xl: 3.25rem; /* 52 */
+  --leading-body: 1.6;
+  --leading-tight: 1.15;
+  --tracking-label: 0.08em;
+
+  /* Jarak (dasar 4px) */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-12: 3rem;
+  --space-16: 4rem;
+  --space-24: 6rem;
+
+  /* Bentuk: sudut tegas, garis alih-alih bayangan */
+  --radius-0: 0;
+  --radius-1: 2px;
+  --border-hair: 1px;
+  --border-mark: 3px;
+
+  /* Gerak: hanya untuk perubahan status; tanpa animasi masuk */
+  --motion-fast: 120ms;
+  --motion-base: 200ms;
+  --ease: cubic-bezier(0.2, 0, 0, 1);
+
+  /* Tata letak */
   --measure: 68ch;
+  --container: 72rem; /* halaman tanpa sidebar */
+  --container-wide: 90rem; /* halaman dengan sidebar */
   --sidebar-width: 17rem;
   --header-height: 3.5rem;
-  --gutter: 1rem;
-  --radius: 8px;
+  --gutter: var(--space-4);
 
   color-scheme: light;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --paper: #14181c;
-    --surface: #1b2025;
-    --ink: #e8e4dc;
-    --ink-soft: #b3b8bd;
-    --ink-faint: #8a9096;
-    --line: #2c333a;
-    --accent: #7fb6cf;
-    --accent-soft: #1e2d35;
-    --warn-bg: #2e2717;
-    --warn-ink: #e8cf98;
+    --paper: #121417;
+    --surface: #191c20;
+    --ink: #ece8e0; /* 15.1:1 */
+    --ink-2: #b7bcc2; /* 9.7:1 */
+    --ink-3: #8d949b; /* 6.0:1 */
+    --rule: #343a41;
+    --tint: #22262b;
+    --loss: #e08a7a;
+    --gain: #7cc3a0;
+    --caution: #e3c07a;
+    --caution-bg: #2f2718;
     color-scheme: dark;
   }
 }
 
 @media (min-width: 48rem) {
   :root {
-    --gutter: 2rem;
+    --gutter: var(--space-8);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --motion-fast: 0ms;
+    --motion-base: 0ms;
   }
 }
 
@@ -63,8 +162,9 @@ body {
   background: var(--paper);
   color: var(--ink);
   font-family: var(--font-sans);
-  font-size: 1.0625rem;
-  line-height: 1.65;
+  font-size: var(--text-base);
+  line-height: var(--leading-body);
+  font-variant-numeric: tabular-nums;
 }
 
 h1,
@@ -72,7 +172,7 @@ h2,
 h3 {
   font-family: var(--font-serif);
   font-weight: 600;
-  line-height: 1.2;
+  line-height: var(--leading-tight);
   letter-spacing: -0.01em;
   text-wrap: balance;
 }
@@ -81,9 +181,16 @@ p {
   text-wrap: pretty;
 }
 
+strong,
+b {
+  font-weight: 600;
+}
+
 a {
   color: var(--accent);
+  text-decoration-thickness: 1px;
   text-underline-offset: 0.18em;
+  transition: text-decoration-thickness var(--motion-fast) var(--ease);
 }
 
 a:hover {
@@ -93,7 +200,7 @@ a:hover {
 :focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 2px;
-  border-radius: 2px;
+  border-radius: var(--radius-1);
 }
 
 img,
@@ -121,7 +228,7 @@ svg {
   padding: 0.5rem 1rem;
   background: var(--ink);
   color: var(--paper);
-  border-radius: var(--radius);
+  border-radius: var(--radius-1);
 }
 
 .skip-link:focus {
@@ -135,28 +242,28 @@ svg {
 
 .eyebrow {
   margin: 0;
-  font-size: 0.8125rem;
+  font-size: var(--text-xs);
   font-weight: 600;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: var(--ink-faint);
+  color: var(--ink-3);
 }
 
 .badge {
   display: inline-block;
   padding: 0.1rem 0.5rem;
-  font-size: 0.75rem;
+  font-size: var(--text-xs);
   font-weight: 600;
-  border: 1px solid var(--line);
-  border-radius: 999px;
-  color: var(--ink-soft);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-1);
+  color: var(--ink-2);
   white-space: nowrap;
 }
 
 .badge--draft {
-  background: var(--warn-bg);
+  background: var(--caution-bg);
   border-color: transparent;
-  color: var(--warn-ink);
+  color: var(--caution);
 }
 
 /* ---------- Isi panjang (body MDX) ---------- */
@@ -166,12 +273,12 @@ svg {
 
 .content h2 {
   margin: 2.5rem 0 0.75rem;
-  font-size: 1.625rem;
+  font-size: var(--text-xl);
 }
 
 .content h3 {
   margin: 2rem 0 0.5rem;
-  font-size: 1.25rem;
+  font-size: var(--text-lg);
 }
 
 .content p,
@@ -194,8 +301,8 @@ svg {
 
 .content blockquote {
   padding-left: 1rem;
-  color: var(--ink-soft);
-  border-left: 3px solid var(--line);
+  color: var(--ink-2);
+  border-left: 3px solid var(--rule);
 }
 
 .content code {
@@ -203,17 +310,18 @@ svg {
   font-size: 0.9em;
   padding: 0.1em 0.3em;
   background: var(--accent-soft);
-  border-radius: 4px;
+  border-radius: var(--radius-1);
 }
 
+/* Blok `text` = rumus/hitungan: bidang lembut dengan garis kiri, bukan kotak kode. */
 .content pre {
-  padding: 1rem;
+  padding: var(--space-3) var(--space-4);
   /* Rumus dibungkus alih-alih digulir, agar terbaca di layar sempit tanpa scroll. */
   white-space: pre-wrap;
   overflow-wrap: anywhere;
-  background: var(--surface);
-  border: 1px solid var(--line);
-  border-radius: var(--radius);
+  line-height: 1.7;
+  background: var(--tint);
+  border-left: var(--border-mark) solid var(--ink-3);
 }
 
 .content pre code {
@@ -230,19 +338,12 @@ svg {
   max-width: 100%;
   overflow-x: auto;
   border-collapse: collapse;
-  font-size: 0.9375rem;
+  font-size: var(--text-sm);
 }
 
 .content th,
 .content td {
   padding: 0.5rem 0.75rem;
   text-align: left;
-  border-bottom: 1px solid var(--line);
-}
-
-/* ---------- Grid kartu ---------- */
-.card-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(min(100%, 16rem), 1fr));
-  gap: 0.75rem;
+  border-bottom: 1px solid var(--rule);
 }

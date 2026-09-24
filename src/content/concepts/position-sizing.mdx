@@ -1,0 +1,108 @@
+---
+title: "Ukuran Posisi"
+termEn: "Position Sizing"
+slug: position-sizing
+category: risk-management
+order: 1
+difficulty: beginner
+description: "Cara menentukan besar posisi (mis. jumlah lot) dari batas risiko per transaksi dan jarak stop loss, bukan sebaliknya."
+status: draft
+featured: false
+prerequisites: [risk]
+related: [variance-and-volatility, leverage-and-margin, risk-of-ruin]
+keywords: [lot, lot size, ukuran lot, money management, risk per trade, risiko per transaksi, R]
+sources: []
+---
+
+## Mengapa Ini Penting
+
+Dua trader bisa memakai analisis yang sama persis, tetapi hasil akhirnya sangat berbeda hanya karena ukuran posisinya berbeda. Ukuran posisi menentukan **berapa rupiah yang hilang bila analisis Anda salah**. Karena setiap trader pasti mengalami transaksi yang salah, ukuran posisi adalah salah satu keputusan terpenting sebelum entry.
+
+## Gagasan Utama
+
+<Definisi>
+
+**Ukuran posisi adalah hasil hitungan, bukan titik awal.** Urutannya:
+
+</Definisi>
+
+1. Tentukan dulu berapa kerugian maksimum yang siap Anda terima untuk satu transaksi (risiko per transaksi).
+2. Tentukan di mana analisis Anda dianggap salah (titik stop loss).
+3. Baru hitung ukuran posisi yang membuat kerugian di titik stop loss sama dengan batas risiko tadi.
+
+Risiko per transaksi sering disebut **1R**. Dengan satuan ini, hasil setiap transaksi bisa dibandingkan secara adil: untung +2R berarti untung dua kali risiko yang direncanakan, apa pun ukuran lotnya.
+
+## Penjelasan Sederhana
+
+Bayangkan Anda hanya mau kehilangan paling banyak Rp100.000 saat mencoba sesuatu. Jika setiap kesalahan kecil merugikan Rp10.000, Anda boleh mencoba 10 kali. Jika setiap kesalahan merugikan Rp50.000, Anda hanya boleh mencoba 2 kali.
+
+Ukuran posisi bekerja dengan cara yang sama: **batas kerugian tetap, jarak ke titik salah menentukan seberapa besar Anda boleh masuk.** Semakin jauh stop loss, semakin kecil posisi yang boleh diambil.
+
+## Contoh Kehidupan Nyata
+
+<Contoh jenis="kehidupan">
+
+Seorang pedagang pasar ingin mencoba menjual barang baru. Ia memutuskan bahwa bila barang itu tidak laku, kerugian yang masih bisa ia tanggung adalah Rp1.000.000. Jika modal per kodi Rp250.000 dan barang yang tidak laku kemungkinan hanya bisa dijual kembali setengah harga, ia tahu dari awal berapa kodi yang boleh dibeli agar kerugian terburuknya tetap dalam batas itu: kerugian terburuk Rp125.000 per kodi, jadi paling banyak 8 kodi.
+
+Ia tidak memulai dari "saya mau beli 20 kodi", tetapi dari "berapa kerugian yang sanggup saya tanggung".
+
+</Contoh>
+
+## Contoh Keuangan
+
+<Contoh jenis="keuangan">
+
+*Ilustrasi.* Dua investor sama-sama punya dana Rp100.000.000 dan sama-sama membeli satu saham yang turun 20%.
+
+- Investor A menaruh Rp10.000.000 di saham itu → rugi Rp2.000.000, atau 2% dari total dana.
+- Investor B menaruh seluruh Rp100.000.000 → rugi Rp20.000.000, atau 20% dari total dana.
+
+Keputusan analisisnya sama; yang membedakan dampaknya hanya ukuran posisi.
+
+</Contoh>
+
+## Contoh Trading
+
+<Contoh jenis="trading">
+
+*Ilustrasi, bukan rekomendasi.* Modal Rp50.000.000, batas risiko 1% per transaksi, stop loss berjarak 100 poin, dan nilai per poin untuk 1 lot adalah Rp10.000. Nilai per poin berbeda-beda untuk tiap instrumen dan broker; angka ini hanya contoh.
+
+```text
+Risiko per transaksi = Rp50.000.000 × 1% = Rp500.000
+Ukuran posisi        = Rp500.000 ÷ (100 poin × Rp10.000) = 0,5 lot
+```
+
+Bandingkan kerugian di titik stop loss untuk beberapa ukuran lot:
+
+| Ukuran posisi | Rugi bila stop loss tersentuh | % modal |
+| --- | --- | --- |
+| 0,5 lot | Rp500.000 | 1% |
+| 1 lot | Rp1.000.000 | 2% |
+| 2 lot | Rp2.000.000 | 4% |
+
+Jika stop loss digeser menjadi 50 poin, ukuran posisi dengan risiko yang sama menjadi 1 lot. Jika stop loss 200 poin, ukuran posisi menjadi 0,25 lot.
+
+Batas risiko ini tidak menjamin kerugian tidak akan melebihi rencana. Harga bisa melompat melewati stop loss, misalnya saat pasar dibuka setelah libur atau saat ada berita besar.
+
+</Contoh>
+
+## Cara Kerja Konsep
+
+```text
+Ukuran posisi = (Modal × % risiko per transaksi) ÷ (Jarak stop loss × Nilai per poin per 1 lot)
+```
+
+Langkah praktis sebelum entry:
+
+1. Tentukan % risiko per transaksi dan ubah ke rupiah.
+2. Tentukan titik stop loss dari analisis, lalu ukur jaraknya dalam poin.
+3. Cari nilai per poin per 1 lot untuk instrumen tersebut di spesifikasi kontrak broker Anda.
+4. Hitung ukuran posisi, lalu bulatkan **ke bawah** ke ukuran lot yang tersedia.
+
+Hal yang sering terlupa:
+
+- **Volatilitas memengaruhi jarak stop loss.** Pada instrumen yang lebih [volatil](../variance-and-volatility/), stop loss yang wajar lebih jauh, sehingga posisi harus lebih kecil.
+- **Leverage tidak mengubah hitungan ini.** Leverage hanya menentukan berapa margin yang dipakai; kerugian per poin tetap ditentukan oleh ukuran posisi. Lihat [Leverage & Margin](../leverage-and-margin/).
+- **Risiko per transaksi yang terlalu besar mempercepat kehancuran modal** saat terjadi rangkaian kekalahan. Lihat [Risiko Kehancuran](../risk-of-ruin/).
+
+<UkuranPosisi />

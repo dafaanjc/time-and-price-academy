@@ -1,0 +1,76 @@
+---
+// Navigasi utama: baris di header desktop, kolom di menu mobile.
+import { navCurrent, primaryNav } from '../lib/nav';
+
+interface Props {
+  layout: 'row' | 'column';
+}
+
+const { layout } = Astro.props;
+const pathname = Astro.url.pathname;
+---
+
+<ul class={`primary-nav primary-nav--${layout}`}>
+  {
+    primaryNav.map((item) => (
+      <li>
+        <a href={item.href} aria-current={navCurrent(item, pathname)}>
+          {item.label}
+        </a>
+      </li>
+    ))
+  }
+</ul>
+
+<style>
+  .primary-nav {
+    display: flex;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .primary-nav--row {
+    gap: var(--space-6);
+  }
+
+  .primary-nav--column {
+    flex-direction: column;
+  }
+
+  a {
+    display: block;
+    color: var(--ink-2);
+    font-weight: 600;
+    text-decoration: none;
+  }
+
+  .primary-nav--row a {
+    padding-block: var(--space-2);
+    border-bottom: var(--border-mark) solid transparent;
+  }
+
+  .primary-nav--column a {
+    padding: var(--space-2) 0;
+    font-size: var(--text-lg);
+    border-bottom: var(--border-hair) solid var(--rule);
+  }
+
+  a:hover {
+    color: var(--ink);
+  }
+
+  /* Bagian aktif: garis tinta di bawah (desktop) atau teks tinta (mobile). */
+  a[aria-current] {
+    color: var(--ink);
+  }
+
+  .primary-nav--row a[aria-current] {
+    border-bottom-color: var(--ink);
+  }
+
+  .primary-nav--column a[aria-current] {
+    padding-left: var(--space-3);
+    border-left: var(--border-mark) solid var(--ink);
+  }
+</style>

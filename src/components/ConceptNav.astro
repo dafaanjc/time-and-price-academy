@@ -1,0 +1,141 @@
+---
+// Indeks konsep bergaya daftar isi cetak: dipakai di sidebar (desktop) dan menu mobile.
+// Kategori yang belum berisi digabung menjadi satu baris "Segera hadir".
+import { categoryHref, conceptHref, getCategoryIndex } from '../lib/concepts';
+import { routes, withBase } from '../lib/url';
+
+const { active, upcoming } = await getCategoryIndex();
+const pathname = Astro.url.pathname;
+const current = (href: string) => (pathname === href ? 'page' : undefined);
+---
+
+<nav class="concept-nav" aria-label="Indeks konsep">
+  <p class="concept-nav__title">
+    <a href={withBase(routes.concepts)} aria-current={current(withBase(routes.concepts))}>Indeks konsep</a>
+  </p>
+  {
+    active.map(({ category, concepts }) => (
+      <section class="concept-nav__group">
+        <h2 class="concept-nav__heading">
+          <a href={categoryHref(category.id)} aria-current={current(categoryHref(category.id))}>
+            {category.title}
+          </a>
+        </h2>
+        <ol>
+          {concepts.map((concept) => (
+            <li>
+              <a href={conceptHref(concept.id)} aria-current={current(conceptHref(concept.id))}>
+                {concept.data.title}
+              </a>
+            </li>
+          ))}
+        </ol>
+      </section>
+    ))
+  }
+  {
+    upcoming.length > 0 && (
+      <p class="concept-nav__upcoming">
+        <span>Segera hadir:</span> {upcoming.map((c) => c.title).join(', ')}
+      </p>
+    )
+  }
+</nav>
+
+<style>
+  .concept-nav {
+    font-size: var(--text-sm);
+  }
+
+  .concept-nav__title {
+    margin: 0 0 var(--space-4);
+    padding-bottom: var(--space-2);
+    border-bottom: var(--border-hair) solid var(--rule);
+  }
+
+  .concept-nav__title a {
+    font-family: var(--font-serif);
+    font-size: var(--text-lg);
+    font-weight: 600;
+    color: var(--ink);
+  }
+
+  .concept-nav__group + .concept-nav__group {
+    margin-top: var(--space-6);
+  }
+
+  .concept-nav__heading {
+    margin: 0 0 var(--space-2);
+    font-family: var(--font-sans);
+    font-size: var(--text-xs);
+    font-weight: 600;
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+  }
+
+  .concept-nav__heading a {
+    color: var(--ink-3);
+  }
+
+  ol {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    counter-reset: concept;
+  }
+
+  li {
+    counter-increment: concept;
+  }
+
+  /* Nomor urut seperti daftar isi buku. */
+  li a {
+    display: grid;
+    grid-template-columns: 1.75rem minmax(0, 1fr);
+    padding: var(--space-1) 0 var(--space-1) var(--space-3);
+    border-left: var(--border-mark) solid transparent;
+  }
+
+  li a::before {
+    content: counter(concept, decimal-leading-zero);
+    color: var(--ink-3);
+    font-size: var(--text-xs);
+    line-height: 2;
+  }
+
+  a {
+    color: var(--ink-2);
+    text-decoration: none;
+  }
+
+  a:hover {
+    color: var(--ink);
+    text-decoration: underline;
+  }
+
+  li a[aria-current='page'] {
+    color: var(--ink);
+    font-weight: 600;
+    border-left-color: var(--ink);
+  }
+
+  .concept-nav__heading a[aria-current='page'],
+  .concept-nav__title a[aria-current='page'] {
+    color: var(--ink);
+    text-decoration: underline;
+  }
+
+  .concept-nav__upcoming {
+    margin: var(--space-6) 0 0;
+    padding-top: var(--space-3);
+    border-top: var(--border-hair) solid var(--rule);
+    font-size: var(--text-xs);
+    color: var(--ink-3);
+  }
+
+  .concept-nav__upcoming span {
+    font-weight: 600;
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+  }
+</style>

@@ -40,9 +40,11 @@ const H_GAP = 24;
 const V_GAP = 48;
 const PADDING = 16;
 const MAX_LINE_CHARS = 22;
-// Garis yang melompati tingkat dibelokkan ke kanan sejauh ini (+ per tingkat tambahan).
-const SKIP_OFFSET = 36;
-const SKIP_STEP = 14;
+// Garis yang melompati tingkat berjalan siku di jalur (lane) khusus di kanan semua simpul,
+// sehingga tidak pernah menembus simpul di tingkat antara atau simpul tetangga.
+const LANE_OFFSET = 24;
+const LANE_STEP = 14;
+const CORNER = 8;
 
 function truncate(line: string, max: number): string {
   return line.length > max ? `${line.slice(0, max - 1).trimEnd()}…` : line;
@@ -91,25 +93,40 @@ export function computeLayers(inputs: GraphInput[]): Map<string, number> {
   return layers;
 }
 
-function edgePath(from: GraphNode, to: GraphNode): string {
-  const span = to.layer - from.layer;
-  if (span <= 1) {
-    // Kurva S dari tepi bawah prasyarat ke tepi atas konsep.
-    const x1 = from.x + NODE_WIDTH / 2;
-    const y1 = from.y + NODE_HEIGHT;
-    const x2 = to.x + NODE_WIDTH / 2;
-    const y2 = to.y;
-    const mid = (y1 + y2) / 2;
-    return `M ${x1} ${y1} C ${x1} ${mid}, ${x2} ${mid}, ${x2} ${y2}`;
-  }
-  // Melompati tingkat: keluar dari sisi kanan, melengkung ke kanan, masuk ke sisi kanan target.
-  const bend = SKIP_OFFSET + SKIP_STEP * (span - 2);
-  const x1 = from.x + NODE_WIDTH;
-  const y1 = from.y + NODE_HEIGHT / 2;
-  const x2 = to.x + NODE_WIDTH;
-  const y2 = to.y + NODE_HEIGHT / 2;
-  const cx = Math.max(x1, x2) + bend;
-  return `M ${x1} ${y1} C ${cx} ${y1}, ${cx} ${y2}, ${x2} ${y2}`;
+/** Kurva S dari tepi bawah prasyarat ke tepi atas konsep (tingkat berurutan). */
+function adjacentPath(from: GraphNode, to: GraphNode): string {
+  const x1 = from.x + NODE_WIDTH / 2;
+  const y1 = from.y + NODE_HEIGHT;
+  const x2 = to.x + NODE_WIDTH / 2;
+  const y2 = to.y;
+  const mid = (y1 + y2) / 2;
+  return `M ${x1} ${y1} C ${x1} ${mid}, ${x2} ${mid}, ${x2} ${y2}`;
+}
+
+/**
+ * Garis yang melompati tingkat: turun dari bawah prasyarat, belok ke jalur di kanan (di dalam celah
+ * antar-tingkat yang tidak berisi simpul), turun di jalur itu, lalu belok masuk ke atas konsep.
+ * Ketinggian belokan digeser per jalur agar garis tidak saling menumpuk.
+ */
+function lanePath(from: GraphNode, to: GraphNode, laneX: number, lane: number): string {
+  const r = CORNER;
+  const x1 = from.x + NODE_WIDTH / 2;
+  const y1 = from.y + NODE_HEIGHT;
+  const x2 = to.x + NODE_WIDTH / 2;
+  const y2 = to.y;
+  // Belokan keluar dekat simpul asal, belokan masuk dekat simpul tujuan: bila dua garis jalur
+  // berbagi satu celah, segmen keluar dan masuknya tetap terpisah (bukan tampak satu garis).
+  const shift = (lane % 3) * 6;
+  const yA = y1 + 10 + shift;
+  const yB = y2 - 16 - shift;
+  return [
+    `M ${x1} ${y1}`,
+    `V ${yA - r} Q ${x1} ${yA} ${x1 + r} ${yA}`,
+    `H ${laneX - r} Q ${laneX} ${yA} ${laneX} ${yA + r}`,
+    `V ${yB - r} Q ${laneX} ${yB} ${laneX - r} ${yB}`,
+    `H ${x2 + r} Q ${x2} ${yB} ${x2} ${yB + r}`,
+    `V ${y2}`,
+  ].join(' ');
 }
 
 /** Hitung posisi simpul dan jalur garis. Urutan input menentukan urutan dalam satu tingkat. */
@@ -122,11 +139,6 @@ export function layoutGraph(inputs: GraphInput[]): GraphLayout {
 
   const widest = Math.max(0, ...rows.map((r) => r.length));
   const contentWidth = widest * NODE_WIDTH + Math.max(0, widest - 1) * H_GAP;
-  const maxSpan = Math.max(
-    1,
-    ...inputs.flatMap((n) => n.prerequisites.map((p) => (layers.get(n.id) ?? 0) - (layers.get(p) ?? 0))),
-  );
-  const skipRoom = maxSpan > 1 ? SKIP_OFFSET + SKIP_STEP * (maxSpan - 2) + 8 : 0;
 
   const nodes: GraphNode[] = rows.flatMap((row, layer) => {
     const rowWidth = row.length * NODE_WIDTH + (row.length - 1) * H_GAP;
@@ -143,16 +155,28 @@ export function layoutGraph(inputs: GraphInput[]): GraphLayout {
   });
 
   const byId = new Map(nodes.map((n) => [n.id, n]));
-  const edges: GraphEdge[] = inputs.flatMap((n) =>
+  const pairs = inputs.flatMap((n) =>
     n.prerequisites.flatMap((p) => {
       const from = byId.get(p);
       const to = byId.get(n.id);
-      return from && to ? [{ from: p, to: n.id, d: edgePath(from, to) }] : [];
+      return from && to ? [{ from, to, span: to.layer - from.layer }] : [];
     }),
   );
 
+  // Jalur kanan: garis terpendek paling dekat ke simpul agar garis panjang tidak memotongnya.
+  const skips = pairs.filter((e) => e.span > 1).sort((a, b) => a.span - b.span || a.from.layer - b.from.layer);
+  const laneOf = new Map(skips.map((e, i) => [e, i]));
+  const laneBase = PADDING + contentWidth + LANE_OFFSET;
+  const laneRoom = skips.length > 0 ? LANE_OFFSET + (skips.length - 1) * LANE_STEP + 8 : 0;
+
+  const edges: GraphEdge[] = pairs.map((e) => {
+    const lane = laneOf.get(e);
+    const d = lane === undefined ? adjacentPath(e.from, e.to) : lanePath(e.from, e.to, laneBase + lane * LANE_STEP, lane);
+    return { from: e.from.id, to: e.to.id, d };
+  });
+
   return {
-    width: PADDING * 2 + contentWidth + skipRoom,
+    width: PADDING * 2 + contentWidth + laneRoom,
     height: PADDING * 2 + layerCount * NODE_HEIGHT + Math.max(0, layerCount - 1) * V_GAP,
     nodes,
     edges,

@@ -1,0 +1,91 @@
+---
+title: "Leverage & Margin"
+termEn: "Leverage & Margin"
+slug: leverage-and-margin
+category: risk-management
+order: 2
+difficulty: intermediate
+description: "Leverage memungkinkan posisi lebih besar dari dana yang dijaminkan; margin adalah dana jaminannya. Keduanya menentukan seberapa dekat akun dengan margin call."
+status: draft
+featured: false
+prerequisites: [position-sizing]
+related: [risk-of-ruin, variance-and-volatility]
+keywords: [margin call, MC, stop out, SO, full margin, free margin, margin level, ekuitas, equity, leverage]
+sources: []
+---
+
+## Mengapa Ini Penting
+
+Banyak akun trading habis bukan karena satu analisis yang sangat salah, tetapi karena posisi yang dibuka memakai hampir seluruh margin. Dalam kondisi itu, pergerakan harga yang biasa saja sudah cukup untuk memicu margin call atau penutupan paksa (stop out). Memahami leverage dan margin membantu Anda melihat **seberapa besar ruang gerak harga sebelum akun dipaksa berhenti.**
+
+## Gagasan Utama
+
+- **Leverage** memungkinkan Anda membuka posisi yang nilainya jauh lebih besar daripada dana yang dijaminkan. Leverage 1:100 berarti setiap Rp1 jaminan dapat menopang posisi senilai Rp100.
+- **Margin** adalah dana yang dikunci sebagai jaminan untuk posisi yang terbuka (margin terpakai).
+- **Ekuitas** adalah saldo ditambah atau dikurangi untung/rugi posisi yang masih terbuka.
+- **Free margin** adalah ekuitas dikurangi margin terpakai.
+- **Margin level** adalah ekuitas dibagi margin terpakai, dalam persen.
+
+Broker menetapkan batas margin level untuk **margin call** (peringatan) dan **stop out** (posisi ditutup paksa). Nilai batas ini berbeda-beda antar broker.
+
+Hal terpenting: **leverage tidak mengubah kerugian per poin.** Kerugian per poin ditentukan oleh [ukuran posisi](../position-sizing/). Leverage hanya membuat posisi besar bisa dibuka dengan jaminan kecil.
+
+## Penjelasan Sederhana
+
+Bayangkan menyewa rumah dengan uang jaminan. Jaminannya kecil dibandingkan nilai rumah, tetapi bila kerusakan melebihi jaminan, pemilik akan meminta tambahan atau mengakhiri sewa. Margin bekerja seperti jaminan itu: selama kerugian masih tertutup, posisi boleh tetap terbuka. Begitu ekuitas turun terlalu jauh dibandingkan jaminan, posisi ditutup.
+
+## Contoh Kehidupan Nyata
+
+<Contoh jenis="kehidupan">
+
+Membeli rumah dengan uang muka 10% berarti Anda mengendalikan aset sepuluh kali lebih besar daripada uang sendiri. Bila harga rumah naik 10%, keuntungan terhadap uang muka terasa besar. Bila harga turun 10%, seluruh uang muka secara hitungan sudah habis. Efek pengungkit yang sama bekerja ke dua arah.
+
+</Contoh>
+
+## Contoh Keuangan
+
+<Contoh jenis="keuangan">
+
+*Ilustrasi.* Posisi senilai Rp500.000.000 dengan leverage 1:100 hanya membutuhkan margin:
+
+```text
+Margin = Rp500.000.000 ÷ 100 = Rp5.000.000
+```
+
+Pergerakan harga 1% pada posisi itu bernilai Rp5.000.000, atau sama dengan seluruh margin yang dijaminkan.
+
+</Contoh>
+
+## Contoh Trading
+
+<Contoh jenis="trading">
+
+*Ilustrasi, bukan rekomendasi.* Ekuitas Rp10.000.000, margin per 1 lot Rp5.000.000, nilai per poin per 1 lot Rp10.000. Anggap broker memberi margin call di margin level 100% dan stop out di 50%. Semua angka ini contoh; spesifikasi sebenarnya berbeda tiap broker dan instrumen.
+
+| Ukuran posisi | Margin terpakai | Free margin | Margin level | Jarak ke margin level 100% | Jarak ke stop out 50% |
+| --- | --- | --- | --- | --- | --- |
+| 0,2 lot | Rp1.000.000 | Rp9.000.000 | 1.000% | ±4.500 poin | ±4.750 poin |
+| 1 lot | Rp5.000.000 | Rp5.000.000 | 200% | ±500 poin | ±750 poin |
+| 1,8 lot | Rp9.000.000 | Rp1.000.000 | 111% | ±56 poin | ±306 poin |
+
+Dengan 1,8 lot, akun hampir **full margin**: pergerakan sekitar 56 poin melawan posisi sudah membawa margin level ke 100%, dan saat stop out tersentuh kerugian sudah sekitar Rp5.500.000 atau 55% ekuitas. Perhatikan bahwa semua ini terjadi tanpa stop loss yang direncanakan; akun "berhenti" karena jaminannya habis, bukan karena analisis dinyatakan salah.
+
+</Contoh>
+
+## Cara Kerja Konsep
+
+```text
+Margin terpakai = Ukuran posisi × Margin per 1 lot
+Free margin     = Ekuitas − Margin terpakai
+Margin level    = Ekuitas ÷ Margin terpakai × 100%
+```
+
+Cara berpikir yang lebih aman:
+
+1. Tentukan ukuran posisi dari **risiko per transaksi dan stop loss** terlebih dahulu (lihat [Ukuran Posisi](../position-sizing/)).
+2. Setelah itu, periksa margin terpakai. Bila posisi yang dihitung dari risiko ternyata memakai hampir seluruh margin, itu tanda posisinya terlalu besar untuk akun tersebut.
+3. Ingat bahwa beberapa posisi terbuka sekaligus menjumlahkan margin terpakai dan kerugian per poinnya.
+
+Margin call dan stop out adalah batas darurat dari broker, bukan rencana manajemen risiko. Rencana risiko seharusnya membuat akun tidak pernah mendekati batas itu. Lihat juga [Risiko Kehancuran](../risk-of-ruin/).
+
+<SimulasiMargin />

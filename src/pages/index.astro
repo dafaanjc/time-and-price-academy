@@ -1,22 +1,25 @@
 ---
+// Beranda: MASALAH TRADER → HITUNG DULU → KONSEP INTI → JALUR BELAJAR (+ prinsip).
+// Pintu masuk utama adalah masalah dalam bahasa trader; teori tetap tersedia lewat indeks dan jalur.
 import BaseLayout from '../layouts/BaseLayout.astro';
-import CategoryGrid from '../components/CategoryGrid.astro';
-import ConceptCard from '../components/ConceptCard.astro';
-import LearningPath from '../components/LearningPath.astro';
-import KnowledgeGraph from '../components/KnowledgeGraph.astro';
+import BrandEmblem from '../components/BrandEmblem.astro';
+import ConceptIndexCompact from '../components/ConceptIndexCompact.astro';
+import LearningPathStrip from '../components/LearningPathStrip.astro';
+import ProblemList from '../components/ProblemList.astro';
+import SectionHeading from '../components/SectionHeading.astro';
+import UkuranPosisi from '../components/tools/UkuranPosisi.astro';
 import { siteConfig } from '../config/site';
-import { getConcepts, getKnowledgeGraph, getLearningPaths } from '../lib/concepts';
+import { getLearningPaths } from '../lib/concepts';
+import { getProblems } from '../lib/problems';
 import { routes, withBase } from '../lib/url';
 
-const concepts = await getConcepts();
-const featured = concepts.filter((c) => c.data.featured);
+const problems = await getProblems();
 const [mainPath] = await getLearningPaths();
-const graph = await getKnowledgeGraph();
 
 const principles = [
   {
     title: 'Dapat ditelusuri',
-    body: 'Setiap klaim harus bisa dilacak ke sumbernya. Konsep tanpa sumber yang terverifikasi ditandai sebagai draf.',
+    body: 'Setiap klaim harus bisa dilacak ke sumbernya. Halaman tanpa sumber terverifikasi ditandai sebagai draf.',
   },
   {
     title: 'Bertahap',
@@ -31,70 +34,70 @@ const principles = [
 
 <BaseLayout>
   <section class="hero" aria-labelledby="hero-title">
-    <p class="eyebrow">{siteConfig.product} · {siteConfig.masterBrand}</p>
-    <h1 id="hero-title" class="hero__title">
-      {siteConfig.taglineParts.map((part) => <span>{`${part} `}</span>)}
-    </h1>
-    <p class="hero__lead prose">
-      {siteConfig.product} adalah perpustakaan riset dan sistem belajar interaktif tentang risiko, probabilitas, dan
-      pengambilan keputusan. Setiap konsep dijelaskan bertahap: dari gagasan dasarnya, contoh sehari-hari,
-      hingga penerapannya di pasar keuangan.
-    </p>
-    <p class="hero__actions">
-      <a class="button" href={withBase(routes.learningPaths)}>Mulai jalur belajar</a>
-      <a class="button button--ghost" href="#jelajahi">Jelajahi topik</a>
-    </p>
+    <div class="hero__text">
+      <p class="eyebrow">{siteConfig.product} · Bagian dari {siteConfig.masterBrand}</p>
+      <h1 id="hero-title" class="hero__title">
+        {siteConfig.taglineParts.map((part) => <span>{`${part} `}</span>)}
+      </h1>
+      <p class="hero__lead">
+        Mulai dari masalah yang Anda alami saat trading, lalu pahami konsep risiko di baliknya: definisinya,
+        contoh hitungannya, dan cara menerapkannya.
+      </p>
+      <p class="hero__actions">
+        <a class="button" href="#masalah">Mulai dari masalah</a>
+        <a class="hero__secondary" href={withBase(routes.learningPaths)}>Ikuti jalur belajar →</a>
+      </p>
+    </div>
+    <BrandEmblem variant="hero" />
   </section>
 
-  <section class="home-section" id="jelajahi" aria-labelledby="jelajahi-title">
-    <h2 id="jelajahi-title">Jelajahi Pengetahuan</h2>
-    <CategoryGrid />
+  <section class="home-section" id="masalah" aria-labelledby="masalah-title">
+    <SectionHeading
+      id="masalah-title"
+      number="01"
+      title="Masalah Trader"
+      more={{ href: withBase(routes.problems), label: 'Semua masalah' }}
+    />
+    <ProblemList problems={problems} headingLevel={3} ruled={false} />
   </section>
 
-  {
-    featured.length > 0 && (
-      <section class="home-section" aria-labelledby="pilihan-title">
-        <h2 id="pilihan-title">Konsep Pilihan</h2>
-        <div class="card-grid">
-          {featured.map((concept) => (
-            <ConceptCard concept={concept} />
-          ))}
-        </div>
-      </section>
-    )
-  }
+  <section class="home-section" aria-labelledby="hitung-title">
+    <SectionHeading id="hitung-title" number="02" title="Hitung Dulu" />
+    <UkuranPosisi />
+  </section>
+
+  <section class="home-section" aria-labelledby="konsep-title">
+    <SectionHeading
+      id="konsep-title"
+      number="03"
+      title="Konsep Inti Risiko"
+      more={{ href: withBase(routes.concepts), label: 'Indeks konsep' }}
+    />
+    <ConceptIndexCompact />
+  </section>
 
   {
     mainPath && (
-      <section class="home-section" id="jalur-belajar" aria-labelledby="jalur-title">
-        <h2 id="jalur-title">Jalur Belajar: {mainPath.title}</h2>
-        <p class="prose section-lead">{mainPath.description}</p>
-        <LearningPath path={mainPath} />
+      <section class="home-section" aria-labelledby="jalur-title">
+        <SectionHeading
+          id="jalur-title"
+          number="04"
+          title="Jalur Belajar"
+          more={{ href: withBase(routes.learningPaths), label: 'Semua jalur' }}
+        />
+        <p class="section-lead">
+          <strong>{mainPath.title}.</strong> {mainPath.description}
+        </p>
+        <LearningPathStrip path={mainPath} />
         <p class="section-more">
-          <a href={withBase(routes.learningPaths)}>Lihat semua jalur belajar →</a>
+          <a href={withBase(routes.map)}>Lihat hubungan antar-konsep di peta pengetahuan →</a>
         </p>
       </section>
     )
   }
 
-  <section class="home-section" aria-labelledby="peta-title">
-    <h2 id="peta-title">Pratinjau Peta Pengetahuan</h2>
-    <div class="map-preview">
-      <div class="map-preview__text">
-        <p class="prose section-lead">
-          Setiap konsep dibangun di atas konsep sebelumnya. Panah pada peta mengarah dari prasyarat ke konsep yang
-          membutuhkannya, sehingga Anda bisa melihat urutan belajar yang masuk akal.
-        </p>
-        <p class="section-more">
-          <a href={withBase(routes.map)}>Buka peta lengkap →</a>
-        </p>
-      </div>
-      <KnowledgeGraph graph={graph} idPrefix="pratinjau" />
-    </div>
-  </section>
-
-  <section class="home-section" aria-labelledby="filosofi-title">
-    <h2 id="filosofi-title">Filosofi Riset</h2>
+  <section class="home-section" aria-labelledby="prinsip-title">
+    <SectionHeading id="prinsip-title" number="05" title="Prinsip" />
     <ul class="principles">
       {
         principles.map((p) => (
@@ -110,106 +113,108 @@ const principles = [
 
 <style>
   .hero {
-    padding-block: 1rem 2.5rem;
-    border-bottom: 1px solid var(--line);
+    display: grid;
+    gap: var(--space-8);
+    align-items: center;
+    padding-block: var(--space-4) var(--space-8);
+  }
+
+  /* Desktop: teks kiri, artwork kanan. Mobile: artwork di bawah tombol. */
+  @media (min-width: 64rem) {
+    .hero {
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: var(--space-12);
+    }
   }
 
   .hero__title {
     display: flex;
     flex-direction: column;
-    margin: 0.75rem 0 1rem;
-    font-size: clamp(2.25rem, 6vw, 3.75rem);
+    margin: var(--space-3) 0 var(--space-4);
+    font-size: clamp(var(--text-2xl), 6vw, var(--text-4xl));
     letter-spacing: -0.02em;
   }
 
-  .hero__title span:last-child {
-    color: var(--accent);
-  }
-
   .hero__lead {
+    max-width: 52ch;
     margin: 0;
-    font-size: 1.125rem;
-    color: var(--ink-soft);
+    font-size: var(--text-lg);
+    color: var(--ink-2);
   }
 
   .hero__actions {
     display: flex;
     flex-wrap: wrap;
-    gap: 0.75rem;
-    margin: 1.75rem 0 0;
+    align-items: center;
+    gap: var(--space-3) var(--space-6);
+    margin: var(--space-8) 0 0;
   }
 
   .button {
     display: inline-flex;
     align-items: center;
     min-height: 2.75rem;
-    padding: 0 1.125rem;
+    padding: 0 var(--space-6);
     font-weight: 600;
-    color: var(--surface);
-    background: var(--accent);
-    border: 1px solid var(--accent);
-    border-radius: var(--radius);
+    color: var(--paper);
+    background: var(--ink);
+    border: var(--border-hair) solid var(--ink);
+    border-radius: var(--radius-1);
     text-decoration: none;
   }
 
-  .button--ghost {
-    color: var(--accent);
+  .button:hover {
+    color: var(--ink);
     background: transparent;
   }
 
-  .home-section {
-    padding-top: 3rem;
-  }
-
-  .home-section h2 {
-    margin: 0 0 1.25rem;
-    font-size: 1.625rem;
-  }
-
-  .section-lead {
-    margin: -0.5rem 0 1.5rem;
-    color: var(--ink-soft);
-  }
-
-  .section-more {
-    margin: 0.5rem 0 0;
+  .hero__secondary {
     font-weight: 600;
+    color: var(--ink);
   }
 
-  .map-preview {
-    display: grid;
-    gap: 1.5rem;
-    align-items: start;
-  }
-
-  .map-preview .section-lead {
-    margin-top: 0;
+  .home-section {
+    padding-top: var(--space-16);
   }
 
   @media (min-width: 64rem) {
-    .map-preview {
-      grid-template-columns: minmax(0, 1fr) auto;
-      gap: 3rem;
+    .home-section {
+      padding-top: var(--space-24);
     }
+  }
+
+  .section-lead {
+    max-width: var(--measure);
+    margin: 0 0 var(--space-6);
+    color: var(--ink-2);
+  }
+
+  .section-lead strong {
+    color: var(--ink);
+  }
+
+  .section-more {
+    margin: var(--space-6) 0 0;
+    font-weight: 600;
   }
 
   .principles {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(min(100%, 15rem), 1fr));
-    gap: 1.5rem;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr));
+    gap: var(--space-8);
     margin: 0;
     padding: 0;
     list-style: none;
   }
 
   .principles h3 {
-    margin: 0 0 0.375rem;
-    font-size: 1.125rem;
+    margin: 0 0 var(--space-2);
+    font-size: var(--text-lg);
   }
 
   .principles p {
     margin: 0;
-    font-size: 0.9375rem;
-    color: var(--ink-soft);
+    font-size: var(--text-sm);
+    color: var(--ink-2);
   }
 </style>

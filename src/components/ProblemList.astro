@@ -1,0 +1,113 @@
+---
+// Daftar masalah trader sebagai baris editorial (bukan kartu): kutipan dalam suara trader,
+// keputusan yang dipertaruhkan, dan konsep yang menjelaskannya.
+import { conceptHref, getConcepts } from '../lib/concepts';
+import { problemHref, type Problem } from '../lib/problems';
+
+interface Props {
+  problems: Problem[];
+  /** Tingkat heading untuk kutipan, sesuai posisinya di halaman. */
+  headingLevel?: 2 | 3;
+  /** Garis tebal di atas daftar. Matikan bila sudah didahului judul bagian bergaris (SectionHeading). */
+  ruled?: boolean;
+}
+
+const { problems, headingLevel = 2, ruled = true } = Astro.props;
+const Heading = `h${headingLevel}` as const;
+const titles = new Map((await getConcepts()).map((c) => [c.id, c.data.title]));
+---
+
+<ol class:list={["problem-list", { "problem-list--ruled": ruled }]}>
+  {
+    problems.map((problem) => (
+      <li class="problem-list__item">
+        <Heading class="problem-list__quote">
+          <a href={problemHref(problem.id)}>“{problem.data.title}”</a>
+        </Heading>
+        <p class="problem-list__decision">
+          <span class="problem-list__label">Keputusan</span>{' '}
+          <span>{problem.data.decision}</span>
+        </p>
+        <p class="problem-list__concepts">
+          <span class="problem-list__label">Konsep</span>{' '}
+          <span>
+            {problem.data.concepts.map((id, i) => (
+              <>
+                {i > 0 && <span aria-hidden="true"> · </span>}
+                <a href={conceptHref(id)}>{titles.get(id) ?? id}</a>
+              </>
+            ))}
+          </span>
+        </p>
+      </li>
+    ))
+  }
+</ol>
+
+<style>
+  .problem-list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .problem-list--ruled {
+    border-top: var(--border-mark) solid var(--ink);
+  }
+
+  .problem-list:not(.problem-list--ruled) .problem-list__item:first-child {
+    padding-top: 0;
+  }
+
+  .problem-list__item {
+    display: grid;
+    gap: var(--space-2);
+    padding-block: var(--space-6);
+    border-bottom: var(--border-hair) solid var(--rule);
+  }
+
+  .problem-list__quote {
+    margin: 0;
+    font-size: var(--text-xl);
+    line-height: 1.25;
+  }
+
+  .problem-list__quote a {
+    color: var(--ink);
+    text-decoration: none;
+  }
+
+  .problem-list__quote a:hover {
+    text-decoration: underline;
+    text-decoration-thickness: 2px;
+  }
+
+  /* Dua kolom: label di kiri, isi di kanan; baris kedua tetap rata dengan isi. */
+  .problem-list__decision,
+  .problem-list__concepts {
+    display: grid;
+    grid-template-columns: 6rem minmax(0, 1fr);
+    column-gap: var(--space-3);
+    margin: 0;
+    max-width: var(--measure);
+    font-size: var(--text-sm);
+    color: var(--ink-2);
+  }
+
+  .problem-list__label {
+    padding-top: 0.15em;
+    font-size: var(--text-xs);
+    font-weight: 600;
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+    color: var(--ink-3);
+  }
+
+  .problem-list__concepts a {
+    color: var(--ink-2);
+  }
+
+  .problem-list__concepts a:hover {
+    color: var(--ink);
+  }
+</style>

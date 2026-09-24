@@ -21,7 +21,11 @@ Konsep ini juga membantu memisahkan kualitas keputusan dari hasil sesaat. Keputu
 
 ## Gagasan Utama
 
+<Definisi>
+
 **Nilai harapan adalah rata-rata tertimbang dari semua hasil yang mungkin, dengan probabilitas setiap hasil sebagai bobotnya.**
+
+</Definisi>
 
 ```text
 E[X] = p₁·x₁ + p₂·x₂ + … + pₙ·xₙ
@@ -43,6 +47,8 @@ Tidak ada sisi dadu yang bernilai 3,5, jadi Anda tidak akan pernah mendapat 3,5 
 
 ## Contoh Kehidupan Nyata
 
+<Contoh jenis="kehidupan">
+
 *Ilustrasi.* Sebuah permainan di pasar malam: bayar Rp4.000 untuk sekali lempar dadu, lalu terima Rp1.000 dikali angka yang keluar.
 
 - Nilai harapan hadiah: Rp1.000 × 3,5 = Rp3.500.
@@ -50,7 +56,11 @@ Tidak ada sisi dadu yang bernilai 3,5, jadi Anda tidak akan pernah mendapat 3,5 
 
 Pada satu permainan Anda bisa untung (misalnya keluar angka 6, menerima Rp6.000). Namun bila dimainkan terus, rata-ratanya adalah rugi Rp500 setiap kali. Inilah cara penyelenggara permainan memperoleh keuntungan secara konsisten: nilai harapan berpihak kepada mereka.
 
+</Contoh>
+
 ## Contoh Keuangan
+
+<Contoh jenis="keuangan">
 
 *Ilustrasi.* Menggunakan tiga skenario dari konsep [Distribusi Probabilitas](../probability-distribution/):
 
@@ -63,7 +73,11 @@ Pada satu permainan Anda bisa untung (misalnya keluar angka 6, menerima Rp6.000)
 
 Nilai harapannya positif, yaitu +3,75%. Namun ada peluang 25% untuk rugi 15%. Nilai harapan saja tidak menunjukkan seberapa menyakitkan skenario buruk itu. Karena itu, nilai harapan perlu dibaca bersama ukuran sebaran seperti [varians dan volatilitas](../variance-and-volatility/).
 
+</Contoh>
+
 ## Contoh Trading
+
+<Contoh jenis="trading">
 
 *Ilustrasi, bukan rekomendasi.* Sebuah pendekatan trading memiliki karakteristik berikut. Angkanya adalah perkiraan dari data, bukan jaminan.
 
@@ -84,6 +98,8 @@ Beberapa catatan penting:
 - Biaya transaksi dan selisih harga eksekusi mengurangi nilai harapan yang sebenarnya.
 - Jika perkiraan peluang menang atau ukuran rata-rata keuntungan keliru, nilai harapan yang sebenarnya juga keliru.
 
+</Contoh>
+
 ## Cara Kerja Konsep
 
 Langkah menghitung nilai harapan:
@@ -98,3 +114,5 @@ Batasan yang perlu diingat:
 - **Paling bermakna untuk keputusan yang berulang.** Untuk keputusan sekali seumur hidup, sebaran hasil dan kerugian terburuk sering lebih penting daripada rata-rata.
 - **Sangat bergantung pada input.** Probabilitas yang keliru menghasilkan nilai harapan yang keliru, sekalipun hitungannya benar.
 - **Tidak menggambarkan risiko kehabisan modal.** Keputusan dengan nilai harapan positif tetap bisa menghabiskan modal bila taruhan per keputusan terlalu besar dibandingkan total modal.
+
+<PenjelajahNilaiHarapan />

@@ -1,0 +1,72 @@
+---
+// Jalur belajar ringkas untuk beranda: langkah bernomor dalam satu alur yang membungkus.
+// Versi lengkap dengan deskripsi ada di LearningPath (/jalur-belajar/).
+import { conceptHref, type ResolvedPath } from '../lib/concepts';
+
+interface Props {
+  path: ResolvedPath;
+}
+
+const { path } = Astro.props;
+const stepNumber = (i: number) => String(i + 1).padStart(2, '0');
+---
+
+<ol class="path-strip" aria-label={`Jalur belajar: ${path.title}`}>
+  {
+    path.steps.map((concept, i) => (
+      <li>
+        <a href={conceptHref(concept.id)}>
+          <span class="path-strip__number" aria-hidden="true">
+            {stepNumber(i)}
+          </span>
+          <span>{concept.data.title}</span>
+        </a>
+      </li>
+    ))
+  }
+</ol>
+
+<style>
+  .path-strip {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2) 0;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  li {
+    display: flex;
+    align-items: center;
+  }
+
+  /* Penghubung di AKHIR langkah (bukan awal) agar tidak jatuh di awal baris saat membungkus. */
+  li:not(:last-child)::after {
+    content: '';
+    width: var(--space-6);
+    height: var(--border-hair);
+    margin-inline: var(--space-2);
+    background: var(--ink-3);
+  }
+
+  a {
+    display: inline-flex;
+    align-items: baseline;
+    gap: var(--space-2);
+    padding: var(--space-2) var(--space-3);
+    color: var(--ink);
+    text-decoration: none;
+    border: var(--border-hair) solid var(--rule);
+    border-radius: var(--radius-1);
+  }
+
+  a:hover {
+    border-color: var(--ink);
+  }
+
+  .path-strip__number {
+    font-size: var(--text-xs);
+    color: var(--ink-3);
+  }
+</style>

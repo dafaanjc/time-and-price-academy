@@ -14,9 +14,14 @@ interface Props {
   /** Path gambar OG (sudah dengan base). */
   image?: string;
   noindex?: boolean;
+  /**
+   * Tampilkan indeks konsep di kiri (desktop). Hanya untuk halaman di dalam area konsep
+   * (konsep, kategori). Halaman lain memakai kontainer di tengah tanpa sidebar.
+   */
+  sidebar?: boolean;
 }
 
-const { title, description, type, section, image, noindex } = Astro.props;
+const { title, description, type, section, image, noindex, sidebar = false } = Astro.props;
 ---
 
 <!doctype html>
@@ -27,8 +32,8 @@ const { title, description, type, section, image, noindex } = Astro.props;
   <body>
     <a class="skip-link" href="#konten">Langsung ke konten</a>
     <SiteHeader />
-    <div class="shell">
-      <Sidebar />
+    <div class:list={['shell', { 'shell--sidebar': sidebar }]}>
+      {sidebar && <Sidebar />}
       <div class="shell__main">
         <main id="konten" tabindex="-1">
           <slot />
@@ -40,9 +45,14 @@ const { title, description, type, section, image, noindex } = Astro.props;
 </html>
 
 <style>
+  .shell {
+    max-width: var(--container);
+    margin-inline: auto;
+  }
+
   .shell__main {
     min-width: 0;
-    padding: 2rem var(--gutter) 0;
+    padding: var(--space-8) var(--gutter) 0;
   }
 
   main:focus {
@@ -50,16 +60,18 @@ const { title, description, type, section, image, noindex } = Astro.props;
   }
 
   @media (min-width: 64rem) {
-    .shell {
-      display: grid;
-      grid-template-columns: var(--sidebar-width) minmax(0, 1fr);
-      max-width: 90rem;
-      margin-inline: auto;
+    .shell__main {
+      padding-top: var(--space-12);
     }
 
-    .shell__main {
-      padding-top: 3rem;
-      padding-inline: 3rem;
+    .shell--sidebar {
+      display: grid;
+      grid-template-columns: var(--sidebar-width) minmax(0, 1fr);
+      max-width: var(--container-wide);
+    }
+
+    .shell--sidebar .shell__main {
+      padding-inline: var(--space-12);
     }
   }
 </style>

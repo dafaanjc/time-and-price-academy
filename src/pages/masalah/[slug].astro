@@ -1,0 +1,22 @@
+---
+import { render } from 'astro:content';
+import ProblemLayout from '../../layouts/ProblemLayout.astro';
+import { toolComponents } from '../../components/tools';
+import { getProblems, type Problem } from '../../lib/problems';
+
+export async function getStaticPaths() {
+  const problems = await getProblems();
+  return problems.map((problem) => ({ params: { slug: problem.id }, props: { problem } }));
+}
+
+interface Props {
+  problem: Problem;
+}
+
+const { problem } = Astro.props;
+const { Content } = await render(problem);
+---
+
+<ProblemLayout problem={problem}>
+  <Content components={toolComponents} />
+</ProblemLayout>

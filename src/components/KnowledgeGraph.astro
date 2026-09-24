@@ -45,7 +45,7 @@ const lineY = (count: number, i: number) => NODE_HEIGHT / 2 + (i - (count - 1) /
         graph.nodes.map((n) => (
           <a href={n.href} class="node" aria-label={n.title}>
             <g transform={`translate(${n.x} ${n.y})`}>
-              <rect width={NODE_WIDTH} height={NODE_HEIGHT} rx="8" />
+              <rect width={NODE_WIDTH} height={NODE_HEIGHT} rx="2" />
               <text x={NODE_WIDTH / 2} text-anchor="middle" dominant-baseline="central" aria-hidden="true">
                 {n.lines.map((line, i) => (
                   <tspan x={NODE_WIDTH / 2} y={lineY(n.lines.length, i)}>
@@ -70,17 +70,17 @@ const lineY = (count: number, i: number) => NODE_HEIGHT / 2 + (i - (count - 1) /
 
   .edge {
     fill: none;
-    stroke: var(--ink-faint);
+    stroke: var(--ink-3);
     stroke-width: 1.5;
   }
 
   .arrow {
-    fill: var(--ink-faint);
+    fill: var(--ink-3);
   }
 
   .node rect {
     fill: var(--surface);
-    stroke: var(--line);
+    stroke: var(--rule);
     stroke-width: 1.5;
   }
 

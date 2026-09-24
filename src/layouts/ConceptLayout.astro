@@ -1,7 +1,7 @@
 ---
 // Urutan halaman konsep:
 // header (deskripsi, meta, atribusi, salin tautan) → notis draf → daftar isi →
-// isi MDX → konsep terkait → prasyarat → sumber → navigasi jalur belajar.
+// isi MDX → masalah trader terkait → konsep terkait → prasyarat → sumber → navigasi jalur belajar.
 import BaseLayout from './BaseLayout.astro';
 import ConceptHeader from '../components/ConceptHeader.astro';
 import PlaceholderNotice from '../components/PlaceholderNotice.astro';
@@ -9,8 +9,10 @@ import TableOfContents from '../components/TableOfContents.astro';
 import ConceptLinkList from '../components/ConceptLinkList.astro';
 import SourceList from '../components/SourceList.astro';
 import PathNav from '../components/PathNav.astro';
+import ProblemList from '../components/ProblemList.astro';
 import { getCategory } from '../data/categories';
 import { getConceptsByIds, getPathContext, type Concept } from '../lib/concepts';
+import { getProblemsForConcept } from '../lib/problems';
 import { layoutSectionIds } from '../lib/sections';
 import { absoluteUrl, conceptOgImage } from '../lib/url';
 
@@ -25,6 +27,8 @@ const { title, description, category, status, related, prerequisites, sources } 
 const relatedConcepts = await getConceptsByIds(related);
 const prerequisiteConcepts = await getConceptsByIds(prerequisites);
 const pathContext = await getPathContext(concept.id);
+// Tautan balik otomatis: masalah trader yang merujuk konsep ini.
+const relatedProblems = await getProblemsForConcept(concept.id);
 const shareUrl = absoluteUrl(Astro.url.pathname, Astro.site);
 ---
 
@@ -34,6 +38,7 @@ const shareUrl = absoluteUrl(Astro.url.pathname, Astro.site);
   type="article"
   section={getCategory(category).title}
   image={conceptOgImage(concept.id)}
+  sidebar
 >
   <article class="concept">
     <ConceptHeader concept={concept} url={shareUrl} />
@@ -41,17 +46,26 @@ const shareUrl = absoluteUrl(Astro.url.pathname, Astro.site);
     {
       status === 'draft' && (
         <PlaceholderNotice>
-          Konsep ini belum melalui peninjauan dan sumbernya belum dipasang. Angka dalam contoh adalah ilustrasi
-          untuk menjelaskan cara berpikir, bukan data pasar nyata atau rekomendasi.
+          Belum ditinjau dan belum bersumber. Angka dalam contoh adalah ilustrasi, bukan data pasar atau rekomendasi.
         </PlaceholderNotice>
       )
     }
 
-    <TableOfContents sections={sections} />
-
-    <div class="content">
-      <slot />
+    <div class="concept__body">
+      <TableOfContents sections={sections} />
+      <div class="content">
+        <slot />
+      </div>
     </div>
+
+    {
+      relatedProblems.length > 0 && (
+        <section class="concept-problems" aria-labelledby={layoutSectionIds.problems}>
+          <h2 id={layoutSectionIds.problems}>Masalah Trader Terkait</h2>
+          <ProblemList problems={relatedProblems} headingLevel={3} />
+        </section>
+      )
+    }
 
     <ConceptLinkList
       id={layoutSectionIds.related}
@@ -74,6 +88,37 @@ const shareUrl = absoluteUrl(Astro.url.pathname, Astro.site);
 </BaseLayout>
 
 <style>
+  /* Layar lebar: isi (lebar baca) di kiri, daftar isi sticky di kolom kanan. */
+  @media (min-width: 80rem) {
+    .concept__body {
+      display: grid;
+      grid-template-columns: minmax(0, var(--measure)) 13rem;
+      gap: var(--space-12);
+      align-items: start;
+    }
+
+    .concept__body > :global(.toc) {
+      grid-column: 2;
+      grid-row: 1;
+      position: sticky;
+      top: calc(var(--header-height) + var(--space-8));
+    }
+
+    .concept__body > .content {
+      grid-column: 1;
+      grid-row: 1;
+    }
+  }
+
+  .concept-problems {
+    max-width: var(--measure);
+  }
+
+  .concept-problems h2 {
+    margin: 0 0 var(--space-3);
+    font-size: var(--text-xl);
+  }
+
   .concept {
     display: flex;
     flex-direction: column;

@@ -36,8 +36,33 @@ const concepts = defineCollection({
     prerequisites: z.array(slug).default([]),
     related: z.array(slug).default([]),
     sources: z.array(source).default([]),
+    /** Sinonim/istilah yang biasa diketik trader, hanya untuk pencarian. */
+    keywords: z.array(z.string().min(1)).default([]),
     sections: z.array(z.object({ id: z.string(), title: z.string() })).optional(),
   }),
 });
 
-export const collections = { concepts };
+const status = z.enum(['draft', 'review', 'published']).default('draft');
+
+// Pintu masuk berbasis masalah trader: MASALAH → KEPUTUSAN → KONSEP → TEORI/BUKTI → PENERAPAN.
+// Masalah tidak menyalin teori; ia merujuk konsep (dicek oleh validate.ts).
+const problems = defineCollection({
+  loader: glob({ pattern: '**/*.mdx', base: './src/content/problems' }),
+  schema: z.object({
+    /** Masalah dalam suara trader, mis. "Kenapa lot gue selalu kebesaran?" (tanpa tanda kutip). */
+    title: z.string().min(1),
+    slug,
+    order: z.number().int().nonnegative(),
+    /** Keputusan yang dipertaruhkan, dalam bahasa netral. */
+    decision: z.string().min(1).max(200),
+    /** Ringkasan untuk daftar, meta description, dan OpenGraph. */
+    description: z.string().min(1).max(220),
+    status,
+    /** Konsep inti yang menjelaskan masalah ini, urut dari yang paling langsung. */
+    concepts: z.array(slug).min(1),
+    keywords: z.array(z.string().min(1)).default([]),
+    sources: z.array(source).default([]),
+  }),
+});
+
+export const collections = { concepts, problems };

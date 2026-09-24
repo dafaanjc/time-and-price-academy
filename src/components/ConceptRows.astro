@@ -1,0 +1,94 @@
+---
+// Baris konsep bernomor bergaya daftar isi: judul, istilah asli, tingkat, deskripsi.
+// Dipakai oleh ConceptIndex (/konsep/) dan halaman kategori.
+import { conceptHref, difficultyLabels, type Concept } from '../lib/concepts';
+
+interface Props {
+  concepts: Concept[];
+}
+
+const { concepts } = Astro.props;
+---
+
+<ol class="concept-rows">
+  {
+    concepts.map((concept) => (
+      <li class="concept-rows__item">
+        <a class="concept-rows__title" href={conceptHref(concept.id)}>
+          {concept.data.title}
+        </a>
+        <span class="concept-rows__meta">
+          {concept.data.termEn && <span lang="en">{concept.data.termEn}</span>}{' '}
+          <span>{difficultyLabels[concept.data.difficulty]}</span>
+        </span>
+        <p class="concept-rows__desc">{concept.data.description}</p>
+      </li>
+    ))
+  }
+</ol>
+
+<style>
+  .concept-rows {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    counter-reset: concept;
+  }
+
+  .concept-rows__item {
+    display: grid;
+    grid-template-columns: 2.25rem minmax(0, 1fr) auto;
+    column-gap: var(--space-2);
+    padding-block: var(--space-3);
+    border-bottom: var(--border-hair) solid var(--rule);
+    counter-increment: concept;
+  }
+
+  .concept-rows__item:first-child {
+    padding-top: 0;
+  }
+
+  /* Nomor urut seperti daftar isi buku. */
+  .concept-rows__item::before {
+    content: counter(concept, decimal-leading-zero);
+    grid-row: 1 / span 2;
+    font-size: var(--text-sm);
+    color: var(--ink-3);
+    line-height: 1.9;
+  }
+
+  .concept-rows__title {
+    font-weight: 600;
+    color: var(--ink);
+    text-decoration: none;
+  }
+
+  .concept-rows__title:hover {
+    text-decoration: underline;
+  }
+
+  .concept-rows__meta {
+    display: flex;
+    gap: var(--space-3);
+    font-size: var(--text-xs);
+    color: var(--ink-3);
+    white-space: nowrap;
+  }
+
+  .concept-rows__meta [lang='en'] {
+    font-style: italic;
+  }
+
+  .concept-rows__desc {
+    grid-column: 2 / -1;
+    margin: var(--space-1) 0 0;
+    font-size: var(--text-sm);
+    color: var(--ink-2);
+  }
+
+  @media (max-width: 29.99rem) {
+    .concept-rows__meta {
+      grid-column: 2 / -1;
+    }
+  }
+</style>

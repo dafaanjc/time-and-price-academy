@@ -1,0 +1,102 @@
+---
+// Indeks konsep ringkas untuk beranda: satu baris per kategori (label + daftar tautan).
+// Versi lengkap dengan deskripsi ada di ConceptIndex (/konsep/).
+import { categoryHref, conceptHref, getCategoryIndex } from '../lib/concepts';
+
+const { active, upcoming } = await getCategoryIndex();
+---
+
+<dl class="concept-compact">
+  {
+    active.map(({ category, concepts }) => (
+      <div class="concept-compact__row">
+        <dt>
+          <a href={categoryHref(category.id)}>{category.title}</a>
+        </dt>
+        <dd>
+          <ul>
+            {concepts.map((concept) => (
+              <li>
+                <a href={conceptHref(concept.id)}>{concept.data.title}</a>
+              </li>
+            ))}
+          </ul>
+        </dd>
+      </div>
+    ))
+  }
+  {
+    upcoming.length > 0 && (
+      <div class="concept-compact__row concept-compact__row--upcoming">
+        <dt>Segera hadir</dt>
+        <dd>{upcoming.map((c) => c.title).join(' · ')}</dd>
+      </div>
+    )
+  }
+</dl>
+
+<style>
+  .concept-compact {
+    margin: 0;
+  }
+
+  .concept-compact__row {
+    display: grid;
+    gap: var(--space-1) var(--space-6);
+    padding-block: var(--space-3);
+    border-bottom: var(--border-hair) solid var(--rule);
+  }
+
+  @media (min-width: 48rem) {
+    .concept-compact__row {
+      grid-template-columns: 12rem minmax(0, 1fr);
+    }
+  }
+
+  dt {
+    font-weight: 600;
+  }
+
+  dt a {
+    color: var(--ink);
+    text-decoration: none;
+  }
+
+  dt a:hover {
+    text-decoration: underline;
+  }
+
+  dd {
+    margin: 0;
+  }
+
+  ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-1) 0;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  /* Pemisah titik tengah di AKHIR item (bukan awal) agar tidak jatuh di awal baris saat membungkus. */
+  li:not(:last-child)::after {
+    content: '·';
+    margin-inline: var(--space-2);
+    color: var(--ink-3);
+  }
+
+  li a {
+    color: var(--ink-2);
+  }
+
+  li a:hover {
+    color: var(--ink);
+  }
+
+  .concept-compact__row--upcoming dt,
+  .concept-compact__row--upcoming dd {
+    font-size: var(--text-sm);
+    color: var(--ink-3);
+  }
+</style>

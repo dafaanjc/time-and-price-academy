@@ -15,7 +15,7 @@ Bahasa konten: **Bahasa Indonesia**. Istilah asli bahasa Inggris dicantumkan di 
 | `difficulty` | ya | enum | `beginner` (Dasar), `intermediate` (Menengah), `advanced` (Lanjutan) |
 | `description` | ya | string ≤ 220 | Deskripsi singkat untuk kartu, meta description, dan OpenGraph |
 | `status` | tidak | enum | `draft` (default), `review`, `published` |
-| `featured` | tidak | boolean | Tampil di "Konsep Pilihan" di beranda |
+| `featured` | tidak | boolean | Saat ini tidak dipakai (bagian "Konsep Pilihan" dihapus dari beranda pada redesign) |
 | `prerequisites` | tidak | slug[] | Konsep yang perlu dipahami lebih dulu |
 | `related` | tidak | slug[] | Konsep terkait, bukan prasyarat |
 | `sources` | tidak | Source[] | Lihat di bawah |
@@ -61,6 +61,47 @@ Sumber dirender oleh `SourceList` → `SourceCard`:
 - judul menjadi tautan ke `url`. Bila `url` kosong tetapi ada `doi`, tautan dibuat ke
   `https://doi.org/<doi>`. Bila keduanya tidak ada, judul ditampilkan tanpa tautan;
 - penulis dan tahun, publisher, DOI, ISBN, dan `note` hanya tampil bila diisi.
+
+### Alat hitung di konten
+
+Empat alat bisa disisipkan di MDX konsep maupun masalah trader, tanpa import:
+
+| Tag | Isi |
+|---|---|
+| `<UkuranPosisi />` | Risiko per transaksi → ukuran posisi |
+| `<SimulasiMargin />` | Jarak ke margin call / stop out |
+| `<TabelKalahBeruntun />` | Kalah beruntun: risiko tetap vs digandakan |
+| `<PenjelajahNilaiHarapan />` | Nilai harapan + simulasi |
+
+Taruh di bagian "Cara Kerja Konsep" (konsep) atau "Penerapan Praktis" (masalah). Satu alat yang sama
+cukup sekali per halaman.
+
+### Komponen isi
+
+Halaman konsep menyediakan dua komponen yang bisa dipakai di MDX **tanpa import**:
+
+```mdx
+## Gagasan Utama
+
+<Definisi>
+
+**Nilai harapan adalah rata-rata tertimbang dari semua hasil yang mungkin…**
+
+</Definisi>
+
+## Contoh Trading
+
+<Contoh jenis="trading">
+
+*Ilustrasi, bukan rekomendasi.* …teks, tabel, dan rumus seperti biasa…
+
+</Contoh>
+```
+
+- `jenis` wajib salah satu dari `kehidupan`, `keuangan`, `trading`, sesuai tiga bagian contoh.
+- Beri baris kosong setelah tag pembuka dan sebelum tag penutup agar Markdown di dalamnya diproses.
+- Heading `##` tetap di **luar** komponen (dipakai daftar isi dan validasi).
+- Build gagal bila `jenis` tidak dikenal atau tag tidak ditutup.
 
 Bagian yang belum ditulis diberi tanda `_Draf: bagian ini belum ditulis._`. Jangan mengisinya dengan
 teks yang terdengar akademis tetapi tidak berdasar.
@@ -114,6 +155,35 @@ teks yang terdengar akademis tetapi tidak berdasar.
 6. Ubah `status` ke `review`, lalu `published`, setelah isi dan sumber diverifikasi.
 
 Konsep baru otomatis muncul di sidebar, menu mobile, halaman kategori, dan jumlah konsep di beranda.
+
+## Masalah trader
+
+Pintu masuk berbasis masalah: **MASALAH → KEPUTUSAN → KONSEP → TEORI/BUKTI → PENERAPAN**. Setiap masalah
+adalah satu file di `src/content/problems/<slug>.mdx` (URL `/masalah/<slug>/`). Masalah **tidak menyalin
+teori**; ia merujuk konsep.
+
+| Field | Wajib | Keterangan |
+|---|---|---|
+| `title` | ya | Masalah dalam suara trader, **tanpa** tanda kutip (ditambahkan otomatis) |
+| `slug` | ya | Sama dengan nama file |
+| `order` | ya | Urutan tampil |
+| `decision` | ya | Keputusan yang dipertaruhkan, dalam bahasa netral (≤ 200 karakter) |
+| `description` | ya | Ringkasan untuk daftar, meta, dan OpenGraph (≤ 220 karakter) |
+| `concepts` | ya | ≥ 1 slug konsep, urut dari yang paling langsung. Wajib ada di koleksi konsep |
+| `keywords` | tidak | Istilah yang biasa diketik trader (mis. `MC`, `revenge trading`), hanya untuk pencarian |
+| `status`, `sources` | tidak | Sama dengan konsep |
+
+Body wajib memuat empat heading ini, **dalam urutan ini**: `## Situasi`, `## Konsep di Baliknya`,
+`## Teori dan Bukti`, `## Penerapan Praktis`. Bagian "Konsep yang Terlibat", "Baca Dulu" (semua
+prasyarat dari konsep yang dirujuk, diurutkan dari yang paling dasar), dan "Sumber" dibuat otomatis; jangan
+menulis heading dengan nama itu.
+
+- Tautan ke konsep dari body masalah: `[Ukuran Posisi](../../konsep/position-sizing/)`.
+- "Teori dan Bukti" berisi hitungan yang bisa diperiksa sendiri. Klaim riset hanya boleh bila sumbernya
+  tercantum di `sources`.
+- Halaman konsep otomatis menampilkan "Masalah Trader Terkait" untuk setiap masalah yang merujuknya.
+- Build gagal bila: konsep yang dirujuk tidak ada, heading wajib hilang atau urutannya salah, tautan tidak
+  relatif atau rusak, sumber berupa placeholder, atau heading bentrok dengan bagian otomatis.
 
 ## Menambah kategori
 
