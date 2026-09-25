@@ -195,7 +195,15 @@ const px = (y: number) => `transform: translateY(${y}px)`;
       out('recovery').textContent = formatRecovery(s.recovery);
       const text = describeHourglass(s);
       out('desc').textContent = text;
-      if (announce) out('live').textContent = text;
+      if (announce) {
+        out('live').textContent = text;
+        // Kosakata gerak "konsekuensi" (R10): angka yang berubah karena tindakan pengguna ditandai sekali.
+        for (const el of [out('remaining'), out('recovery')]) {
+          el.classList.remove('value-changed');
+          void (el as HTMLElement).offsetWidth;
+          el.classList.add('value-changed');
+        }
+      }
       step.disabled = losses >= max;
     };
 

@@ -1,7 +1,9 @@
 ---
-// Kerangka bersama alat hitung: label, judul, input (slot "inputs"), hasil (slot "results"),
-// ringkasan untuk pembaca layar (aria-live), dan catatan bahwa ini alat bantu, bukan rekomendasi.
-// Tanpa JavaScript, hasil awal (dihitung di server dari nilai default) tetap tampil.
+// Kerangka bersama alat hitung: label, judul, lalu empat tahap berlabel (R10) —
+// 01 Input (slot "inputs") → 02 Asumsi (catatan batasan) → 03 Hasil (slot "results") →
+// 04 Konsekuensi (ringkasan satu kalimat, aria-live). Tanpa JavaScript, hasil awal (dihitung di server dari
+// nilai default) tetap tampil. Angka hasil yang berubah setelah pengguna mengubah input diberi tanda
+// kuningan sekali (`.value-changed`, kosakata gerak "konsekuensi"); tidak pernah saat halaman dimuat.
 interface Props {
   /** Nama alat untuk skrip (data-tool). */
   tool: string;
@@ -32,16 +34,49 @@ const { tool, title, description, summary, variant = 'default', label = 'Alat hi
     <h3 class="tool__title">{title}</h3>
     <p class="tool__desc">{description}</p>
   </header>
+  <p class="tool__stage label"><span class="label__index">01</span><span class="label__sep" aria-hidden="true">·</span>Input</p>
   <div class="tool__inputs">
     <slot name="inputs" />
   </div>
+  <p class="tool__stage label"><span class="label__index">02</span><span class="label__sep" aria-hidden="true">·</span>Asumsi</p>
+  <p class="tool__note tool__assumption">{note}</p>
+  <noscript><p class="tool__note">Aktifkan JavaScript untuk menghitung dengan angka Anda sendiri.</p></noscript>
+  <p class="tool__stage label tool__stage--results"><span class="label__index">03</span><span class="label__sep" aria-hidden="true">·</span>Hasil</p>
   <div class="tool__results">
     <slot name="results" />
   </div>
+  <p class="tool__stage label"><span class="label__index">04</span><span class="label__sep" aria-hidden="true">·</span>Konsekuensi</p>
   <p class="tool__summary" data-summary aria-live="polite">{summary}</p>
-  <p class="tool__note">{note}</p>
-  <noscript><p class="tool__note">Aktifkan JavaScript untuk menghitung dengan angka Anda sendiri.</p></noscript>
 </form>
+
+<script>
+  // Kosakata gerak "konsekuensi": angka di .readout yang berubah setelah pengguna bertindak diberi tanda sekali.
+  for (const form of document.querySelectorAll<HTMLFormElement>('form.tool')) {
+    let armed = false;
+    const arm = () => (armed = true);
+    form.addEventListener('input', arm);
+    form.addEventListener('change', arm);
+    form.addEventListener('click', arm);
+    const mark = (el: Element | null) => {
+      if (!el) return;
+      el.classList.remove('value-changed');
+      void (el as HTMLElement).offsetWidth; // mulai ulang animasi
+      el.classList.add('value-changed');
+    };
+    new MutationObserver((records) => {
+      if (!armed) return;
+      const seen = new Set<Element>();
+      for (const r of records) {
+        const node = r.target.nodeType === Node.TEXT_NODE ? r.target.parentElement : (r.target as Element);
+        const dd = node?.closest('.readout dd');
+        if (dd && !seen.has(dd)) {
+          seen.add(dd);
+          mark(dd);
+        }
+      }
+    }).observe(form, { subtree: true, childList: true, characterData: true });
+  }
+</script>
 
 <style>
   .tool {
@@ -387,23 +422,39 @@ const { tool, title, description, summary, variant = 'default', label = 'Alat hi
 
   .tool--instrument .tool__results {
     margin: 0;
-    padding: var(--space-6);
+    padding: var(--space-3) var(--space-6) var(--space-6);
+    border-top: 0;
+    background: var(--paper);
+  }
+
+  /* Label tahap: 01 Input · 02 Asumsi · 03 Hasil · 04 Konsekuensi. */
+  .tool--instrument .tool__stage {
+    margin: 0;
+    padding: var(--space-3) var(--space-6) 0;
+    font-size: var(--text-2xs);
+  }
+
+  .tool--instrument .tool__stage--results {
     border-top: var(--border-hair) solid var(--rule-strong);
     background: var(--paper);
   }
 
-  .tool--instrument .tool__summary,
-  .tool--instrument .tool__note {
-    margin: 0;
-    padding: var(--space-3) var(--space-6) 0;
+  .tool--instrument .tool__inputs {
+    padding-top: var(--space-3);
   }
 
-  .tool--instrument .tool__note:last-of-type {
-    padding-bottom: var(--space-4);
+  .tool--instrument .tool__note {
+    margin: 0;
+    padding: var(--space-2) var(--space-6) var(--space-4);
   }
 
   .tool--instrument .tool__summary {
-    padding-top: var(--space-4);
+    margin: 0;
+    padding: var(--space-2) var(--space-6) var(--space-6);
+    font-size: var(--text-base);
+  }
+
+  .tool--instrument .tool__stage:has(+ .tool__summary) {
     border-top: var(--border-hair) solid var(--rule);
   }
 

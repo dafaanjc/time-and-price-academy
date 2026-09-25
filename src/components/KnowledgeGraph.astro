@@ -52,7 +52,7 @@ const tips = graph.nodes.map((n) => {
 
 <div class="graph" data-graph data-marker={`url(#${markerId})`} data-marker-active={`url(#${markerActiveId})`}>
   <!-- Dapat difokuskan agar pengguna keyboard bisa menggeser graf di layar sempit. -->
-  <div class="graph__scroll" tabindex="0" role="region" aria-labelledby={titleId}>
+  <div class="graph__scroll" tabindex="0" role="region" aria-labelledby={titleId} data-start-x={graph.nodes[0]?.x ?? 0}>
     <svg
       width={graph.width}
       height={graph.height}
@@ -76,7 +76,7 @@ const tips = graph.nodes.map((n) => {
       <g class="edges" aria-hidden="true">
         {
           graph.edges.map((e) => (
-            <path class="edge" d={e.d} data-from={e.from} data-to={e.to} marker-end={`url(#${markerId})`} />
+            <path class="edge" d={e.d} pathLength="1" data-from={e.from} data-to={e.to} marker-end={`url(#${markerId})`} />
           ))
         }
       </g>
@@ -166,6 +166,12 @@ const tips = graph.nodes.map((n) => {
   // Sorotan simpul: simpul, garis prasyarat yang terhubung, tetangga langsung, dan kartu keterangannya
   // menyala bersama; sisanya meredup.
   document.querySelectorAll<HTMLElement>('[data-graph]').forEach((root) => {
+    // Layar sempit: mulai dengan simpul akar (tingkat 0) di tengah layar, bukan jalur lompatan kosong di tepi kiri.
+    const scroller = root.querySelector<HTMLElement>('.graph__scroll');
+    if (scroller && scroller.scrollWidth > scroller.clientWidth) {
+      scroller.scrollLeft = Math.max(0, Number(scroller.dataset.startX) + 12 - scroller.clientWidth / 2);
+    }
+
     const marker = root.dataset.marker ?? '';
     const markerActive = root.dataset.markerActive ?? '';
     const edges = [...root.querySelectorAll<SVGPathElement>('.edge')];
@@ -204,11 +210,16 @@ const tips = graph.nodes.map((n) => {
 
 <style>
   /* Ukuran asli graf dijaga; bila lebih lebar dari layar, area ini yang digeser. */
+  /* Bidang koordinat eksplisit (R10): kisi yang sama dengan plot-field, bingkai garis ukur. */
   .graph__scroll {
     overflow-x: auto;
     padding: var(--space-2);
-    background: var(--surface);
-    border: var(--border-hair) solid var(--rule);
+    background-color: var(--surface);
+    background-image:
+      linear-gradient(to right, var(--grid-line-major) var(--stroke-hair), transparent var(--stroke-hair)),
+      linear-gradient(to bottom, var(--grid-line-major) var(--stroke-hair), transparent var(--stroke-hair));
+    background-size: var(--grid-cell) var(--grid-cell);
+    border: var(--border-hair) solid var(--rule-strong);
   }
 
   .graph__scroll:focus-visible {
@@ -289,9 +300,12 @@ const tips = graph.nodes.map((n) => {
       opacity var(--motion-base) var(--ease);
   }
 
+  /* Kosakata gerak "hubungan": garis prasyarat yang terhubung digambar ulang dari asalnya ke tujuannya. */
   .edge.is-linked {
     stroke: var(--mark);
     stroke-width: var(--stroke-trace);
+    stroke-dasharray: 1;
+    animation: edge-draw var(--motion-slow) var(--ease) both;
   }
 
   /* Fokus pada satu simpul: yang tidak berhubungan mundur ke latar. */

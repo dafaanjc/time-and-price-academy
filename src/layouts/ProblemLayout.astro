@@ -1,9 +1,10 @@
 ---
 // Halaman masalah trader: MASALAH → KEPUTUSAN → KONSEP → TEORI/BUKTI → PENERAPAN.
-// Urutan: header (kutipan, keputusan, atribusi) → daftar isi → notis draf → isi MDX (4 bagian wajib) →
-// konsep yang terlibat → baca dulu → sumber → catatan tepi "Anggaran salah".
-// Desktop (≥ 64rem, grid editorial): header & isi di kolom 1–7; daftar isi (sejajar header) dan
-// "Anggaran salah" (sticky, sejajar isi) di kolom 9–12. Mobile: satu kolom dalam urutan DOM di atas.
+// R10 "memasuki satu masalah keputusan": pita gelap selebar layar (satu-satunya `.plate` di halaman ini)
+// berisi kutipan trader sangat besar, keputusan yang dipertaruhkan, dan konsep di baliknya (tautan bernomor).
+// Di bawahnya: atribusi → notis draf → isi MDX (4 bagian wajib) → konsep yang terlibat → baca dulu → sumber.
+// Desktop (≥ 64rem): isi di kolom 1–7; daftar isi lalu "Anggaran salah" (sticky) di kolom 9–12.
+// Mobile: satu kolom — pita, daftar isi, isi, catatan tepi.
 import BaseLayout from './BaseLayout.astro';
 import Byline from '../components/Byline.astro';
 import ConceptLinkList from '../components/ConceptLinkList.astro';
@@ -11,7 +12,8 @@ import LossBudget from '../components/LossBudget.astro';
 import PlaceholderNotice from '../components/PlaceholderNotice.astro';
 import SourceList from '../components/SourceList.astro';
 import TableOfContents from '../components/TableOfContents.astro';
-import { getProblemConcepts, getReadFirst, type Problem } from '../lib/problems';
+import { conceptHref } from '../lib/concepts';
+import { getProblemConcepts, getProblems, getReadFirst, type Problem } from '../lib/problems';
 import { problemSectionIds } from '../lib/sections';
 import { absoluteUrl, problemOgImage, routes, withBase } from '../lib/url';
 
@@ -26,6 +28,9 @@ const { title, decision, description, status, sources } = problem.data;
 const concepts = await getProblemConcepts(problem);
 const readFirst = await getReadFirst(problem);
 const shareUrl = absoluteUrl(Astro.url.pathname, Astro.site);
+const allProblems = await getProblems();
+const pad = (n: number) => String(n).padStart(2, '0');
+const position = `${pad(allProblems.findIndex((p) => p.id === problem.id) + 1)} / ${pad(allProblems.length)}`;
 const sections = [
   ...headings,
   { id: problemSectionIds.concepts, title: 'Konsep yang Terlibat' },
@@ -42,14 +47,34 @@ const sections = [
   image={problemOgImage(problem.id)}
 >
   <article class="problem">
-    <header class="problem__header">
-      <p class="eyebrow"><a href={withBase(routes.problems)}>Masalah trader</a></p>
-      <h1 class="problem__quote">“{title}”</h1>
-      <p class="problem__decision">
-        <span class="problem__label">Keputusan yang dipertaruhkan</span>{' '}
-        {decision}
-      </p>
-      <Byline url={shareUrl} />
+    <header class="problem__header plate">
+      <div class="problem__header-inner">
+        <p class="label problem__index">
+          <a href={withBase(routes.problems)}>Masalah trader</a><span class="label__sep" aria-hidden="true">·</span><span class="label__index">{position}</span>
+        </p>
+        <h1 class="problem__quote">“{title}”</h1>
+        <div class="problem__stakes">
+          <p class="problem__decision">
+            <span class="label">Keputusan yang dipertaruhkan</span>{' '}
+            <span class="problem__decision-text">{decision}</span>
+          </p>
+          {
+            concepts.length > 0 && (
+              <div class="problem__concepts">
+                <p class="label">Konsep di baliknya</p>
+                <ol>
+                  {concepts.map((c, i) => (
+                    <li>
+                      <span class="label__index" aria-hidden="true">{pad(i + 1)}</span>{' '}
+                      <a href={conceptHref(c.id)}>{c.data.title}</a>
+                    </li>
+                  ))}
+                </ol>
+              </div>
+            )
+          }
+        </div>
+      </div>
     </header>
 
     <div class="problem__toc">
@@ -57,6 +82,8 @@ const sections = [
     </div>
 
     <div class="problem__body">
+      <Byline url={shareUrl} />
+
       {
         status === 'draft' && (
           <PlaceholderNotice>
@@ -104,6 +131,91 @@ const sections = [
     margin: 0;
   }
 
+  /* Pita keputusan: selebar layar (menembus gutter & margin kontainer), isi sejajar kolom halaman. */
+  .problem__header {
+    --bleed: calc(max(0px, (100vw - var(--container)) / 2) + var(--gutter));
+    margin: calc(-1 * var(--space-8)) calc(-1 * var(--bleed)) 0;
+    padding: var(--space-12) var(--bleed) var(--space-12);
+    border-inline: 0;
+    background-image:
+      linear-gradient(to right, var(--plate-grid) var(--stroke-hair), transparent var(--stroke-hair)),
+      linear-gradient(to bottom, var(--plate-grid) var(--stroke-hair), transparent var(--stroke-hair));
+    background-size: var(--grid-cell) var(--grid-cell);
+  }
+
+  .problem__header-inner {
+    display: grid;
+    gap: var(--space-6) var(--grid-gap);
+  }
+
+  .problem__index a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .problem__index a:hover {
+    color: var(--ink);
+    text-decoration: underline;
+  }
+
+  /* Suara trader, sangat besar: pernyataan masalah adalah objek utama halaman. */
+  .problem__quote {
+    max-width: 18ch;
+    margin: 0;
+    font-size: clamp(var(--text-2xl), 7vw, var(--text-5xl));
+    line-height: var(--leading-display);
+    letter-spacing: var(--tracking-display);
+    text-wrap: balance;
+  }
+
+  .problem__stakes {
+    display: grid;
+    gap: var(--space-6);
+    padding-top: var(--space-4);
+    border-top: var(--border-hair) solid var(--rule-strong);
+  }
+
+  .problem__decision {
+    display: grid;
+    gap: var(--space-2);
+    margin: 0;
+  }
+
+  .problem__decision-text {
+    max-width: var(--measure-narrow);
+    font-family: var(--font-serif);
+    font-size: var(--text-xl);
+    line-height: var(--leading-tight);
+  }
+
+  .problem__concepts p {
+    margin: 0 0 var(--space-2);
+  }
+
+  .problem__concepts ol {
+    display: grid;
+    gap: var(--space-1);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .problem__concepts li {
+    display: flex;
+    gap: var(--space-2);
+    align-items: baseline;
+  }
+
+  .problem__concepts .label__index {
+    font-family: var(--font-label);
+    font-size: var(--text-label);
+    letter-spacing: var(--tracking-mono);
+  }
+
+  .problem__concepts a {
+    font-weight: 600;
+  }
+
   @media (min-width: 64rem) {
     .problem {
       display: grid;
@@ -112,9 +224,40 @@ const sections = [
       align-items: start;
     }
 
-    .problem__header,
+    .problem__header {
+      grid-column: 1 / -1;
+      grid-row: 1;
+      margin-top: calc(-1 * var(--space-12));
+      padding-block: var(--space-16);
+    }
+
+    .problem__header-inner {
+      grid-template-columns: repeat(var(--grid-columns), minmax(0, 1fr));
+      align-items: end;
+    }
+
+    .problem__index,
+    .problem__quote {
+      grid-column: 1 / -1;
+    }
+
+    .problem__stakes {
+      grid-column: 1 / -1;
+      grid-template-columns: repeat(var(--grid-columns), minmax(0, 1fr));
+      gap: var(--grid-gap);
+    }
+
+    .problem__decision {
+      grid-column: 1 / span 7;
+    }
+
+    .problem__concepts {
+      grid-column: 9 / -1;
+    }
+
     .problem__body {
       grid-column: 1 / span 7;
+      grid-row: 2 / span 2;
     }
 
     .problem__toc,
@@ -122,65 +265,19 @@ const sections = [
       grid-column: 9 / -1;
     }
 
-    .problem__header,
     .problem__toc {
-      grid-row: 1;
-    }
-
-    .problem__body,
-    .problem__aside {
       grid-row: 2;
     }
 
-    /* Daftar isi di kolom sempit: satu kolom, tanpa garis bawah (dipisah ruang dari header). */
-    .problem__toc :global(ol) {
-      columns: 1;
-    }
-
     .problem__aside {
+      grid-row: 3;
       position: sticky;
       top: calc(var(--header-height) + var(--space-8));
     }
-  }
 
-  .problem__header {
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-4);
-    max-width: var(--measure);
-  }
-
-  .eyebrow a {
-    color: inherit;
-    text-decoration: none;
-  }
-
-  .eyebrow a:hover {
-    color: var(--ink);
-    text-decoration: underline;
-  }
-
-  .problem__quote {
-    margin: 0;
-    padding-left: var(--space-4);
-    font-size: clamp(var(--text-xl), 4.5vw, var(--text-3xl));
-    line-height: 1.2;
-    border-left: var(--border-mark) solid var(--ink);
-  }
-
-  .problem__decision {
-    display: grid;
-    gap: var(--space-1);
-    margin: 0;
-    font-size: var(--text-lg);
-    color: var(--ink-2);
-  }
-
-  .problem__label {
-    font-size: var(--text-xs);
-    font-weight: 600;
-    letter-spacing: var(--tracking-label);
-    text-transform: uppercase;
-    color: var(--ink-3);
+    /* Daftar isi di kolom sempit: satu kolom. */
+    .problem__toc :global(ol) {
+      columns: 1;
+    }
   }
 </style>

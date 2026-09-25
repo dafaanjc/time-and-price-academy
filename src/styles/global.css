@@ -451,6 +451,84 @@ svg {
   }
 }
 
+/* ---------- Kosakata gerak (R10) ----------
+   Gerak menandai sesuatu, tidak menghias. Empat kata, masing-masing dengan arti tetap:
+   1. MASUK HALAMAN  — `.rule-measure`: garis ukur di kepala halaman digambar sekali dari kiri (transisi:
+      "halaman ini dimulai di sini"). Pengganti fade-up untuk halaman isi; [data-reveal] tetap khusus beranda.
+   2. HUBUNGAN       — `.row-link`: tick kuningan meluncur masuk di kiri baris saat hover/fokus
+      ("ini yang Anda tunjuk"); garis graf yang terhubung digambar ulang (`@keyframes edge-draw`).
+   3. KONSEKUENSI    — `.value-changed`: garis bawah kuningan menyusut sekali di angka hasil yang baru berubah
+      ("input Anda mengubah ini").
+   4. KEADAAN        — transisi hover/fokus/buka-tutup yang sudah ada (--motion-fast/--motion-base).
+   Semua durasi dari token; di bawah prefers-reduced-motion menjadi 0 (keadaan akhir langsung tampil). */
+@keyframes rule-draw {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+@keyframes edge-draw {
+  from {
+    stroke-dashoffset: 1;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes value-mark {
+  from {
+    background-size: 100% var(--stroke-trace-bold);
+  }
+  to {
+    background-size: 0 var(--stroke-trace-bold);
+  }
+}
+
+/* Garis ukur (sama dengan `hr`), digambar sekali saat halaman dibuka. */
+.rule-measure {
+  height: var(--tick-minor);
+  margin: 0;
+  border: 0;
+  background:
+    linear-gradient(var(--rule-strong), var(--rule-strong)) bottom / 100% var(--stroke-hair) no-repeat,
+    repeating-linear-gradient(to right, var(--rule-strong) 0 var(--stroke-hair), transparent var(--stroke-hair) var(--grid-cell));
+  transform-origin: left center;
+  animation: rule-draw var(--motion-slow) var(--ease) both;
+}
+
+/* Baris navigasi editorial: tick kuningan di kiri saat ditunjuk. Pasang pada elemen yang `position: relative`. */
+.row-link {
+  position: relative;
+}
+
+.row-link::after {
+  content: "";
+  position: absolute;
+  top: 0.8em;
+  left: calc(-1 * var(--space-4));
+  width: var(--tick-major);
+  height: var(--stroke-trace);
+  background: var(--mark);
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform var(--motion-base) var(--ease);
+}
+
+.row-link:hover::after,
+.row-link:focus-within::after {
+  transform: scaleX(1);
+}
+
+/* Angka hasil yang baru berubah (dipasang oleh ToolFrame). */
+.value-changed {
+  background: linear-gradient(var(--mark), var(--mark)) left bottom / 0 var(--stroke-trace-bold) no-repeat;
+  animation: value-mark var(--motion-slow) var(--ease) both;
+}
+
 /* ---------- Grid editorial ---------- */
 /* Mobile: satu kolom. Desktop: 12 kolom; teks mengambil 7 kolom kiri, catatan/ilustrasi 4 kolom
    kanan dengan satu kolom kosong di antaranya — keseimbangan asimetris, bukan dua kolom sama. */

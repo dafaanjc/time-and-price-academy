@@ -165,13 +165,15 @@ Detail skema dan cara menambah konsep ada di [`content-model.md`](./content-mode
 | `ConceptIndex` | Indeks semua kategori untuk `/konsep/`; tiap kategori memakai `ConceptRows` |
 | `ConceptRows` | Baris konsep bernomor (judul, istilah asli, tingkat, deskripsi); juga dipakai halaman kategori |
 | `ProblemList` | Daftar masalah trader sebagai baris editorial: kutipan, keputusan, konsep (di `/masalah/` dan tautan balik halaman konsep) |
-| `ProblemLayout` | Halaman masalah: kutipan → keputusan → atribusi → daftar isi → isi (4 bagian wajib) → konsep yang terlibat → baca dulu → sumber. Desktop: grid editorial, isi di kolom 1–7, daftar isi + `LossBudget` (sticky) di kolom 9–12 |
+| `ProblemLayout` | Halaman masalah (R10): pita keputusan gelap selebar layar (kutipan trader, keputusan yang dipertaruhkan, konsep di baliknya) → daftar isi → atribusi → isi (4 bagian wajib) → konsep yang terlibat → baca dulu → sumber. Desktop: isi di kolom 1–7, daftar isi lalu `LossBudget` (sticky) di kolom 9–12 |
+| `PageHead` | Kepala halaman navigasi (R10): baris indeks mono, judul serif, lead, garis ukur yang digambar sekali, slot `figure` opsional. Kategori, jalur belajar, peta |
+| `PathPosition` | Rel posisi konsep di jalur belajarnya (langkah n / N, tick kuningan), di bawah kepala halaman konsep |
 | `LossBudget` | Catatan tepi "Anggaran salah": sisa modal setelah 10 kali salah beruntun pada risiko 1/2/5/10% (hitungan pasti dari `src/lib/hourglass.ts`), tautan ke instrumen jam pasir di beranda (`#jam-pasir`) |
 | `figures/HourglassGlyph` | Glyph jam pasir kecil (motif "anggaran": waktu baca, anggaran salah). Tanda teknis, bukan emblem; `aria-hidden` |
 | `Sidebar` | `ConceptNav` di kiri (≥ 64rem), sticky; hanya bila `BaseLayout sidebar` |
 | `MobileNav` | Navigasi mobile dengan `<dialog>` native (fokus terkunci, Esc/backdrop menutup) |
 | `SiteFooter` | Atribusi "By Muhamad Daffa - Time & Price Academy" dan disclaimer |
-| `LearningPath` | Langkah bernomor dengan deskripsi (`/jalur-belajar/`) |
+| `LearningPath` | Rute jalur belajar (R10): rel ukur vertikal, nomor langkah mono besar, baris editorial (bukan kartu), tick kuningan saat ditunjuk (`/jalur-belajar/`) |
 | `SectionHeading` | Judul bagian bernomor bergaya dokumen cetak ("01 MASALAH TRADER ─ Semua →") |
 | `HomeHero` | Hero beranda (R9.1): baris merek (induk + produk), judul `siteConfig.heroLine`, pertanyaan inti, dua tautan + `figures/HeroStage` |
 | `figures/HeroStage` | Panggung gelap hero: kisi → medan hasil prosedural (`src/lib/outcome-field.ts`) → emblem monumental; dua komposisi (lebar/ringkas); satu interaksi gulir (horizon 1T → 2T, sebaran ∝ √t, paralaks emblem ≤ `--parallax-shift`) |
@@ -184,7 +186,7 @@ Detail skema dan cara menambah konsep ada di [`content-model.md`](./content-mode
 | `CategoryIndex` | Indeks kategori sebagai daftar editorial: nomor "01 / 05", motif, judul, deskripsi, konsep |
 | `figures/TimePriceFigure` | FIG. 01, gambar teknik isometrik Waktu × Harga (SVG inline; geometri dari `src/lib/iso.ts`); `bare` = tanpa figure/caption, dipakai sebagai fallback RiskField |
 | `figures/CategoryMotif` | Motif SVG teknis per kategori (`motif` di `categories.ts`: axes, band, oscillation, kink, tree) |
-| `tools/ToolFrame` | Kerangka alat hitung: label, judul, input, hasil, ringkasan `aria-live`, catatan "bukan rekomendasi". Sejak R9 selalu bergaya instrumen; `variant` hanya mengatur penempatan (`default` = di artikel, lebar baca; `instrument` = beranda) |
+| `tools/ToolFrame` | Kerangka alat hitung: label, judul, lalu empat tahap berlabel (R10) 01 Input → 02 Asumsi (catatan batasan) → 03 Hasil → 04 Konsekuensi (`aria-live`). Angka hasil yang berubah setelah pengguna bertindak ditandai sekali (`.value-changed`). Selalu bergaya instrumen; `variant` hanya mengatur penempatan |
 | `tools/UkuranPosisi` | Risiko per transaksi → ukuran posisi; rugi di stop loss setelah lot dibulatkan; risiko sebenarnya dan stop maksimum untuk "lot yang biasa dipakai"; meter risiko (`riskGauge`) di semua varian; `variant="instrument"` untuk beranda |
 | `tools/SimulasiMargin` | Margin level dan jarak (poin) ke margin call / stop out |
 | `tools/TabelKalahBeruntun` | Sisa modal saat kalah beruntun: risiko tetap vs digandakan |
@@ -200,7 +202,7 @@ Detail skema dan cara menambah konsep ada di [`content-model.md`](./content-mode
 | `TableOfContents` | "Di halaman ini", dari heading `##` MDX atau override `sections`. Kolom kanan sticky (≥ 80rem), dua kolom (tablet), sebaris membungkus (mobile) |
 | `mdx/Contoh` | Kotak contoh di isi konsep: `<Contoh jenis="kehidupan|keuangan|trading">` (trading bergaris peringatan) |
 | `mdx/Definisi` | Kotak definisi utama di "Gagasan Utama" |
-| `ConceptLinkList` | Daftar tautan konsep (dipakai untuk Konsep Terkait dan Prasyarat) |
+| `ConceptLinkList` | Daftar tautan konsep bernomor bergaya baris editorial (Konsep Terkait, Prasyarat, Konsep yang Terlibat, Baca Dulu) |
 | `SourceList` | Bagian "Sumber": urutan per jenis dan keadaan kosong |
 | `SourceCard` | Satu sumber: label jenis, judul (tautan URL/DOI, tab baru), penulis · tahun, publisher/DOI/ISBN, catatan |
 | `KnowledgeGraph` | Graf prasyarat sebagai SVG; setiap simpul tautan ke konsep, penanda bentuk per kategori + legenda |

@@ -49,7 +49,7 @@ are kept on purpose: retune values there instead of renaming.
 | `--tint` | Soft fill: inline code, active item |
 | `--mark` / `--mark-soft` | **The only expressive colour**: instrument brass (echoes the hourglass). For pointers, major ticks, index numbers, selection. Never large fills. |
 | `--loss` / `--gain` / `--caution(-bg)` | Muted data semantics, only inside examples and calculations. Never decoration. |
-| `--plate`, `--plate-ink(-2/-3)`, `--plate-rule(-strong)`, `--plate-mark`, `--plate-sand`, `--plate-grid` | **The plate**: one dark exhibit surface per page (home: the hero stage). Dark in both themes so the black emblem can appear large without recolouring. The `.plate` class remaps ink/rule/mark/sand tokens inside it. Never for ordinary sections. |
+| `--plate`, `--plate-ink(-2/-3)`, `--plate-rule(-strong)`, `--plate-mark`, `--plate-sand`, `--plate-grid` | **The plate**: at most one dark field per page, only where the page *is* the exhibit — home: the hero stage; problem pages: the decision band. Concept, category, path, map and tool surfaces stay light. Dark in both themes so the black emblem can appear large without recolouring. The `.plate` class remaps ink/rule/mark/sand tokens inside it. Never for ordinary sections. |
 | `--sand` | Hourglass sand (capital) outside the plate; `.plate` maps it to `--plate-sand`. The only brass *mass* on the site, always edged in `--mark`. |
 
 Rules: monochrome first. Links are distinguished by underline, not colour. Every text/background
@@ -122,6 +122,15 @@ axis, graph traces, tick marks, dashed guides, measurement annotations.
 - **Risk Field camera:** a very slow drift (`--field-drift-period`, about ±3°) plus small pointer/scroll
   parallax, only inside the Risk Field figure and only while it is on screen. Never a rotation/spin.
   (The figure is not mounted anywhere since R9, so the site currently has no continuous motion.)
+- **R10 motion vocabulary** (tokens + classes in `global.css`; each word has one meaning):
+  1. *Page entrance* — `.rule-measure`: the measuring rule under a page header draws once from the left
+     (`PageHead`). Content pages use this, never `data-reveal` (which stays homepage-only).
+  2. *Relationship* — `.row-link`: a brass tick slides in left of an editorial row on hover/focus (uses
+     `::after`; `::before` is reserved for counters); knowledge-map edges linked to the focused node
+     redraw (`edge-draw`, `pathLength="1"`).
+  3. *Consequence* — `.value-changed`: a brass underline shrinks once under a result number that changed
+     because the user acted (ToolFrame arms it on the first input/change/click; never on load).
+  4. *State* — hover/focus/open transitions (`--motion-fast` / `--motion-base`).
 - Otherwise no decorative entrance animations, parallax, looping motion or scroll-jacking.
 - All durations collapse to 0 under `prefers-reduced-motion` (handled in the tokens).
 
@@ -215,6 +224,18 @@ Labels are rendered in markup, never via CSS `content`, so they stay accessible.
 - **R9 "Jam Pasir Modal" — hero (done):** plate tokens + `.plate`, `HomeHero` rebuilt around
   `figures/CapitalHourglass` + emblem (`BrandEmblem variant="plate"`), emblem removed from
   `HomePhilosophy`, `siteConfig.heroLine`, Risk Field unmounted.
+- **R10 — visual language propagation (done):** shared patterns, not a copied hero.
+  - `PageHead` (index line · serif title · lead · drawing measuring rule · optional figure) on category
+    (with `CategoryMotif`), learning path and map.
+  - Problem pages: full-width dark **decision band** (trader quote very large, decision at stake, numbered
+    concept links); body cols 1–7; contents then sticky `LossBudget` in cols 9–12.
+  - Concept pages stay light and quiet: `PathPosition` rail (step n / N in its learning path) under the header.
+  - Lists are editorial rows, not cards: `ConceptLinkList` (numbered), `ConceptRows`, learning-path
+    **route** (vertical measuring rail, big mono step numbers, sticky path intro on desktop).
+  - Tools: `ToolFrame` shows the anatomy **01 Input → 02 Asumsi → 03 Hasil → 04 Konsekuensi** (the limits
+    note is the Asumsi stage) — clearly "interactive tool" vs. learning content.
+  - Knowledge map: plot-field grid inside the frame, edge redraw on focus; narrow screens open centred on
+    the root node.
 - **R9.1 — hero refinement (done):** `figures/HeroStage` (+ `lib/outcome-field.ts`) replaces the hero
   plate; the hourglass moves to section `00 Anggaran salah`; emblem frame-crop rule; scroll-linked stage.
 - **R9 follow-ups (done):**

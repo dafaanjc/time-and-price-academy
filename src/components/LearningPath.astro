@@ -1,6 +1,8 @@
 ---
-// Jalur belajar sebagai diagram alur teknis (blueprint): terminal MULAI → langkah bernomor tegas
-// (kotak hairline, nomor mono besar, rel penghubung berpanah) → terminal SELESAI.
+// Jalur belajar sebagai rute (R10): rel ukur vertikal dengan tick per langkah; setiap langkah adalah baris
+// editorial (nomor mono besar, judul serif, meta, ringkasan), bukan kartu. Tick kuningan saat ditunjuk.
+// Terminal MULAI/SELESAI tetap sebagai label ujung rel.
+import HourglassGlyph from './figures/HourglassGlyph.astro';
 import { conceptHref, difficultyLabels, type ResolvedPath } from '../lib/concepts';
 import { readingMinutes } from '../lib/reading-time';
 
@@ -12,204 +14,108 @@ const { path } = Astro.props;
 const pad = (n: number) => String(n).padStart(2, '0');
 ---
 
-<div class="flow">
-  <p class="label flow__terminal" aria-hidden="true">Mulai</p>
-  <ol class="flow__steps" aria-label={`Jalur belajar: ${path.title}`}>
+<div class="route">
+  <p class="label route__terminal" aria-hidden="true">Mulai</p>
+  <ol class="route__steps" aria-label={`Jalur belajar: ${path.title}`}>
     {
       path.steps.map((concept, i) => (
-        <li class="step">
-          <div class="step__rail" aria-hidden="true">
-            <span class="step__number">{pad(i + 1)}</span>
-            <span class="step__line"></span>
-          </div>
-          <a class="step__card" href={conceptHref(concept.id)}>
-            <span class="label">
+        <li class="route__step row-link">
+          <span class="route__number" aria-hidden="true">{pad(i + 1)}</span>
+          <div class="route__body">
+            <a class="route__title" href={conceptHref(concept.id)}>{concept.data.title}</a>
+            <p class="label route__meta">
               <span class="label__index">Langkah {pad(i + 1)} / {pad(path.steps.length)}</span>
-              <span class="label__sep" aria-hidden="true">·</span>{difficultyLabels[concept.data.difficulty]}<span class="label__sep" aria-hidden="true">·</span>{readingMinutes(concept.body)} mnt baca
-            </span>
-            <span class="step__title">{concept.data.title}</span>
-            <span class="step__desc">{concept.data.description}</span>
-          </a>
+              <span class="label__sep" aria-hidden="true">·</span><span>{difficultyLabels[concept.data.difficulty]}</span>
+              <span class="label__sep" aria-hidden="true">·</span><span class="route__time"><HourglassGlyph fill={(i + 1) / path.steps.length} />{readingMinutes(concept.body)} mnt baca</span>
+            </p>
+            <p class="route__desc">{concept.data.description}</p>
+          </div>
         </li>
       ))
     }
   </ol>
-  <p class="label flow__terminal flow__terminal--end" aria-hidden="true">Selesai</p>
+  <p class="label route__terminal route__terminal--end" aria-hidden="true">Selesai</p>
 </div>
 
 <style>
-  .flow {
-    max-width: var(--measure);
+  .route {
+    --rail-x: 1.75rem;
+    position: relative;
   }
 
-  .flow__terminal {
-    display: inline-block;
-    padding: var(--space-1) var(--space-3);
-    border: var(--border-hair) solid var(--rule-strong);
-    border-radius: var(--radius-0);
-    background: var(--surface);
+  /* Rel ukur: garis vertikal dengan tick tiap sel kisi, dari MULAI sampai SELESAI. */
+  .route::before {
+    content: "";
+    position: absolute;
+    top: 0.75rem;
+    bottom: 0.75rem;
+    left: var(--rail-x);
+    width: var(--tick-minor);
+    background:
+      linear-gradient(var(--rule-strong), var(--rule-strong)) left / var(--stroke-hair) 100% no-repeat,
+      repeating-linear-gradient(to bottom, var(--rule-strong) 0 var(--stroke-hair), transparent var(--stroke-hair) var(--grid-cell));
   }
 
-  .flow__steps {
+  .route__terminal {
+    position: relative;
+    margin: 0;
+    padding-left: calc(var(--rail-x) + var(--space-6));
+  }
+
+  .route__steps {
+    margin: var(--space-4) 0;
     padding: 0;
     list-style: none;
   }
 
-  .step {
+  .route__step {
     display: grid;
-    grid-template-columns: 3.5rem minmax(0, 1fr);
-    gap: var(--space-4);
+    grid-template-columns: calc(var(--rail-x) * 2) minmax(0, 1fr);
+    column-gap: var(--space-4);
+    padding-block: var(--space-4);
+    border-bottom: var(--border-hair) solid var(--rule);
   }
 
-  /* Rel: kotak nomor, lalu garis turun yang berakhir di ujung panah menuju langkah berikutnya. */
-  .step__rail {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+  .route__step:first-child {
+    border-top: var(--border-hair) solid var(--rule);
   }
 
-  .step__number {
-    display: grid;
-    place-items: center;
-    width: 3.5rem;
-    height: 3.5rem;
+  /* Nomor langkah di atas rel: angka mono di bidang kertas, memotong garis rel. */
+  .route__number {
+    position: relative;
+    justify-self: center;
+    align-self: start;
+    padding: var(--space-1) 0;
     font-family: var(--font-label);
-    font-size: var(--text-lg);
+    font-size: var(--text-xl);
+    line-height: 1;
     letter-spacing: var(--tracking-mono);
     color: var(--mark);
-    background: var(--surface);
-    border: var(--border-hair) solid var(--rule-strong);
-    transition:
-      background-color var(--motion-base) var(--ease),
-      border-color var(--motion-base) var(--ease);
+    background: var(--paper);
   }
 
-  .step__line {
-    position: relative;
-    flex: 1;
-    width: var(--border-hair);
-    min-height: var(--space-6);
-    background: var(--rule-strong);
-  }
-
-  /* Ujung panah menunjuk ke bawah, ke kotak nomor berikutnya. */
-  .step__line::after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 50%;
-    width: var(--space-2);
-    height: var(--space-2);
-    background: var(--rule-strong);
-    transform: translateX(-50%);
-    clip-path: polygon(0 0, 100% 0, 50% 100%);
-  }
-
-  /* Langkah terakhir: rel tetap turun sedikit ke terminal SELESAI. */
-  .step:last-child .step__line {
-    min-height: var(--space-6);
-  }
-
-  .step__card {
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-2);
-    margin-bottom: var(--space-6);
-    padding: var(--space-4) var(--space-6);
-    color: inherit;
-    text-decoration: none;
-    background: var(--surface);
-    border: var(--border-hair) solid var(--rule-strong);
-    transition: border-color var(--motion-base) var(--ease);
-  }
-
-  .step:last-child .step__card {
-    margin-bottom: var(--space-4);
-  }
-
-  .step__title {
+  .route__title {
     font-family: var(--font-serif);
-    font-size: var(--text-lg);
+    font-size: var(--text-xl);
     font-weight: 600;
     line-height: var(--leading-tight);
     color: var(--ink);
   }
 
-  .step__desc {
+  .route__meta {
+    margin: var(--space-2) 0 0;
+  }
+
+  .route__time {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45em;
+  }
+
+  .route__desc {
+    max-width: var(--measure-narrow);
+    margin: var(--space-2) 0 0;
     font-size: var(--text-sm);
     color: var(--ink-2);
-  }
-
-  .step:hover .step__card,
-  .step__card:focus-visible {
-    border-color: var(--mark);
-  }
-
-  /* Keyboard: seluruh langkah (nomor + kartu) menyala, bukan hanya kartu. */
-  .step:has(.step__card:focus-visible) .step__number {
-    border-color: var(--mark);
-    background: var(--mark-soft);
-  }
-
-  .step__card:focus-visible .step__title {
-    text-decoration: underline;
-    text-decoration-thickness: 1px;
-    text-decoration-color: var(--mark);
-    text-underline-offset: 0.2em;
-  }
-
-  /* Deskripsi dibatasi ke lebar keterangan agar baris pendek tetap nyaman dibaca. */
-  .step__desc {
-    max-width: var(--measure-narrow);
-  }
-
-  .step:hover .step__number {
-    border-color: var(--mark);
-    background: var(--mark-soft);
-  }
-
-  .step__card:hover .step__title {
-    text-decoration: underline;
-    text-decoration-thickness: 1px;
-    text-decoration-color: var(--mark);
-    text-underline-offset: 0.2em;
-  }
-
-  .flow__steps {
-    margin-block: var(--space-4);
-  }
-
-  @media (max-width: 30rem) {
-    .step {
-      grid-template-columns: 2.5rem minmax(0, 1fr);
-      gap: var(--space-3);
-    }
-
-    .step__number {
-      width: 2.5rem;
-      height: 2.5rem;
-      font-size: var(--text-base);
-    }
-
-    .step__card {
-      padding: var(--space-3) var(--space-4);
-      overflow-wrap: anywhere;
-    }
-  }
-
-  @media (max-width: 20rem) {
-    .step {
-      grid-template-columns: minmax(0, 1fr);
-    }
-
-    /* Layar sangat sempit: rel turun ke atas kartu sebagai nomor saja. */
-    .step__rail {
-      flex-direction: row;
-      justify-content: flex-start;
-    }
-
-    .step__line {
-      display: none;
-    }
   }
 </style>

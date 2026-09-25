@@ -1,5 +1,7 @@
 ---
-// Daftar tautan konsep: dipakai untuk "Konsep Terkait" dan "Prasyarat".
+// Daftar tautan konsep: dipakai untuk "Konsep Terkait", "Prasyarat", "Konsep yang Terlibat", "Baca Dulu".
+// R10: baris editorial bernomor (bukan kartu bertumpuk) — nomor mono, judul, ringkasan satu baris,
+// tick kuningan saat ditunjuk (`.row-link`).
 import { conceptHref, type Concept } from '../lib/concepts';
 
 interface Props {
@@ -10,20 +12,22 @@ interface Props {
 }
 
 const { id, title, concepts, empty } = Astro.props;
+const pad = (n: number) => String(n).padStart(2, '0');
 ---
 
 <section class="concept-links" aria-labelledby={id}>
   <h2 id={id}>{title}</h2>
   {
     concepts.length > 0 ? (
-      <ul>
-        {concepts.map((c) => (
-          <li>
+      <ol>
+        {concepts.map((c, i) => (
+          <li class="row-link">
+            <span class="concept-links__index" aria-hidden="true">{pad(i + 1)}</span>
             <a href={conceptHref(c.id)}>{c.data.title}</a>
-            <span>{c.data.description}</span>
+            <span class="concept-links__desc">{c.data.description}</span>
           </li>
         ))}
-      </ul>
+      </ol>
     ) : (
       <p class="concept-links__empty">{empty}</p>
     )
@@ -36,32 +40,41 @@ const { id, title, concepts, empty } = Astro.props;
   }
 
   h2 {
-    margin: 0 0 0.75rem;
+    margin: 0 0 var(--space-3);
     font-size: var(--text-xl);
   }
 
-  ul {
-    display: grid;
-    gap: 0.5rem;
+  ol {
     margin: 0;
     padding: 0;
     list-style: none;
+    border-top: var(--border-hair) solid var(--rule-strong);
   }
 
   li {
-    display: flex;
-    flex-direction: column;
-    padding: 0.75rem 1rem;
-    background: var(--surface);
-    border: 1px solid var(--rule);
-    border-radius: var(--radius-1);
+    display: grid;
+    grid-template-columns: 2.25rem minmax(0, 1fr);
+    column-gap: var(--space-2);
+    padding-block: var(--space-3);
+    border-bottom: var(--border-hair) solid var(--rule);
+  }
+
+  .concept-links__index {
+    grid-row: 1 / span 2;
+    font-family: var(--font-label);
+    font-size: var(--text-label);
+    letter-spacing: var(--tracking-mono);
+    line-height: 2;
+    color: var(--mark);
   }
 
   a {
     font-weight: 600;
+    color: var(--ink);
   }
 
-  span {
+  .concept-links__desc {
+    margin-top: var(--space-1);
     font-size: var(--text-sm);
     color: var(--ink-2);
   }
