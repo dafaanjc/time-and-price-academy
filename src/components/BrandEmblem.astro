@@ -1,9 +1,11 @@
 ---
 // Artwork emblem merek induk (figur klasik + jam pasir), dari aset resmi di src/assets/Logo/.
 // Aturan pakai (docs/architecture.md → "Merek"): maksimal SATU kali per halaman, tidak di header,
-// tidak dipotong, tidak diwarnai ulang. Latar gambar dilebur dengan blend mode:
-// - `plate` (hero beranda): SELALU versi gelap (1024px, satu-satunya sumber yang tajam di ukuran besar)
+// tidak digambar ulang, tidak diwarnai ulang, tidak diberi efek (bevel/3D/logam). Potongan hanya potongan
+// bingkai di panggung hero (jubah bawah & bahu kiri); kepala dan jam pasir selalu utuh. Latar gambar dilebur dengan blend mode:
+// - `plate` (panggung hero beranda): SELALU versi gelap (1024px, satu-satunya sumber yang tajam di ukuran besar)
 //   di atas pelat gelap, `screen` → latar hitam murni melebur ke warna pelat. Sama di kedua tema.
+//   Ukuran & potongan bingkai diatur oleh wadahnya (figures/HeroStage); gambar sendiri tidak diubah.
 // - `footer`, tema gelap: versi gelap + `screen`;
 //   tema terang: versi terang (latar abu-abu ±227) + `brightness(1.16)` agar latar menjadi putih,
 //   lalu `multiply` → putih menjadi transparan di atas warna kertas. Garis etsa tidak berubah.
@@ -13,7 +15,7 @@ import emblemDark from '../assets/Logo/black logo.png';
 import emblemLight from '../assets/Logo/logos.jpeg';
 
 interface Props {
-  /** `plate`: objek pameran di pelat hero beranda; `footer`: tanda kecil di footer halaman lain. */
+  /** `plate`: objek di panggung hero beranda; `footer`: tanda kecil di footer halaman lain. */
   variant: 'plate' | 'footer';
 }
 
@@ -21,9 +23,11 @@ const { variant } = Astro.props;
 const isPlate = variant === 'plate';
 
 // Lebar tampil maksimum (CSS px). Versi terang hanya 433px, jadi hanya dipakai di ukuran kecil.
-const displayWidth = isPlate ? 280 : 96;
-const sizes = isPlate ? '(min-width: 64rem) 280px, 168px' : '96px';
-const widths = (max: number) => [displayWidth, displayWidth * 2].map((w) => Math.min(w, max));
+// Panggung hero: emblem ±86% lebar panggung (±690px di layar 1440) atau ±117% lebar layar di ponsel.
+const displayWidth = isPlate ? 1024 : 96;
+const sizes = isPlate ? '(min-width: 64rem) 60vw, 117vw' : '96px';
+const widths = (max: number) =>
+  (isPlate ? [480, 720, 1024] : [displayWidth, displayWidth * 2]).map((w) => Math.min(w, max));
 
 const dark = await getImage({ src: emblemDark, widths: widths(emblemDark.width), format: 'webp' });
 const light = isPlate ? dark : await getImage({ src: emblemLight, widths: widths(emblemLight.width), format: 'webp' });
@@ -41,6 +45,7 @@ const height = Math.round((displayWidth * source.height) / source.width);
     height={height}
     alt={isPlate ? siteConfig.emblemAlt : ''}
     loading={isPlate ? 'eager' : 'lazy'}
+    fetchpriority={isPlate ? 'high' : 'auto'}
     decoding="async"
   />
 </picture>
@@ -61,7 +66,7 @@ const height = Math.round((displayWidth * source.height) / source.width);
   }
 
   .emblem--plate {
-    width: min(280px, 100%);
+    width: 100%;
   }
 
   /* Pelat selalu gelap: versi gelap, latar hitam melebur lewat `screen` di kedua tema. */

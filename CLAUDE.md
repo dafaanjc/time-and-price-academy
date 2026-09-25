@@ -9,8 +9,10 @@ Hard rules that already exist in the codebase:
 - Brand, product, author and tagline strings only via `siteConfig` (`src/config/site.ts`);
   `scripts/check-branding.mjs` fails the build otherwise.
 - Internal links via `withBase()` / `routes` (`src/lib/url.ts`).
-- Brand emblem at most once per page (home: Objek 00 on the hero plate in `HomeHero`, black version,
-  uncropped; other pages: footer), never in the header, never cropped, never recoloured.
+- Brand emblem at most once per page (home: Objek 00 on the hero stage, `figures/HeroStage`, black version;
+  other pages: footer), never in the header, never redrawn, recoloured, stretched, bevelled/3D/metallic.
+  The only allowed crop is the hero stage's **frame crop** (lower drapery and far-left shoulder); the head and
+  the hourglass are always fully visible.
 - Do not edit content MDX (`src/content/**`) as part of design work.
 
 ## Visual Design System
@@ -47,7 +49,8 @@ are kept on purpose: retune values there instead of renaming.
 | `--tint` | Soft fill: inline code, active item |
 | `--mark` / `--mark-soft` | **The only expressive colour**: instrument brass (echoes the hourglass). For pointers, major ticks, index numbers, selection. Never large fills. |
 | `--loss` / `--gain` / `--caution(-bg)` | Muted data semantics, only inside examples and calculations. Never decoration. |
-| `--plate`, `--plate-ink(-2/-3)`, `--plate-rule(-strong)`, `--plate-mark`, `--plate-sand` | **The plate**: one dark exhibit surface per page (home: the hero). Dark in both themes so the black emblem can appear large without recolouring. The `.plate` class remaps ink/rule/mark tokens inside it. Never for ordinary sections. `--plate-sand` is the only brass mass (the hourglass sand), always edged in `--plate-mark`. |
+| `--plate`, `--plate-ink(-2/-3)`, `--plate-rule(-strong)`, `--plate-mark`, `--plate-sand`, `--plate-grid` | **The plate**: one dark exhibit surface per page (home: the hero stage). Dark in both themes so the black emblem can appear large without recolouring. The `.plate` class remaps ink/rule/mark/sand tokens inside it. Never for ordinary sections. |
+| `--sand` | Hourglass sand (capital) outside the plate; `.plate` maps it to `--plate-sand`. The only brass *mass* on the site, always edged in `--mark`. |
 
 Rules: monochrome first. Links are distinguished by underline, not colour. Every text/background
 pair ≥ 4.5:1 in both themes (values are annotated in the stylesheet; recompute after any change).
@@ -111,6 +114,11 @@ axis, graph traces, tick marks, dashed guides, measurement annotations.
   the hero or anything above the fold, never stagger children, never re-animate on scroll back.
 - **Capital hourglass sand:** moves only when the user acts (changes risk, takes another loss, resets),
   once per action, `--motion-slow`. Never idle, never a looping trickle.
+- **Hero stage (the one scroll-linked interaction, R9.1):** while the page scrolls past the hero, the outcome
+  field's horizon grows 1T → 2T and its spread widens ∝ √t (CSS `scale` on SVG groups driven by
+  `--stage-spread`), the readout updates, and the emblem shifts by at most `--parallax-shift` (the only
+  parallax on the site). rAF-throttled, passive listener, only while the stage is intersecting; off under
+  reduced motion (static 1T state, `--parallax-shift: 0`).
 - **Risk Field camera:** a very slow drift (`--field-drift-period`, about ±3°) plus small pointer/scroll
   parallax, only inside the Risk Field figure and only while it is on screen. Never a rotation/spin.
   (The figure is not mounted anywhere since R9, so the site currently has no continuous motion.)
@@ -123,12 +131,20 @@ Visuals should build along this chain (e.g. a band of outcomes → a probability
 weighted mean marker → a ±σ spread), not present the ideas as unrelated cards. The chain lives in
 `src/data/concept-chain.ts` (label, question, glyph); `LearningSystem` + `figures/ChainGlyph` draw it.
 
-### Hero: Capital Hourglass (R9 "Jam Pasir Modal")
-The homepage hero answers "what happens when your decision is wrong?" with an object the visitor operates.
-- Left, on the wall: label, `siteConfig.heroLine` ("Trading bukan cuma soal entry."), the question in
-  serif italic, a lead, and the two entry links. No stats row.
-- Right: one `.plate` holding **Objek 00** (the emblem, `BrandEmblem variant="plate"`) and **Instrumen 00**
-  (`figures/CapitalHourglass`). Sand = capital; each wrong decision drops a fixed % of *current* capital
+### Hero: stage (R9.1) + Capital Hourglass section
+The hero establishes Time & Price Academy → Risk Lab, states the philosophy and poses the question; the
+section directly below lets the visitor answer it.
+- Hero left, on the wall: brand line (`masterBrand` mono over `product` serif), `siteConfig.heroLine`
+  ("Trading bukan cuma soal entry."), the question in serif italic, a lead, two links (problems; `#jam-pasir`).
+  No stats row, no controls.
+- Hero right: `figures/HeroStage`, one `.plate` that bleeds to the right viewport edge on desktop (edge to
+  edge on mobile). Layers in one fixed-aspect coordinate space (wide 1000×720, compact 600×760): faint dark
+  grid → procedural **outcome field** (`src/lib/outcome-field.ts`, tested: from "now" at the figure's
+  hourglass, 4 → 12 → 24 branching paths, ±2σ envelope ∝ √t, flat brass E[P] — no drift implied — and a
+  density curve at T; compact adds one past path) → the emblem at monumental scale (frame crop only).
+  Caption: FIG. 00 (what the field means) + OBJEK 00. It is an artefact, not a widget: no inputs.
+- Section `00 Anggaran salah` (directly under the hero): **Instrumen 00** (`figures/CapitalHourglass`) on a
+  light surface panel, theme-neutral tokens. Sand = capital; each wrong decision drops a fixed % of *current* capital
   (same maths as `losingStreak(…, 'fixed')`); the neck opening = risk per trade; the scale is calibrated
   by bulb area, not height; the one brass pointer marks remaining capital; a dashed guide shows the same
   number of losses at 1%. Controls: risk 1 / 2 / 5 / 10 %, "Salah sekali lagi", "Ulang dari nol".
@@ -136,7 +152,7 @@ The homepage hero answers "what happens when your decision is wrong?" with an ob
 - It is a **loss budget** only: never show gains, P&L colours, prices or anything that reads as a signal.
 - Code: `src/lib/hourglass.ts` (geometry, levels, text equivalent; tested in `tests/hourglass.test.ts`).
   Server-rendered complete state + `<desc>` text; the controls appear only with JS; `aria-live` announces
-  each change. On mobile the instrument is in the first viewport and the emblem follows inside the plate.
+  each change.
 
 ### 3D: Risk Field (not mounted since R9)
 Retired from the homepage hero in R9 for performance and focus (no three.js on any page now). Code and
@@ -199,6 +215,8 @@ Labels are rendered in markup, never via CSS `content`, so they stay accessible.
 - **R9 "Jam Pasir Modal" — hero (done):** plate tokens + `.plate`, `HomeHero` rebuilt around
   `figures/CapitalHourglass` + emblem (`BrandEmblem variant="plate"`), emblem removed from
   `HomePhilosophy`, `siteConfig.heroLine`, Risk Field unmounted.
+- **R9.1 — hero refinement (done):** `figures/HeroStage` (+ `lib/outcome-field.ts`) replaces the hero
+  plate; the hourglass moves to section `00 Anggaran salah`; emblem frame-crop rule; scroll-linked stage.
 - **R9 follow-ups (done):**
   - Problem pages on the editorial grid: header + body in columns 1–7; "Di halaman ini" and a sticky
     `LossBudget` ("Anggaran salah": remaining capital after 10 losses at 1/2/5/10 %, links to `#jam-pasir`)

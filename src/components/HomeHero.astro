@@ -1,19 +1,19 @@
 ---
-// Hero beranda — arah R9 "Jam Pasir Modal".
-// Kiri (dinding terang): judul besar kalimat biasa, pertanyaan inti ("apa yang terjadi saat keputusan Anda salah?"),
-// dan pintu masuk. Kanan: SATU pelat gelap berisi dua objek — emblem resmi (Objek 00, versi hitam, utuh; satu-satunya
-// emblem di beranda) dan instrumen jam pasir modal yang bisa dioperasikan (Instrumen 00).
-// Mobile: instrumen tampil di layar pertama, emblem menyusul di bawahnya di dalam pelat yang sama.
-// Risk Field 3D tidak lagi dipasang di sini (lihat CLAUDE.md → "3D: Risk Field").
+// Hero beranda — R9.1 "Jam Pasir Modal", panggung.
+// Kiri (dinding terang): merek induk + produk, judul besar kalimat biasa, pertanyaan inti ("apa yang terjadi saat
+// keputusan Anda salah?"), lead, dua pintu masuk (masalah; jam pasir modal di bagian berikutnya).
+// Kanan: panggung gelap (figures/HeroStage) — emblem resmi dalam skala monumental + medan hasil prosedural
+// (waktu, probabilitas, cabang kemungkinan, ketidakpastian). Tanpa kontrol: alat hitung ada di bawah hero.
+// Desktop: panggung menembus sampai tepi kanan layar. Mobile: panggung tepi ke tepi di bawah teks.
 import { siteConfig } from '../config/site';
-import BrandEmblem from './BrandEmblem.astro';
-import CapitalHourglass from './figures/CapitalHourglass.astro';
+import HeroStage from './figures/HeroStage.astro';
 ---
 
 <section class="hero" aria-labelledby="hero-title">
   <div class="hero__text">
-    <p class="label">
-      {siteConfig.masterBrand}<span class="label__sep" aria-hidden="true">·</span>{siteConfig.product}
+    <p class="hero__brand">
+      <span class="label">{siteConfig.masterBrand}</span>
+      <span class="hero__product">{siteConfig.product}</span>
     </p>
     <h1 id="hero-title" class="hero__title">{siteConfig.heroLine}</h1>
     <p class="hero__question">Pertanyaan yang lebih penting: apa yang terjadi saat keputusan Anda salah?</p>
@@ -23,20 +23,12 @@ import CapitalHourglass from './figures/CapitalHourglass.astro';
     </p>
     <p class="hero__actions">
       <a class="button" href="#masalah">Mulai dari masalah</a>
-      <a class="hero__secondary" href="#sistem">Lihat sistem belajar →</a>
+      <a class="hero__secondary" href="#jam-pasir">Uji jam pasir modal ↓</a>
     </p>
   </div>
 
-  <div class="hero__plate plate">
-    <div class="hero__instrument">
-      <CapitalHourglass />
-    </div>
-    <figure class="hero__object">
-      <BrandEmblem variant="plate" />
-      <figcaption class="label">
-        <span class="label__index">Objek 00</span><span class="label__sep" aria-hidden="true">·</span>{`Emblem ${siteConfig.masterBrand}`}
-      </figcaption>
-    </figure>
+  <div class="hero__stage">
+    <HeroStage />
   </div>
 </section>
 
@@ -47,9 +39,26 @@ import CapitalHourglass from './figures/CapitalHourglass.astro';
     padding-block: 0 var(--space-8);
   }
 
+  /* Merek induk (mono kecil) di atas nama produk (serif): dua tingkat, dipisah garis rambut. */
+  .hero__brand {
+    display: inline-grid;
+    gap: var(--space-1);
+    margin: 0;
+    padding-bottom: var(--space-2);
+    border-bottom: var(--border-hair) solid var(--rule-strong);
+  }
+
+  .hero__product {
+    font-family: var(--font-serif);
+    font-size: var(--text-xl);
+    font-weight: 600;
+    line-height: 1;
+    letter-spacing: var(--tracking-display);
+  }
+
   /* Judul kalimat biasa, sangat besar dan rapat: satu pernyataan, bukan slogan kapital. */
   .hero__title {
-    margin: var(--space-4) 0 var(--space-4);
+    margin: var(--space-6) 0 var(--space-4);
     font-size: clamp(var(--text-3xl), 11vw, var(--text-5xl));
     line-height: var(--leading-hero);
     letter-spacing: var(--tracking-display);
@@ -107,44 +116,10 @@ import CapitalHourglass from './figures/CapitalHourglass.astro';
     color: var(--ink);
   }
 
-  /* Pelat: tepi ke tepi di mobile (menembus gutter), bingkai di dalam grid di desktop. */
-  .hero__plate {
-    display: grid;
-    gap: var(--space-8);
+  /* Mobile/tablet: panggung tepi ke tepi. */
+  .hero__stage {
     margin-inline: calc(-1 * var(--gutter));
-    padding: var(--space-6) var(--gutter) var(--space-8);
-    border-inline: 0;
-  }
-
-  .hero__object {
-    display: flex;
-    align-items: center;
-    gap: var(--space-4);
-    margin: 0;
-    padding-top: var(--space-6);
-    border-top: var(--border-hair) solid var(--plate-rule);
-  }
-
-  .hero__object :global(.emblem--plate) {
-    width: 7.5rem;
-  }
-
-  @media (min-width: 48rem) {
-    .hero__plate {
-      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-      align-items: start;
-    }
-
-    .hero__object {
-      flex-direction: column;
-      align-items: flex-start;
-      padding-top: 0;
-      border-top: 0;
-    }
-
-    .hero__object :global(.emblem--plate) {
-      width: min(280px, 100%);
-    }
+    min-width: 0;
   }
 
   @media (min-width: 64rem) {
@@ -152,7 +127,7 @@ import CapitalHourglass from './figures/CapitalHourglass.astro';
       grid-template-columns: repeat(var(--grid-columns), minmax(0, 1fr));
       gap: var(--grid-gap);
       align-items: center;
-      padding-block: var(--space-4) var(--space-16);
+      padding-block: 0 var(--space-16);
     }
 
     .hero__text {
@@ -167,24 +142,10 @@ import CapitalHourglass from './figures/CapitalHourglass.astro';
       font-size: var(--text-xl);
     }
 
-    .hero__plate {
+    /* Panggung dari kolom 6 sampai tepi kanan layar (melewati gutter dan margin luar kontainer). */
+    .hero__stage {
       grid-column: 6 / -1;
-      grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
-      gap: var(--space-8);
-      margin-inline: 0;
-      padding: var(--space-8);
-      border-inline: var(--border-hair) solid var(--plate-rule);
-    }
-
-    /* Desktop: emblem (asal-usul) di kiri, instrumen (alat kerja) di kanan. */
-    .hero__object {
-      order: -1;
-      align-self: center;
-      gap: var(--space-4);
-    }
-
-    .hero__object :global(.emblem--plate) {
-      width: 100%;
+      margin-inline: 0 calc(-1 * (max(0px, (100vw - var(--container)) / 2) + var(--gutter)));
     }
   }
 </style>

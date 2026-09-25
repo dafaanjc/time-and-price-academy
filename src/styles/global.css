@@ -79,6 +79,9 @@
   --plate-rule-strong: #6e7277; /* garis ukur/bingkai kaca: 3.7:1 */
   --plate-mark: #cfae6b; /* kuningan di pelat: 8.4:1 */
   --plate-sand: #6b5a3a; /* isian pasir (modal); tepinya selalu digaris --plate-mark */
+  --plate-grid: rgb(236 232 223 / 0.045); /* kisi koordinat di panggung gelap: samar */
+  /* Pasir di luar pelat (jam pasir modal di dinding terang). Isian non-teks; tepinya selalu --mark. */
+  --sand: #dcc9a0;
 
   /* Warna — semantik data (hanya di contoh/kalkulasi). Diredam, bukan merah/hijau terminal. */
   --loss: #9b3a2c; /* 6.1:1 */
@@ -168,6 +171,7 @@
   --motion-slow: 480ms; /* mis. jejak grafik digambar sekali */
   --motion-reveal: 560ms; /* section muncul sekali saat di-scroll ke layar */
   --reveal-shift: 8px; /* jarak naik saat muncul: kecil, tanpa efek melayang */
+  --parallax-shift: 18px; /* geser emblem di panggung hero saat menggulir: satu-satunya paralaks */
   --ease: cubic-bezier(0.2, 0, 0, 1);
 
   /* Tata letak — grid editorial */
@@ -197,6 +201,7 @@
     --mark: #cfae6b; /* 8.9:1 */
     --mark-soft: #2a2418;
     --plate: #1b1e22; /* sedikit lebih terang dari paper gelap; dibatasi --plate-rule */
+    --sand: #4d4130;
     --plate-ink-3: #9d988e; /* 5.8:1 */
     --plate-rule-strong: #6e7277; /* 3.5:1 */
     --loss: #e08a7a;
@@ -231,6 +236,7 @@
     --motion-slow: 0ms;
     --motion-reveal: 0ms;
     --reveal-shift: 0px;
+    --parallax-shift: 0px;
   }
 }
 
@@ -258,6 +264,9 @@ html {
    Garis, bukan gradien warna; kisi mayor tiap 4 sel. Ditempel pada kanvas, tidak ikut bergulir. */
 body {
   margin: 0;
+  /* Panggung hero menembus sampai tepi kanan layar (100vw termasuk scrollbar): potong luapan mendatar
+     tanpa membuat wadah gulir baru (sticky tetap bekerja). */
+  overflow-x: clip;
   background-color: var(--paper);
   background-image:
     linear-gradient(to right, var(--grid-line-major) var(--stroke-hair), transparent var(--stroke-hair)),
@@ -487,6 +496,7 @@ svg {
 /* Pelat: bidang gelap untuk satu objek pameran (lihat token --plate-*). Garis rambut, sudut tegas,
    tanpa bayangan. Label, tautan, dan fokus di dalamnya memakai tinta pelat agar kontras tetap ≥ 4.5:1. */
 .plate {
+  --sand: var(--plate-sand);
   --accent: var(--plate-ink);
   --axis: var(--plate-rule-strong);
   --tick: var(--plate-ink-3);

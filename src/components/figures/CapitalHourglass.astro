@@ -1,5 +1,6 @@
 ---
-// INSTRUMEN 00 · Jam pasir modal (hero beranda, di atas pelat gelap).
+// INSTRUMEN 00 · Jam pasir modal (beranda, bagian tepat di bawah hero; sejak R9.1 di dinding terang).
+// Warna dari token umum (--ink*, --rule*, --mark, --sand), jadi juga benar bila diletakkan di dalam `.plate`.
 // Pasir = modal. Setiap keputusan yang salah menjatuhkan risiko % dari modal berjalan; bukaan leher = risiko per
 // transaksi. Skala di kanan dikalibrasi dari luas tabung (tidak linear), penunjuk kuningan = sisa modal, garis
 // putus-putus = sisa modal bila risikonya 1%. Hitungan pasti (src/lib/hourglass.ts), bukan data pasar.
@@ -238,26 +239,26 @@ const px = (y: number) => `transform: translateY(${y}px)`;
 
   .hourglass__glass {
     fill: none;
-    stroke: var(--plate-ink-2);
+    stroke: var(--ink-2);
     stroke-width: var(--stroke-trace);
     stroke-linejoin: round;
   }
 
   .hourglass__fill {
-    fill: var(--plate-sand);
+    fill: var(--sand);
   }
 
   .hourglass__surface {
-    fill: var(--plate-mark);
+    fill: var(--mark);
   }
 
   .hourglass__stream {
-    stroke: var(--plate-mark);
+    stroke: var(--mark);
   }
 
   .hourglass__pointer {
     fill: none;
-    stroke: var(--plate-mark);
+    stroke: var(--mark);
     stroke-width: var(--stroke-hair);
     stroke-dasharray: var(--dash-guide);
   }
@@ -273,7 +274,7 @@ const px = (y: number) => `transform: translateY(${y}px)`;
     gap: var(--space-4);
     margin: 0;
     padding-top: var(--space-3);
-    border-top: var(--border-hair) solid var(--plate-rule);
+    border-top: var(--border-hair) solid var(--rule);
   }
 
   .hourglass__readout dd {
@@ -286,11 +287,11 @@ const px = (y: number) => `transform: translateY(${y}px)`;
 
   .hourglass__main dd {
     font-size: var(--text-2xl);
-    color: var(--plate-ink);
+    color: var(--ink);
   }
 
   .hourglass__main dt {
-    color: var(--plate-mark);
+    color: var(--mark);
   }
 
   .hourglass__controls {
@@ -336,8 +337,8 @@ const px = (y: number) => `transform: translateY(${y}px)`;
     padding: 0 var(--space-3);
     font-family: var(--font-mono);
     font-size: var(--text-sm);
-    color: var(--plate-ink-2);
-    border: var(--border-hair) solid var(--plate-rule-strong);
+    color: var(--ink-2);
+    border: var(--border-hair) solid var(--rule-strong);
     border-radius: var(--radius-1);
     transition:
       color var(--motion-fast) var(--ease),
@@ -345,18 +346,18 @@ const px = (y: number) => `transform: translateY(${y}px)`;
   }
 
   .hourglass__risk input:hover + span {
-    color: var(--plate-ink);
-    border-color: var(--plate-ink-2);
+    color: var(--ink);
+    border-color: var(--ink-2);
   }
 
   .hourglass__risk input:checked + span {
-    color: var(--plate-mark);
+    color: var(--mark);
     font-weight: 600;
-    border-color: var(--plate-mark);
+    border-color: var(--mark);
   }
 
   .hourglass__risk input:focus-visible + span {
-    outline: 2px solid var(--plate-ink);
+    outline: 2px solid var(--ink);
     outline-offset: 2px;
   }
 
@@ -380,13 +381,13 @@ const px = (y: number) => `transform: translateY(${y}px)`;
   }
 
   .hourglass__step {
-    color: var(--plate);
-    background: var(--plate-ink);
-    border: var(--border-hair) solid var(--plate-ink);
+    color: var(--paper);
+    background: var(--ink);
+    border: var(--border-hair) solid var(--ink);
   }
 
   .hourglass__step:hover:not(:disabled) {
-    color: var(--plate-ink);
+    color: var(--ink);
     background: transparent;
   }
 
@@ -397,7 +398,7 @@ const px = (y: number) => `transform: translateY(${y}px)`;
 
   .hourglass__actions .hourglass__reset {
     padding-inline: 0;
-    color: var(--plate-ink);
+    color: var(--ink);
     background: none;
     border: 0;
     text-decoration: underline;
@@ -412,6 +413,6 @@ const px = (y: number) => `transform: translateY(${y}px)`;
   .hourglass__caption {
     font-size: var(--text-xs);
     line-height: 1.5;
-    color: var(--plate-ink-3);
+    color: var(--ink-3);
   }
 </style>
