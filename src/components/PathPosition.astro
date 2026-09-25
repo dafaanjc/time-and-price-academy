@@ -1,0 +1,59 @@
+---
+// Posisi konsep di jalur belajarnya (R10, halaman konsep): satu baris label + rel tick. Tick sebelum = sudah
+// dilewati (tinta), tick ini = kuningan, sesudah = garis rambut. Rel dekoratif (aria-hidden); teksnya
+// menyebut jalur dan langkah, dan menaut ke jalur itu di /jalur-belajar/.
+import { pathAnchor, type PathContext } from '../lib/concepts';
+import { routes, withBase } from '../lib/url';
+
+interface Props {
+  context: PathContext;
+}
+
+const { context } = Astro.props;
+const { path, index } = context;
+const pad = (n: number) => String(n).padStart(2, '0');
+---
+
+<nav class="path-position" aria-label="Posisi di jalur belajar">
+  <p class="label">
+    <a href={`${withBase(routes.learningPaths)}#${pathAnchor(path.id)}`}>{path.title}</a><span class="label__sep" aria-hidden="true">·</span><span class="label__index">Langkah {pad(index + 1)} / {pad(path.steps.length)}</span>
+  </p>
+  <ol class="path-position__rail" aria-hidden="true">
+    {path.steps.map((_, i) => <li class:list={{ 'is-past': i < index, 'is-current': i === index }} />)}
+  </ol>
+</nav>
+
+<style>
+  .path-position {
+    display: grid;
+    gap: var(--space-2);
+    max-width: var(--measure-narrow);
+  }
+
+  .path-position a {
+    color: inherit;
+  }
+
+  .path-position__rail {
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: minmax(0, 1fr);
+    gap: var(--space-1);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .path-position__rail li {
+    height: var(--tick-major);
+    border-bottom: var(--stroke-hair) solid var(--rule-strong);
+  }
+
+  .path-position__rail .is-past {
+    border-bottom: var(--stroke-trace-bold) solid var(--ink-3);
+  }
+
+  .path-position__rail .is-current {
+    border-bottom: var(--border-mark) solid var(--mark);
+  }
+</style>

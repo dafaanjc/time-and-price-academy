@@ -68,6 +68,21 @@
   --mark: #7b5a1f; /* 5.6:1 pada paper */
   --mark-soft: #ece3cf;
 
+  /* Pelat — bidang gelap untuk SATU objek pameran per halaman (beranda: hero jam pasir modal + emblem).
+     Gelap di kedua tema: emblem resmi versi hitam hanya bisa tampil besar di atas latar gelap
+     (tidak diwarnai ulang). Bukan untuk section biasa; bukan kaca, tanpa blur/bayangan. */
+  --plate: #16181b;
+  --plate-ink: #ece8df; /* 14.6:1 pada plate */
+  --plate-ink-2: #bdb8ae; /* 9.0:1 */
+  --plate-ink-3: #9d988e; /* 6.2:1 — label/meta di pelat */
+  --plate-rule: #3a3e43; /* garis dekoratif di pelat */
+  --plate-rule-strong: #6e7277; /* garis ukur/bingkai kaca: 3.7:1 */
+  --plate-mark: #cfae6b; /* kuningan di pelat: 8.4:1 */
+  --plate-sand: #6b5a3a; /* isian pasir (modal); tepinya selalu digaris --plate-mark */
+  --plate-grid: rgb(236 232 223 / 0.045); /* kisi koordinat di panggung gelap: samar */
+  /* Pasir di luar pelat (jam pasir modal di dinding terang). Isian non-teks; tepinya selalu --mark. */
+  --sand: #dcc9a0;
+
   /* Warna — semantik data (hanya di contoh/kalkulasi). Diredam, bukan merah/hijau terminal. */
   --loss: #9b3a2c; /* 6.1:1 */
   --gain: #2e6a4e; /* 5.7:1 */
@@ -119,11 +134,13 @@
   --text-2xl: 2.0625rem; /* 33 */
   --text-3xl: 2.625rem; /* 42 */
   --text-4xl: 3.25rem; /* 52 */
-  --text-5xl: 4.125rem; /* 66 — judul pameran (hero), hanya desktop */
+  --text-5xl: 4.125rem; /* 66 — judul pameran, hanya desktop */
+  --text-6xl: 5.25rem; /* 84 — judul hero beranda, hanya desktop */
   --text-label: 0.75rem; /* 12 — label mono; mono tampak lebih besar dari sans di ukuran sama */
   --leading-body: 1.6;
   --leading-tight: 1.15;
   --leading-display: 1.04;
+  --leading-hero: 0.98; /* judul hero kalimat biasa (bukan kapital) di ukuran --text-6xl */
   --tracking-label: 0.08em; /* label sans kapital */
   --tracking-mono: 0.1em; /* label mono kapital */
   --tracking-display: -0.022em;
@@ -154,6 +171,10 @@
   --motion-slow: 480ms; /* mis. jejak grafik digambar sekali */
   --motion-reveal: 560ms; /* section muncul sekali saat di-scroll ke layar */
   --reveal-shift: 8px; /* jarak naik saat muncul: kecil, tanpa efek melayang */
+  --parallax-shift: 18px; /* geser emblem di panggung hero saat menggulir */
+  --parallax-pointer: 10px; /* R9.2: paralaks kursor di panggung hero, geser lapisan terdepan (kisi 25%, emblem 55%, medan 100%) */
+  --tilt-max: 1.2deg; /* R9.2: kemiringan maksimum medan hasil mengikuti kursor */
+  --motion-ambient: 6400ms; /* R9.2: satu siklus jejak di panggung hero (denyut → tempuh → mendarat → pudar) */
   --ease: cubic-bezier(0.2, 0, 0, 1);
 
   /* Tata letak — grid editorial */
@@ -182,6 +203,10 @@
     --tint: #1d2125;
     --mark: #cfae6b; /* 8.9:1 */
     --mark-soft: #2a2418;
+    --plate: #1b1e22; /* sedikit lebih terang dari paper gelap; dibatasi --plate-rule */
+    --sand: #4d4130;
+    --plate-ink-3: #9d988e; /* 5.8:1 */
+    --plate-rule-strong: #6e7277; /* 3.5:1 */
     --loss: #e08a7a;
     --gain: #7cc3a0;
     --caution: #e3c07a;
@@ -214,6 +239,10 @@
     --motion-slow: 0ms;
     --motion-reveal: 0ms;
     --reveal-shift: 0px;
+    --parallax-shift: 0px;
+    --parallax-pointer: 0px;
+    --tilt-max: 0deg;
+    --motion-ambient: 0ms;
   }
 }
 
@@ -241,6 +270,9 @@ html {
    Garis, bukan gradien warna; kisi mayor tiap 4 sel. Ditempel pada kanvas, tidak ikut bergulir. */
 body {
   margin: 0;
+  /* Panggung hero menembus sampai tepi kanan layar (100vw termasuk scrollbar): potong luapan mendatar
+     tanpa membuat wadah gulir baru (sticky tetap bekerja). */
+  overflow-x: clip;
   background-color: var(--paper);
   background-image:
     linear-gradient(to right, var(--grid-line-major) var(--stroke-hair), transparent var(--stroke-hair)),
@@ -366,6 +398,12 @@ svg {
   color: var(--ink-3);
 }
 
+/* Huruf yang maknanya berubah bila dikapitalkan (σ → Σ) tetap apa adanya di dalam label kapital.
+   `!important` disengaja: utilitas ini harus menang atas aturan label kapital komponen mana pun. */
+.keep-case {
+  text-transform: none !important;
+}
+
 /* Nomor indeks/penunjuk dalam label (mis. "01"): warna tanda ukur. */
 .label__index {
   color: var(--mark);
@@ -392,8 +430,7 @@ svg {
 }
 
 .badge--draft {
-  background: var(--caution-bg);
-  border-color: transparent;
+  border-color: var(--caution);
   color: var(--caution);
 }
 
@@ -418,6 +455,84 @@ svg {
     opacity: 1;
     transform: none;
   }
+}
+
+/* ---------- Kosakata gerak (R10) ----------
+   Gerak menandai sesuatu, tidak menghias. Empat kata, masing-masing dengan arti tetap:
+   1. MASUK HALAMAN  — `.rule-measure`: garis ukur di kepala halaman digambar sekali dari kiri (transisi:
+      "halaman ini dimulai di sini"). Pengganti fade-up untuk halaman isi; [data-reveal] tetap khusus beranda.
+   2. HUBUNGAN       — `.row-link`: tick kuningan meluncur masuk di kiri baris saat hover/fokus
+      ("ini yang Anda tunjuk"); garis graf yang terhubung digambar ulang (`@keyframes edge-draw`).
+   3. KONSEKUENSI    — `.value-changed`: garis bawah kuningan menyusut sekali di angka hasil yang baru berubah
+      ("input Anda mengubah ini").
+   4. KEADAAN        — transisi hover/fokus/buka-tutup yang sudah ada (--motion-fast/--motion-base).
+   Semua durasi dari token; di bawah prefers-reduced-motion menjadi 0 (keadaan akhir langsung tampil). */
+@keyframes rule-draw {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+@keyframes edge-draw {
+  from {
+    stroke-dashoffset: 1;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes value-mark {
+  from {
+    background-size: 100% var(--stroke-trace-bold);
+  }
+  to {
+    background-size: 0 var(--stroke-trace-bold);
+  }
+}
+
+/* Garis ukur (sama dengan `hr`), digambar sekali saat halaman dibuka. */
+.rule-measure {
+  height: var(--tick-minor);
+  margin: 0;
+  border: 0;
+  background:
+    linear-gradient(var(--rule-strong), var(--rule-strong)) bottom / 100% var(--stroke-hair) no-repeat,
+    repeating-linear-gradient(to right, var(--rule-strong) 0 var(--stroke-hair), transparent var(--stroke-hair) var(--grid-cell));
+  transform-origin: left center;
+  animation: rule-draw var(--motion-slow) var(--ease) both;
+}
+
+/* Baris navigasi editorial: tick kuningan di kiri saat ditunjuk. Pasang pada elemen yang `position: relative`. */
+.row-link {
+  position: relative;
+}
+
+.row-link::after {
+  content: "";
+  position: absolute;
+  top: 0.8em;
+  left: calc(-1 * var(--space-4));
+  width: var(--tick-major);
+  height: var(--stroke-trace);
+  background: var(--mark);
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform var(--motion-base) var(--ease);
+}
+
+.row-link:hover::after,
+.row-link:focus-within::after {
+  transform: scaleX(1);
+}
+
+/* Angka hasil yang baru berubah (dipasang oleh ToolFrame). */
+.value-changed {
+  background: linear-gradient(var(--mark), var(--mark)) left bottom / 0 var(--stroke-trace-bold) no-repeat;
+  animation: value-mark var(--motion-slow) var(--ease) both;
 }
 
 /* ---------- Grid editorial ---------- */
@@ -460,6 +575,27 @@ svg {
     linear-gradient(to bottom, var(--grid-line-major) var(--stroke-hair), transparent var(--stroke-hair));
   background-size: var(--grid-cell) var(--grid-cell);
   border: var(--border-hair) solid var(--rule);
+}
+
+/* Pelat: bidang gelap untuk satu objek pameran (lihat token --plate-*). Garis rambut, sudut tegas,
+   tanpa bayangan. Label, tautan, dan fokus di dalamnya memakai tinta pelat agar kontras tetap ≥ 4.5:1. */
+.plate {
+  --sand: var(--plate-sand);
+  --accent: var(--plate-ink);
+  --axis: var(--plate-rule-strong);
+  --tick: var(--plate-ink-3);
+  --trace: var(--plate-ink);
+  --trace-2: var(--plate-ink-3);
+  --rule: var(--plate-rule);
+  --rule-strong: var(--plate-rule-strong);
+  --mark: var(--plate-mark);
+  --ink: var(--plate-ink);
+  --ink-2: var(--plate-ink-2);
+  --ink-3: var(--plate-ink-3);
+  color: var(--plate-ink);
+  background: var(--plate);
+  border: var(--border-hair) solid var(--plate-rule);
+  border-radius: var(--radius-0);
 }
 
 /* Kelas untuk elemen SVG inline agar ilustrasi mengikuti tema tanpa warna tertulis di markup. */

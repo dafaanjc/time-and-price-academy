@@ -43,19 +43,21 @@ export interface GraphLayout {
   layerCount: number;
 }
 
-export const NODE_WIDTH = 200;
+// Ukuran dipadatkan (R9) agar peta 5 simpul per tingkat + jalur muat di bingkai desktop (≥ 80rem) tanpa digeser.
+export const NODE_WIDTH = 172;
 export const NODE_HEIGHT = 56;
 /** Simpul digambar sebagai lingkaran kecil di tepi kiri sel; garis masuk/keluar di atas/bawahnya, label di kanannya. */
 export const NODE_RADIUS = 6;
 export const NODE_ANCHOR_X = 12;
-const H_GAP = 24;
+const H_GAP = 16;
 const V_GAP = 48;
-const PADDING = 16;
-const MAX_LINE_CHARS = 22;
-// Garis yang melompati tingkat berjalan siku di jalur (lane) khusus di kanan semua simpul,
-// sehingga tidak pernah menembus simpul di tingkat antara atau simpul tetangga.
-const LANE_OFFSET = 24;
-const LANE_STEP = 14;
+const PADDING = 12;
+const MAX_LINE_CHARS = 18;
+// Garis yang melompati tingkat berjalan siku di jalur (lane) khusus di luar semua simpul — di kiri atau
+// di kanan, mana yang lebih dekat — sehingga tidak pernah menembus simpul di tingkat antara atau tetangga,
+// dan garis dari simpul kiri tidak perlu menyeberangi seluruh peta.
+const LANE_OFFSET = 16;
+const LANE_STEP = 10;
 const CORNER = 8;
 
 function truncate(line: string, max: number): string {
@@ -125,6 +127,35 @@ export function computeLayers(inputs: GraphInput[]): Map<string, number> {
   return layers;
 }
 
+export type MarkerShape = 'circle' | 'square' | 'diamond' | 'triangle' | 'cross';
+
+/**
+ * Path SVG penanda simpul berpusat di (cx, cy) dengan "jari-jari" r. Semua bentuk mengisi kotak ±r dan
+ * luasnya kira-kira setara secara visual, sehingga tidak ada kategori yang tampak lebih penting.
+ */
+export function markerPath(shape: MarkerShape, cx: number, cy: number, r: number): string {
+  const f = (n: number) => Math.round(n * 10) / 10;
+  switch (shape) {
+    case 'square': {
+      const h = r * 0.88;
+      return `M${f(cx - h)} ${f(cy - h)} H${f(cx + h)} V${f(cy + h)} H${f(cx - h)} Z`;
+    }
+    case 'diamond':
+      return `M${f(cx)} ${f(cy - r * 1.15)} L${f(cx + r * 1.15)} ${f(cy)} L${f(cx)} ${f(cy + r * 1.15)} L${f(cx - r * 1.15)} ${f(cy)} Z`;
+    case 'triangle':
+      return `M${f(cx)} ${f(cy - r * 1.1)} L${f(cx + r * 1.05)} ${f(cy + r * 0.8)} L${f(cx - r * 1.05)} ${f(cy + r * 0.8)} Z`;
+    case 'cross': {
+      const a = r * 0.36;
+      return (
+        `M${f(cx - a)} ${f(cy - r)} H${f(cx + a)} V${f(cy - a)} H${f(cx + r)} V${f(cy + a)} H${f(cx + a)} ` +
+        `V${f(cy + r)} H${f(cx - a)} V${f(cy + a)} H${f(cx - r)} V${f(cy - a)} H${f(cx - a)} Z`
+      );
+    }
+    default:
+      return `M${f(cx - r)} ${f(cy)} A${r} ${r} 0 1 0 ${f(cx + r)} ${f(cy)} A${r} ${r} 0 1 0 ${f(cx - r)} ${f(cy)} Z`;
+  }
+}
+
 /** Titik masuk (atas lingkaran) dan keluar (bawah lingkaran) sebuah simpul. */
 const outPoint = (n: GraphNode): [number, number] => [n.x + NODE_ANCHOR_X, n.y + NODE_HEIGHT / 2 + NODE_RADIUS];
 const inPoint = (n: GraphNode): [number, number] => [n.x + NODE_ANCHOR_X, n.y + NODE_HEIGHT / 2 - NODE_RADIUS];
@@ -146,7 +177,7 @@ function adjacentPath(from: GraphNode, to: GraphNode): string {
 }
 
 /**
- * Garis yang melompati tingkat: turun dari bawah prasyarat, belok ke jalur di kanan (di dalam celah
+ * Garis yang melompati tingkat: turun dari bawah prasyarat, belok ke jalur di kiri/kanan (di dalam celah
  * antar-tingkat yang tidak berisi simpul), turun di jalur itu, lalu belok masuk ke atas konsep.
  * Ketinggian belokan digeser per jalur agar garis tidak saling menumpuk.
  */
@@ -154,6 +185,8 @@ function lanePath(from: GraphNode, to: GraphNode, laneX: number, lane: number): 
   const r = CORNER;
   const [x1, y1Start] = outPoint(from);
   const [x2, y2] = inPoint(to);
+  const out = Math.sign(laneX - x1) || 1; // arah menuju jalur
+  const back = Math.sign(x2 - laneX) || -out; // arah dari jalur ke konsep
   const y1 = from.y + NODE_HEIGHT;
   // Belokan keluar dekat simpul asal, belokan masuk dekat simpul tujuan: bila dua garis jalur
   // berbagi satu celah, segmen keluar dan masuknya tetap terpisah (bukan tampak satu garis).
@@ -162,10 +195,10 @@ function lanePath(from: GraphNode, to: GraphNode, laneX: number, lane: number): 
   const yB = to.y - 16 - shift;
   return [
     `M ${x1} ${y1Start}`,
-    `V ${yA - r} Q ${x1} ${yA} ${x1 + r} ${yA}`,
-    `H ${laneX - r} Q ${laneX} ${yA} ${laneX} ${yA + r}`,
-    `V ${yB - r} Q ${laneX} ${yB} ${laneX - r} ${yB}`,
-    `H ${x2 + r} Q ${x2} ${yB} ${x2} ${yB + r}`,
+    `V ${yA - r} Q ${x1} ${yA} ${x1 + out * r} ${yA}`,
+    `H ${laneX - out * r} Q ${laneX} ${yA} ${laneX} ${yA + r}`,
+    `V ${yB - r} Q ${laneX} ${yB} ${laneX + back * r} ${yB}`,
+    `H ${x2 - back * r} Q ${x2} ${yB} ${x2} ${yB + r}`,
     `V ${y2}`,
   ].join(' ');
 }
@@ -181,46 +214,66 @@ export function layoutGraph(inputs: GraphInput[]): GraphLayout {
   const widest = Math.max(0, ...rows.map((r) => r.length));
   const contentWidth = widest * NODE_WIDTH + Math.max(0, widest - 1) * H_GAP;
 
-  const nodes: GraphNode[] = rows.flatMap((row, layer) => {
-    const rowWidth = row.length * NODE_WIDTH + (row.length - 1) * H_GAP;
-    const offset = PADDING + (contentWidth - rowWidth) / 2;
-    return row.map((n, i) => ({
-      id: n.id,
-      title: n.title,
-      description: n.description ?? '',
-      href: n.href,
-      group: n.group,
-      meta: n.meta ?? '',
-      layer,
-      x: offset + i * (NODE_WIDTH + H_GAP),
-      y: PADDING + layer * (NODE_HEIGHT + V_GAP),
-      lines: wrapTitle(n.title),
-    }));
-  });
+  // Tata letak awal (tanpa ruang jalur) untuk menentukan sisi jalur tiap garis lompatan.
+  const place = (x0: number): GraphNode[] =>
+    rows.flatMap((row, layer) => {
+      const rowWidth = row.length * NODE_WIDTH + (row.length - 1) * H_GAP;
+      const offset = x0 + (contentWidth - rowWidth) / 2;
+      return row.map((n, i) => ({
+        id: n.id,
+        title: n.title,
+        description: n.description ?? '',
+        href: n.href,
+        group: n.group,
+        meta: n.meta ?? '',
+        layer,
+        x: offset + i * (NODE_WIDTH + H_GAP),
+        y: PADDING + layer * (NODE_HEIGHT + V_GAP),
+        lines: wrapTitle(n.title),
+      }));
+    });
 
-  const byId = new Map(nodes.map((n) => [n.id, n]));
-  const pairs = inputs.flatMap((n) =>
-    n.prerequisites.flatMap((p) => {
-      const from = byId.get(p);
-      const to = byId.get(n.id);
-      return from && to ? [{ from, to, span: to.layer - from.layer }] : [];
-    }),
-  );
+  const pairsFor = (nodes: GraphNode[]) => {
+    const byId = new Map(nodes.map((n) => [n.id, n]));
+    return inputs.flatMap((n) =>
+      n.prerequisites.flatMap((p) => {
+        const from = byId.get(p);
+        const to = byId.get(n.id);
+        return from && to ? [{ from, to, span: to.layer - from.layer }] : [];
+      }),
+    );
+  };
 
-  // Jalur kanan: garis terpendek paling dekat ke simpul agar garis panjang tidak memotongnya.
-  const skips = pairs.filter((e) => e.span > 1).sort((a, b) => a.span - b.span || a.from.layer - b.from.layer);
-  const laneOf = new Map(skips.map((e, i) => [e, i]));
-  const laneBase = PADDING + contentWidth + LANE_OFFSET;
-  const laneRoom = skips.length > 0 ? LANE_OFFSET + (skips.length - 1) * LANE_STEP + 8 : 0;
+  // Sisi jalur: kiri bila titik tengah kedua simpul di separuh kiri isi, selain itu kanan.
+  // Garis terpendek paling dekat ke simpul agar garis panjang tidak memotongnya.
+  const centre = contentWidth / 2;
+  const draft = pairsFor(place(0)).filter((e) => e.span > 1);
+  const bySpan = (a: (typeof draft)[number], b: (typeof draft)[number]) => a.span - b.span || a.from.layer - b.from.layer;
+  const sideOf = (e: (typeof draft)[number]) => ((e.from.x + e.to.x) / 2 + NODE_ANCHOR_X < centre ? 'left' : 'right');
+  const key = (e: { from: { id: string }; to: { id: string } }) => `${e.from.id}>${e.to.id}`;
+  const lanes = new Map<string, { side: 'left' | 'right'; index: number }>();
+  for (const side of ['left', 'right'] as const) {
+    draft.filter((e) => sideOf(e) === side).sort(bySpan).forEach((e, index) => lanes.set(key(e), { side, index }));
+  }
+  const count = (side: 'left' | 'right') => [...lanes.values()].filter((l) => l.side === side).length;
+  const room = (n: number) => (n > 0 ? LANE_OFFSET + (n - 1) * LANE_STEP + 8 : 0);
+  const leftRoom = room(count('left'));
+  const rightRoom = room(count('right'));
+  const x0 = PADDING + leftRoom;
+
+  const nodes = place(x0);
+  const pairs = pairsFor(nodes);
+  const laneX = ({ side, index }: { side: 'left' | 'right'; index: number }) =>
+    side === 'left' ? x0 - LANE_OFFSET - index * LANE_STEP : x0 + contentWidth + LANE_OFFSET + index * LANE_STEP;
 
   const edges: GraphEdge[] = pairs.map((e) => {
-    const lane = laneOf.get(e);
-    const d = lane === undefined ? adjacentPath(e.from, e.to) : lanePath(e.from, e.to, laneBase + lane * LANE_STEP, lane);
+    const lane = lanes.get(key(e));
+    const d = lane === undefined ? adjacentPath(e.from, e.to) : lanePath(e.from, e.to, laneX(lane), lane.index);
     return { from: e.from.id, to: e.to.id, d };
   });
 
   return {
-    width: PADDING * 2 + contentWidth + laneRoom,
+    width: PADDING * 2 + leftRoom + contentWidth + rightRoom,
     height: PADDING * 2 + layerCount * NODE_HEIGHT + Math.max(0, layerCount - 1) * V_GAP,
     nodes,
     edges,

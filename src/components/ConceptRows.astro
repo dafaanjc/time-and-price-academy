@@ -1,6 +1,6 @@
 ---
 // Baris konsep bernomor bergaya daftar isi: judul, istilah asli, tingkat, deskripsi.
-// Dipakai oleh ConceptIndex (/konsep/) dan halaman kategori.
+// Dipakai oleh ConceptIndex (/konsep/) dan halaman kategori. Tick kuningan saat ditunjuk (`.row-link`, R10).
 import { conceptHref, difficultyLabels, type Concept } from '../lib/concepts';
 
 interface Props {
@@ -13,7 +13,7 @@ const { concepts } = Astro.props;
 <ol class="concept-rows">
   {
     concepts.map((concept) => (
-      <li class="concept-rows__item">
+      <li class="concept-rows__item row-link">
         <a class="concept-rows__title" href={conceptHref(concept.id)}>
           {concept.data.title}
         </a>

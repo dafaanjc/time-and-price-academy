@@ -1,16 +1,18 @@
 ---
 // Beranda "Modern Digital Museum", enam ruang berurutan:
-// HERO (tagline + FIG. 01 Medan Risiko 3D, fallback SVG) → FILOSOFI (Waktu × Harga + emblem pameran + prinsip)
+// HERO (judul + panggung gelap: emblem + medan hasil) → 00 JAM PASIR MODAL (jawaban atas pertanyaan hero)
+// → FILOSOFI (Waktu × Harga + prinsip)
 // → 01 MASALAH TRADER → 02 SISTEM BELAJAR (rantai Risiko → … → Varians) → 03 INSTRUMEN (ukuran posisi)
 // → 04 INDEKS KATEGORI. Pintu masuk utama adalah masalah dalam bahasa trader; teori lewat rantai & indeks.
 import BaseLayout from '../layouts/BaseLayout.astro';
 import CategoryIndex from '../components/CategoryIndex.astro';
-import HomeHero from '../components/HomeHero.astro';
+import HomeLanding from '../components/HomeLanding.astro';
 import HomePhilosophy from '../components/HomePhilosophy.astro';
 import HomeProblems from '../components/HomeProblems.astro';
 import LearningSystem from '../components/LearningSystem.astro';
 import SectionHeading from '../components/SectionHeading.astro';
 import UkuranPosisi from '../components/tools/UkuranPosisi.astro';
+import CapitalHourglass from '../components/figures/CapitalHourglass.astro';
 import { getProblems } from '../lib/problems';
 import { routes, withBase } from '../lib/url';
 
@@ -18,7 +20,24 @@ const problems = await getProblems();
 ---
 
 <BaseLayout>
-  <HomeHero />
+  <HomeLanding />
+
+  <section class="home-section budget" aria-labelledby="anggaran-title">
+    <SectionHeading id="anggaran-title" number="00" title="Anggaran salah" />
+    <div class="budget__grid">
+      <div class="budget__intro">
+        <p class="budget__statement">Salah itu pasti. Yang bisa Anda atur adalah berapa yang hilang setiap kali salah.</p>
+        <p class="budget__lead">
+          Pasir di jam ini adalah modal. Pilih risiko per transaksi, lalu tekan “Salah sekali lagi”. Dengan risiko tetap,
+          setiap kesalahan mengambil persentase yang sama dari modal yang tersisa, dan kenaikan yang dibutuhkan untuk
+          pulih tumbuh lebih cepat daripada kerugiannya.
+        </p>
+      </div>
+      <div class="budget__instrument">
+        <CapitalHourglass />
+      </div>
+    </div>
+  </section>
   <HomePhilosophy />
   <HomeProblems problems={problems} number="01" />
   <LearningSystem number="02" />
@@ -58,6 +77,34 @@ const problems = await getProblems();
 <style>
   .home-section {
     padding-top: var(--space-16);
+  }
+
+  .budget__grid {
+    display: grid;
+    gap: var(--space-8) var(--grid-gap);
+  }
+
+  .budget__statement {
+    margin: 0;
+    font-family: var(--font-serif);
+    font-size: var(--text-2xl);
+    font-weight: 600;
+    line-height: var(--leading-tight);
+    letter-spacing: var(--tracking-display);
+    text-wrap: balance;
+  }
+
+  .budget__lead {
+    max-width: var(--measure-narrow);
+    margin: var(--space-4) 0 0;
+    color: var(--ink-2);
+  }
+
+  /* Instrumen di bidang koordinat terang: alat, bukan artefak (panggung gelap hanya di hero). */
+  .budget__instrument {
+    padding: var(--space-6);
+    background: var(--surface);
+    border: var(--border-hair) solid var(--rule-strong);
   }
 
   .instrument {
@@ -107,6 +154,23 @@ const problems = await getProblems();
     .instrument {
       grid-template-columns: repeat(var(--grid-columns), minmax(0, 1fr));
       align-items: start;
+    }
+
+    .budget__grid {
+      grid-template-columns: repeat(var(--grid-columns), minmax(0, 1fr));
+      align-items: start;
+    }
+
+    .budget__intro {
+      grid-column: 1 / span 5;
+    }
+
+    .budget__statement {
+      font-size: var(--text-3xl);
+    }
+
+    .budget__instrument {
+      grid-column: 7 / -1;
     }
 
     .instrument__intro {

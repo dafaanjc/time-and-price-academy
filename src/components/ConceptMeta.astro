@@ -5,6 +5,7 @@ import { siteConfig } from '../config/site';
 import { getCategory } from '../data/categories';
 import { categoryHref, difficultyLabels, statusLabels, type Concept } from '../lib/concepts';
 import { readingMinutes } from '../lib/reading-time';
+import HourglassGlyph from './figures/HourglassGlyph.astro';
 
 interface Props {
   concept: Concept;
@@ -13,10 +14,10 @@ interface Props {
 const { concept } = Astro.props;
 const { category, difficulty, status } = concept.data;
 const isDraft = status === 'draft';
-const items = [
+const items: { text: string; href?: string; glyph?: boolean }[] = [
   { text: getCategory(category).title, href: categoryHref(category) },
   { text: `Tingkat ${difficultyLabels[difficulty]}` },
-  { text: `${readingMinutes(concept.body)} menit baca` },
+  { text: `${readingMinutes(concept.body)} menit baca`, glyph: true },
   { text: `Author: ${siteConfig.author}` },
   { text: siteConfig.masterBrand },
 ];
@@ -31,7 +32,14 @@ const items = [
             <span class="label__sep" aria-hidden="true">·</span>{' '}
           </>
         )}
-        {item.href ? <a href={item.href}>{item.text}</a> : <span>{item.text}</span>}{' '}
+        {item.href ? (
+          <a href={item.href}>{item.text}</a>
+        ) : (
+          <span class:list={{ 'concept-meta__time': item.glyph }}>
+            {item.glyph && <HourglassGlyph />}
+            {item.text}
+          </span>
+        )}{' '}
       </>
     ))
   }
@@ -55,6 +63,12 @@ const items = [
     min-height: 1.5rem;
     color: var(--ink);
     font-weight: 600;
+  }
+
+  .concept-meta__time {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45em;
   }
 
   .concept-meta .badge {

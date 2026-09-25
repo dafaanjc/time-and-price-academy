@@ -4,7 +4,9 @@
 // berhubungan meredup, dan kartu keterangan (nama + ringkasan) muncul halus. Tanpa JS graf tetap utuh;
 // hanya sorotan & keterangan yang hilang. Di layar sempit graf dipertahankan pada ukuran terbacanya dan
 // digeser mendatar (bukan diperkecil sampai teksnya tak terbaca).
-import { NODE_ANCHOR_X, NODE_HEIGHT, NODE_RADIUS, NODE_WIDTH, wrapText, wrapTitle, type GraphLayout } from '../lib/graph';
+// Simpul diberi penanda bentuk per kategori (R9, dari `marker` di data/categories.ts); legenda di bawah graf.
+import { categories, type CategoryId } from '../data/categories';
+import { markerPath, NODE_ANCHOR_X, NODE_HEIGHT, NODE_RADIUS, NODE_WIDTH, wrapText, wrapTitle, type GraphLayout } from '../lib/graph';
 
 interface Props {
   graph: GraphLayout;
@@ -18,6 +20,9 @@ const descId = `${idPrefix}-desk`;
 const markerId = `${idPrefix}-panah`;
 const markerActiveId = `${idPrefix}-panah-aktif`;
 const LINE_HEIGHT = 17;
+const markerOf = (group: string | undefined) => categories.find((c) => c.id === (group as CategoryId))?.marker ?? 'circle';
+// Legenda: hanya kategori yang benar-benar punya simpul di graf, dalam urutan kategori.
+const legend = categories.filter((c) => graph.nodes.some((n) => n.group === c.id));
 const LABEL_X = NODE_ANCHOR_X + NODE_RADIUS + 10;
 
 // Posisi baris teks agar satu atau dua baris tetap di tengah sel simpul.
@@ -47,7 +52,7 @@ const tips = graph.nodes.map((n) => {
 
 <div class="graph" data-graph data-marker={`url(#${markerId})`} data-marker-active={`url(#${markerActiveId})`}>
   <!-- Dapat difokuskan agar pengguna keyboard bisa menggeser graf di layar sempit. -->
-  <div class="graph__scroll" tabindex="0" role="region" aria-labelledby={titleId}>
+  <div class="graph__scroll" tabindex="0" role="region" aria-labelledby={titleId} data-start-x={graph.nodes[0]?.x ?? 0}>
     <svg
       width={graph.width}
       height={graph.height}
@@ -71,7 +76,7 @@ const tips = graph.nodes.map((n) => {
       <g class="edges" aria-hidden="true">
         {
           graph.edges.map((e) => (
-            <path class="edge" d={e.d} data-from={e.from} data-to={e.to} marker-end={`url(#${markerId})`} />
+            <path class="edge" d={e.d} pathLength="1" data-from={e.from} data-to={e.to} marker-end={`url(#${markerId})`} />
           ))
         }
       </g>
@@ -83,7 +88,7 @@ const tips = graph.nodes.map((n) => {
               <g transform={`translate(${n.x} ${n.y})`}>
                 <rect class="node__hit" width={NODE_WIDTH} height={NODE_HEIGHT} />
                 <circle class="node__ring" cx={NODE_ANCHOR_X} cy={NODE_HEIGHT / 2} r={NODE_RADIUS + 5} />
-                <circle class="node__dot" cx={NODE_ANCHOR_X} cy={NODE_HEIGHT / 2} r={NODE_RADIUS} />
+                <path class="node__dot" d={markerPath(markerOf(n.group), NODE_ANCHOR_X, NODE_HEIGHT / 2, NODE_RADIUS)} />
                 <text x={LABEL_X} dominant-baseline="central" aria-hidden="true">
                   {n.lines.map((line, i) => (
                     <tspan x={LABEL_X} y={lineY(n.lines.length, i)}>
@@ -136,19 +141,37 @@ const tips = graph.nodes.map((n) => {
     </svg>
   </div>
 
-  <!-- Legenda dekoratif; artinya sudah dijelaskan di <desc> dan teks halaman. -->
-  <p class="graph__legend label" aria-hidden="true">
-    <span class="graph__key graph__key--node"></span><span>Konsep</span>
-    <span class="label__sep">·</span>
-    <span class="graph__key graph__key--edge"></span><span>Prasyarat → konsep</span>
-    <span class="graph__hint"><span class="label__sep">·</span>Geser mendatar untuk melihat seluruh peta</span>
-  </p>
+  <!-- Legenda: bentuk penanda = kategori. Teksnya terbaca pembaca layar; gambar penandanya dekoratif. -->
+  <div class="graph__legend label">
+    <ul class="graph__categories" aria-label="Kategori (bentuk penanda simpul)">
+      {
+        legend.map((c) => (
+          <li>
+            <svg class="graph__key" viewBox="0 0 16 16" width="12" height="12" aria-hidden="true" focusable="false">
+              <path d={markerPath(c.marker, 8, 8, 5.5)} />
+            </svg>
+            <span>{c.title}</span>
+          </li>
+        ))
+      }
+    </ul>
+    <p class="graph__edge-key" aria-hidden="true">
+      <span class="graph__key graph__key--edge"></span><span>Prasyarat → konsep</span>
+      <span class="graph__hint"><span class="label__sep">·</span>Geser mendatar untuk melihat seluruh peta</span>
+    </p>
+  </div>
 </div>
 
 <script>
   // Sorotan simpul: simpul, garis prasyarat yang terhubung, tetangga langsung, dan kartu keterangannya
   // menyala bersama; sisanya meredup.
   document.querySelectorAll<HTMLElement>('[data-graph]').forEach((root) => {
+    // Layar sempit: mulai dengan simpul akar (tingkat 0) di tengah layar, bukan jalur lompatan kosong di tepi kiri.
+    const scroller = root.querySelector<HTMLElement>('.graph__scroll');
+    if (scroller && scroller.scrollWidth > scroller.clientWidth) {
+      scroller.scrollLeft = Math.max(0, Number(scroller.dataset.startX) + 12 - scroller.clientWidth / 2);
+    }
+
     const marker = root.dataset.marker ?? '';
     const markerActive = root.dataset.markerActive ?? '';
     const edges = [...root.querySelectorAll<SVGPathElement>('.edge')];
@@ -187,18 +210,23 @@ const tips = graph.nodes.map((n) => {
 
 <style>
   /* Ukuran asli graf dijaga; bila lebih lebar dari layar, area ini yang digeser. */
+  /* Bidang koordinat eksplisit (R10): kisi yang sama dengan plot-field, bingkai garis ukur. */
   .graph__scroll {
     overflow-x: auto;
     padding: var(--space-2);
-    background: var(--surface);
-    border: var(--border-hair) solid var(--rule);
+    background-color: var(--surface);
+    background-image:
+      linear-gradient(to right, var(--grid-line-major) var(--stroke-hair), transparent var(--stroke-hair)),
+      linear-gradient(to bottom, var(--grid-line-major) var(--stroke-hair), transparent var(--stroke-hair));
+    background-size: var(--grid-cell) var(--grid-cell);
+    border: var(--border-hair) solid var(--rule-strong);
   }
 
   .graph__scroll:focus-visible {
     outline-offset: 4px;
   }
 
-  .graph svg {
+  .graph__scroll > svg {
     display: block;
     max-width: none;
     margin-inline: auto;
@@ -208,8 +236,31 @@ const tips = graph.nodes.map((n) => {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    gap: var(--space-1) var(--space-2);
+    justify-content: space-between;
+    gap: var(--space-2) var(--space-6);
     margin: var(--space-3) 0 0;
+  }
+
+  .graph__categories,
+  .graph__edge-key {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-1) var(--space-4);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .graph__categories li,
+  .graph__edge-key {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+  }
+
+  .graph__edge-key {
+    gap: var(--space-2);
   }
 
   .graph__key {
@@ -217,11 +268,10 @@ const tips = graph.nodes.map((n) => {
     flex: none;
   }
 
-  .graph__key--node {
-    width: var(--space-2);
-    height: var(--space-2);
-    border: var(--stroke-trace) solid var(--ink-3);
-    border-radius: 50%;
+  svg.graph__key path {
+    fill: var(--surface);
+    stroke: var(--ink-3);
+    stroke-width: var(--stroke-trace);
   }
 
   .graph__key--edge {
@@ -250,9 +300,12 @@ const tips = graph.nodes.map((n) => {
       opacity var(--motion-base) var(--ease);
   }
 
+  /* Kosakata gerak "hubungan": garis prasyarat yang terhubung digambar ulang dari asalnya ke tujuannya. */
   .edge.is-linked {
     stroke: var(--mark);
     stroke-width: var(--stroke-trace);
+    stroke-dasharray: 1;
+    animation: edge-draw var(--motion-slow) var(--ease) both;
   }
 
   /* Fokus pada satu simpul: yang tidak berhubungan mundur ke latar. */

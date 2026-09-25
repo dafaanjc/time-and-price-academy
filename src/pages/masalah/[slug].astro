@@ -14,9 +14,10 @@ interface Props {
 }
 
 const { problem } = Astro.props;
-const { Content } = await render(problem);
+const { Content, headings } = await render(problem);
+const sections = headings.filter((h) => h.depth === 2).map((h) => ({ id: h.slug, title: h.text }));
 ---
 
-<ProblemLayout problem={problem}>
+<ProblemLayout problem={problem} headings={sections}>
   <Content components={toolComponents} />
 </ProblemLayout>

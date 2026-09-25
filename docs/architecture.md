@@ -71,13 +71,14 @@ Semua identitas ada di `src/config/site.ts` dan diekspor sebagai `siteConfig`:
 
 | Field | Nilai | Dipakai oleh |
 |---|---|---|
-| `masterBrand` | Time & Price Academy | `SiteHeader` (wordmark), `SiteFooter`, label hero, `HomePhilosophy`, alt emblem |
+| `masterBrand` | Time & Price Academy | `SiteHeader` (wordmark), `SiteFooter`, label hero, keterangan emblem, `HomePhilosophy`, alt emblem |
 | `product` | Risk Lab | `SiteHeader`, `SiteFooter`, hero, deskripsi halaman |
 | `author` | Muhamad Daffa | `<meta name="author">`, `article:author` |
 | `name` | Risk Lab — Time & Price Academy | `<title>`, `og:site_name`, `og:title` default |
 | `attribution` | By Muhamad Daffa - Time & Price Academy | `Byline` (setiap konsep), `SiteFooter` (setiap halaman) |
 | `lang` / `locale` | `id` / `id_ID` | `<html lang>`, `og:locale` |
-| `taglineParts` / `tagline` | Pahami Risiko. Pahami Keputusan. | hero, `<title>` beranda |
+| `taglineParts` / `tagline` | Pahami Risiko. Pahami Keputusan. | `<title>` beranda, gambar OG |
+| `heroLine` | Trading bukan cuma soal entry. | judul hero beranda (`HomeLanding`) |
 | `description` | (diturunkan dari `product` dan `masterBrand`) | meta description default |
 
 Namanya sengaja `siteConfig`, bukan `site`, agar tidak tertukar dengan `Astro.site` (URL dari `SITE_URL`).
@@ -106,12 +107,16 @@ Aturan pakai:
 
 - **Header:** tidak memakai emblem, karena detailnya hilang di 24–32px. Header memakai wordmark
   tipografis dari `siteConfig`. Ini penulisan nama, bukan logo baru.
-- **Emblem maksimal satu kali per halaman:** sebagai objek pameran di bagian transisi beranda
-  (`HomePhilosophy`, varian `exhibit`, 300px desktop / 240px mobile) atau di
+- **Emblem maksimal satu kali per halaman:** di beranda sebagai Objek 00 di panggung hero
+  (`figures/HeroStage`, varian `plate`, skala monumental ±86% lebar panggung; potongan bingkai hanya pada
+  jubah bawah & bahu kiri, kepala dan jam pasir selalu utuh), atau di
   footer halaman lain (96px, `alt=""` karena atribusi sudah tertulis di sebelahnya).
-- **Latar dilebur tanpa kotak** (`BrandEmblem.astro`, `<picture>` per tema):
-  - tema gelap: `black logo.png` + `mix-blend-mode: screen`. Hitam murni menjadi transparan tanpa filter;
-  - tema terang: `logos.jpeg` + `filter: brightness(1.16)` + `mix-blend-mode: multiply`. Kecerahan
+- **Latar dilebur tanpa kotak** (`BrandEmblem.astro`):
+  - varian `plate` (kedua tema): selalu `black logo.png` (satu-satunya sumber yang tajam di ukuran besar)
+    di atas `--plate` + `mix-blend-mode: screen`. Pelat selalu gelap, jadi aset tidak diwarnai ulang;
+  - varian `footer`, `<picture>` per tema:
+    - tema gelap: `black logo.png` + `mix-blend-mode: screen`. Hitam murni menjadi transparan tanpa filter;
+    - tema terang: `logos.jpeg` + `filter: brightness(1.16)` + `mix-blend-mode: multiply`. Kecerahan
     menaikkan latar terendah (221) menjadi putih, lalu `multiply` membuat putih transparan di atas kertas.
     Garis etsa hampir tidak berubah; hanya sorotan paling terang yang terpotong ke putih.
 - **Gambar OG:** versi terang dengan teknik yang sama (sharp `linear(1.16)` + composite `multiply`) di
@@ -121,7 +126,7 @@ Aturan pakai:
 - **Dilarang:** memotong jam pasir menjadi ikon, mewarnai ulang, masker bentuk, watermark, latar
   bagian, atau memakai emblem sebagai dekorasi berulang.
 - `scripts/check-branding.mjs` memeriksa: wordmark ada di header, header tanpa gambar, emblem ≤ 1 per
-  halaman, beranda punya emblem pameran (`emblem--exhibit`), dan `favicon.svg` (ikon buatan lama) tidak kembali.
+  halaman, beranda punya emblem di pelat hero (`emblem--plate`), dan `favicon.svg` (ikon buatan lama) tidak kembali.
 
 ## Sistem konten
 
@@ -154,28 +159,34 @@ Detail skema dan cara menambah konsep ada di [`content-model.md`](./content-mode
 | `BaseLayout` | Struktur halaman, `lang="id"`, skip link. Prop `sidebar`: indeks konsep di kiri (hanya halaman konsep/kategori); tanpa itu kontainer di tengah (`--container`) |
 | `SeoHead` | `<title>`, description, canonical, OpenGraph, Twitter card |
 | `SiteHeader` | Wordmark tipografis "TIME & PRICE ACADEMY │ Risk Lab" (dua baris di layar < 30rem) dan tombol menu mobile |
-| `BrandEmblem` | Artwork emblem resmi (varian `exhibit` / `footer`), dilebur ke tema dengan blend mode |
+| `BrandEmblem` | Artwork emblem resmi (varian `plate` / `footer`), dilebur ke latar dengan blend mode |
 | `PrimaryNav` | Navigasi utama dari `src/lib/nav.ts` (Konsep / Jalur Belajar / Peta): baris di header desktop, kolom di menu mobile |
 | `ConceptNav` | Indeks konsep bergaya daftar isi bernomor; kategori kosong digabung jadi satu baris "Segera hadir" |
 | `ConceptIndex` | Indeks semua kategori untuk `/konsep/`; tiap kategori memakai `ConceptRows` |
 | `ConceptRows` | Baris konsep bernomor (judul, istilah asli, tingkat, deskripsi); juga dipakai halaman kategori |
 | `ProblemList` | Daftar masalah trader sebagai baris editorial: kutipan, keputusan, konsep (di `/masalah/` dan tautan balik halaman konsep) |
-| `ProblemLayout` | Halaman masalah: kutipan → keputusan → atribusi → isi (4 bagian wajib) → konsep yang terlibat → baca dulu → sumber |
+| `ProblemLayout` | Halaman masalah (R10): pita keputusan gelap selebar layar (kutipan trader, keputusan yang dipertaruhkan, konsep di baliknya) → daftar isi → atribusi → isi (4 bagian wajib) → konsep yang terlibat → baca dulu → sumber. Desktop: isi di kolom 1–7, daftar isi lalu `LossBudget` (sticky) di kolom 9–12 |
+| `PageHead` | Kepala halaman navigasi (R10): baris indeks mono, judul serif, lead, garis ukur yang digambar sekali, slot `figure` opsional. Kategori, jalur belajar, peta |
+| `PathPosition` | Rel posisi konsep di jalur belajarnya (langkah n / N, tick kuningan), di bawah kepala halaman konsep |
+| `LossBudget` | Catatan tepi "Anggaran salah": sisa modal setelah 10 kali salah beruntun pada risiko 1/2/5/10% (hitungan pasti dari `src/lib/hourglass.ts`), tautan ke instrumen jam pasir di beranda (`#jam-pasir`) |
+| `figures/HourglassGlyph` | Glyph jam pasir kecil (motif "anggaran": waktu baca, anggaran salah). Tanda teknis, bukan emblem; `aria-hidden` |
 | `Sidebar` | `ConceptNav` di kiri (≥ 64rem), sticky; hanya bila `BaseLayout sidebar` |
 | `MobileNav` | Navigasi mobile dengan `<dialog>` native (fokus terkunci, Esc/backdrop menutup) |
 | `SiteFooter` | Atribusi "By Muhamad Daffa - Time & Price Academy" dan disclaimer |
-| `LearningPath` | Langkah bernomor dengan deskripsi (`/jalur-belajar/`) |
+| `LearningPath` | Rute jalur belajar (R10): rel ukur vertikal, nomor langkah mono besar, baris editorial (bukan kartu), tick kuningan saat ditunjuk (`/jalur-belajar/`) |
 | `SectionHeading` | Judul bagian bernomor bergaya dokumen cetak ("01 MASALAH TRADER ─ Semua →") |
-| `HomeHero` | Hero beranda: label merek, tagline kapital, tombol, baris spesifikasi (angka dari data) + `figures/RiskField` |
-| `figures/RiskField` | FIG. 01 Medan Risiko: relief kepadatan 3D (three.js, dimuat malas lewat `import()`); kualitas high/medium/low dari `src/lib/risk-field/quality.ts`, geometri murni di `geometry.ts`, adegan di `scene.ts`; fallback & isi HTML awal = `TimePriceFigure bare` |
-| `HomePhilosophy` | Pernyataan Waktu × Harga + garis ukur "satu jalur → sebaran", emblem sebagai objek pameran, tiga prinsip |
+| `HomeLanding` | Hero beranda (R9.1; dulu `HomeHero`): baris merek (induk + produk), judul `siteConfig.heroLine`, pertanyaan inti, dua tautan + `figures/HeroStage`. Nama file & kelas `landing__*` sengaja baru: Astro menurunkan ID cakupan CSS dari path file, jadi CSS `HomeHero` lama (mis. dev server yang belum dimuat ulang setelah pindah branch) tidak bisa lagi mengenai markup ini |
+| `figures/HeroStage` | Panggung gelap hero: kisi → medan hasil prosedural (`src/lib/outcome-field.ts`) → emblem monumental; dua komposisi (lebar/ringkas); satu interaksi gulir (horizon 1T → 2T, sebaran ∝ √t, paralaks emblem ≤ `--parallax-shift`); R9.2: paralaks kursor per lapisan (`--parallax-pointer`, `--tilt-max`) dan siklus jejak ambien (`traceAt`, `--motion-ambient`: denyut di "sekarang" → satu jalur ditempuh → pendaratan di kurva kepadatan), hanya saat terlihat, mati di bawah gerak dikurangi |
+| `figures/CapitalHourglass` | (Bagian `00 Anggaran salah` di bawah hero, token netral tema.) Instrumen jam pasir modal: pasir = modal, tiap keputusan salah menjatuhkan risiko % dari modal berjalan; skala dikalibrasi dari luas tabung, pembanding 1%, kontrol risiko 1/2/5/10% + "Salah sekali lagi". Geometri & hitungan murni di `src/lib/hourglass.ts` (diuji); tanpa JS keadaan awal tetap tergambar + teks setara |
+| `figures/RiskField` | (Tidak dipasang sejak R9; disimpan untuk kemungkinan dipakai di Distribusi.) FIG. 01 Medan Risiko: relief kepadatan 3D (three.js, dimuat malas lewat `import()`); kualitas high/medium/low dari `src/lib/risk-field/quality.ts`, geometri murni di `geometry.ts`, adegan di `scene.ts`; fallback & isi HTML awal = `TimePriceFigure bare` |
+| `HomePhilosophy` | Pernyataan Waktu × Harga + garis ukur "satu jalur → sebaran", tiga prinsip sebagai catatan tepi |
 | `HomeProblems` | Masalah trader di beranda: pengantar menempel (kiri) + entri bernomor di sumbu tegak (kanan) |
 | `LearningSystem` | Rantai konsep Risiko → … → Varians (`src/data/concept-chain.ts`) sebagai diagram bertick dengan `figures/ChainGlyph` |
 | `figures/ChainGlyph` | Glyph teknis bertumpuk per langkah rantai (path, band, slice, curve, mean, spread) |
 | `CategoryIndex` | Indeks kategori sebagai daftar editorial: nomor "01 / 05", motif, judul, deskripsi, konsep |
 | `figures/TimePriceFigure` | FIG. 01, gambar teknik isometrik Waktu × Harga (SVG inline; geometri dari `src/lib/iso.ts`); `bare` = tanpa figure/caption, dipakai sebagai fallback RiskField |
 | `figures/CategoryMotif` | Motif SVG teknis per kategori (`motif` di `categories.ts`: axes, band, oscillation, kink, tree) |
-| `tools/ToolFrame` | Kerangka alat hitung: label, judul, input, hasil, ringkasan `aria-live`, catatan "bukan rekomendasi" |
+| `tools/ToolFrame` | Kerangka alat hitung: label, judul, lalu empat tahap berlabel (R10) 01 Input → 02 Asumsi (catatan batasan) → 03 Hasil → 04 Konsekuensi (`aria-live`). Angka hasil yang berubah setelah pengguna bertindak ditandai sekali (`.value-changed`). Selalu bergaya instrumen; `variant` hanya mengatur penempatan |
 | `tools/UkuranPosisi` | Risiko per transaksi → ukuran posisi; rugi di stop loss setelah lot dibulatkan; risiko sebenarnya dan stop maksimum untuk "lot yang biasa dipakai"; meter risiko (`riskGauge`) di semua varian; `variant="instrument"` untuk beranda |
 | `tools/SimulasiMargin` | Margin level dan jarak (poin) ke margin call / stop out |
 | `tools/TabelKalahBeruntun` | Sisa modal saat kalah beruntun: risiko tetap vs digandakan |
@@ -184,17 +195,17 @@ Detail skema dan cara menambah konsep ada di [`content-model.md`](./content-mode
 | `tools/SimulasiEkuitas` | Nilai harapan → 200 kurva ekuitas (median, pita 5–95%, nilai harapan) → histogram drawdown maksimum dengan ambang |
 | `ConceptLayout` | Urutan halaman konsep: header → pita draf → [isi MDX + daftar isi] → masalah terkait → konsep terkait → prasyarat → sumber → navigasi jalur. Di ≥ 80rem daftar isi menjadi kolom kanan sticky |
 | `ConceptHeader` | Pembuka padat: meta satu baris, judul + istilah asli, deskripsi, byline |
-| `ConceptMeta` | Satu baris: kategori · tingkat · waktu baca · lencana Draf |
+| `ConceptMeta` | Satu baris: kategori · tingkat · waktu baca (dengan `HourglassGlyph`) · lencana Draf (garis, tanpa isian) |
 | `Byline` | Atribusi "By Muhamad Daffa - Time & Price Academy" + `CopyLinkButton` |
 | `CopyLinkButton` | Menyalin URL canonical (atau `location.href`) dan mengumumkan hasilnya lewat `role="status"` |
-| `PlaceholderNotice` | Pita tipis "DRAF" untuk konsep/masalah berstatus `draft` |
+| `PlaceholderNotice` | Satu baris "DRAF" di antara dua garis rambut untuk konsep/masalah berstatus `draft` (bukan panel berwarna) |
 | `TableOfContents` | "Di halaman ini", dari heading `##` MDX atau override `sections`. Kolom kanan sticky (≥ 80rem), dua kolom (tablet), sebaris membungkus (mobile) |
 | `mdx/Contoh` | Kotak contoh di isi konsep: `<Contoh jenis="kehidupan|keuangan|trading">` (trading bergaris peringatan) |
 | `mdx/Definisi` | Kotak definisi utama di "Gagasan Utama" |
-| `ConceptLinkList` | Daftar tautan konsep (dipakai untuk Konsep Terkait dan Prasyarat) |
+| `ConceptLinkList` | Daftar tautan konsep bernomor bergaya baris editorial (Konsep Terkait, Prasyarat, Konsep yang Terlibat, Baca Dulu) |
 | `SourceList` | Bagian "Sumber": urutan per jenis dan keadaan kosong |
 | `SourceCard` | Satu sumber: label jenis, judul (tautan URL/DOI, tab baru), penulis · tahun, publisher/DOI/ISBN, catatan |
-| `KnowledgeGraph` | Graf prasyarat sebagai SVG; setiap simpul tautan ke konsep |
+| `KnowledgeGraph` | Graf prasyarat sebagai SVG; setiap simpul tautan ke konsep, penanda bentuk per kategori + legenda |
 | `PathNav` | "Sebelumnya / Berikutnya" dan posisi langkah, berdasarkan jalur belajar pertama yang memuat konsep; di langkah terakhir menunjuk "Jalur berikutnya" (jalur yang `requires` jalur ini) |
 
 ID bagian yang dirender layout (`konsep-terkait`, `prasyarat`, `sumber`) didefinisikan sekali di
@@ -258,13 +269,19 @@ SVG statis saat build, tanpa library dan tanpa JavaScript klien.
    dipilih agar graf terbaca di mobile tanpa diperkecil.
 4. **Garis.** Hanya relasi prasyarat (konsep terkait tampil di halaman konsep):
    - antar tingkat berurutan: kurva S dari bawah prasyarat ke atas konsep;
-   - melompati tingkat: garis siku di **jalur (lane) khusus di kanan semua simpul**. Garis turun dari
+   - melompati tingkat: garis siku di **jalur (lane) khusus di luar semua simpul, di sisi kiri atau kanan
+     (mana yang lebih dekat ke kedua simpul, R9)**. Garis turun dari
      bawah simpul asal, belok di celah antar-tingkat (yang tidak berisi simpul), turun di jalurnya, lalu
      masuk ke atas simpul tujuan. Setiap garis mendapat jalur sendiri (garis terpendek paling dekat), dan
      belokan keluar/masuk dipisah agar dua garis di satu celah tidak tampak menyatu. Tidak ada garis yang
      menembus simpul lain; ini diuji secara geometris.
-5. **Judul.** Maksimal dua baris × 22 karakter. Sisanya dipotong dengan elipsis.
-6. **Aksesibilitas.** SVG punya `<title>` dan `<desc>`. Setiap simpul adalah `<a>` dengan
+5. **Judul.** Maksimal dua baris × 18 karakter. Sisanya dipotong dengan elipsis. Ukuran simpul (172px)
+   dan jarak dipadatkan di R9 agar peta nyata (5 simpul per tingkat + jalur, ±1030px) muat di bingkai
+   desktop ≥ 80rem tanpa digeser; di layar lebih sempit area peta digeser mendatar.
+6. **Kategori.** Penanda simpul berbentuk per kategori (`marker` di `src/data/categories.ts`: lingkaran,
+   persegi, belah ketupat, segitiga, silang; `markerPath()` di `graph.ts`), monokrom di kedua tema.
+   Legenda di bawah peta hanya memuat kategori yang punya simpul.
+7. **Aksesibilitas.** SVG punya `<title>` dan `<desc>`. Setiap simpul adalah `<a>` dengan
    `aria-label` judul lengkap, bisa difokuskan dengan Tab dan punya cincin fokus. Halaman `/peta/`
    menyertakan tabel prasyarat sebagai alternatif teks.
 

@@ -1,0 +1,652 @@
+---
+// Panggung hero (R9.1): artefak filosofis + visualisasi risiko dalam satu bidang gelap.
+//
+// Lapisan (satu sistem koordinat dengan rasio tetap, jadi posisi selalu sejajar):
+//   1. kisi koordinat samar (CSS);
+//   2. medan hasil prosedural (SVG, src/lib/outcome-field.ts): dari jam pasir di tangan figur ("sekarang"),
+//      masa depan bercabang ke kanan, selubung ±2σ, garis E[P] kuningan (satu-satunya), kurva kepadatan di T;
+//   3. emblem resmi (BrandEmblem `plate`, versi hitam, rata, tidak diwarnai ulang) dalam skala monumental.
+//      Potongan bingkai: tepi panggung hanya memotong jubah bawah dan bahu kiri; kepala dan jam pasir selalu utuh.
+// Dua komposisi, dipilih dari lebar panggung sendiri (container query, ≥ 34rem = lebar): lebar (1000×720, figur kiri &
+// medan kanan) dan ringkas (600×760, figur atas dipotong
+// garis, medan di bawah dengan garis bantu dari jam pasir ke "sekarang" dan satu jalur masa lalu).
+// Gerak (satu interaksi): saat menggulir melewati hero, horizon bertambah 1T → 2T dan sebaran melebar ∝ √t
+// (skala CSS pada grup SVG), emblem bergeser sangat sedikit (paralaks). Tanpa JS / gerak dikurangi: keadaan 1T diam.
+// R9.2 (kedalaman & gerak halus, hanya saat panggung terlihat, mati di bawah prefers-reduced-motion):
+//   - paralaks kursor per lapisan (kisi → emblem → medan) + kemiringan kecil medan (`--parallax-pointer`, `--tilt-max`);
+//   - siklus jejak (`traceAt`, `--motion-ambient`): denyut di "sekarang" (jam pasir) → satu jalur ditempuh sampai T →
+//     penanda pendaratan di kurva kepadatan → pudar; setiap siklus jalur lain. Tanpa blur/glow, hanya opasitas garis.
+//   Emblem sendiri tidak dianimasikan selain pergeseran (aturan merek: tidak digambar ulang/diwarnai ulang).
+import { siteConfig } from '../../config/site';
+import { outcomeField } from '../../lib/outcome-field';
+import BrandEmblem from '../BrandEmblem.astro';
+
+// Komposisi lebar: 1000×720. Titik "sekarang" tepat di kanan jam pasir figur.
+const W = { w: 1000, h: 720, x0: 684, y0: 347, xT: 905, sigmaT: 66, axis: 664 };
+const wide = outcomeField({ x0: W.x0, y0: W.y0, xT: W.xT, sigmaT: W.sigmaT, densityWidth: 58, seed: 11 });
+
+// Komposisi ringkas: 600×760. Figur dipotong di y = 500; "sekarang" di bawah jam pasir.
+const C = { w: 600, h: 760, x0: 368, y0: 636, xT: 526, sigmaT: 34, axis: 742, cut: 500 };
+const compact = outcomeField({ x0: C.x0, y0: C.y0, xT: C.xT, sigmaT: C.sigmaT, densityWidth: 40, seed: 11, steps: 24 });
+// Satu jalur masa lalu (deterministik) yang tiba di "sekarang".
+const past = (() => {
+  const pts: string[] = [];
+  const n = 18;
+  for (let i = 0; i <= n; i++) {
+    const x = 28 + ((C.x0 - 28) * i) / n;
+    const y = C.y0 + (i === n ? 0 : Math.sin(i * 1.7) * 9 + Math.cos(i * 0.9) * 6);
+    pts.push(`${i ? 'L' : 'M'}${Math.round(x * 10) / 10} ${Math.round(y * 10) / 10}`);
+  }
+  return pts.join(' ');
+})();
+
+const pct = (v: number, of: number) => `${Math.round((v / of) * 10000) / 100}%`;
+const origin = (x: number, y: number, box: { w: number; h: number }) => `${pct(x, box.w)} ${pct(y, box.h)}`;
+---
+
+<figure class="stage plate" data-stage aria-labelledby="stage-caption">
+  <div class="stage__field">
+    <!-- Lapisan 2: medan hasil. Dekoratif-informatif; artinya ada di keterangan. -->
+    <svg
+      class="stage__svg stage__svg--wide"
+      viewBox={`0 0 ${W.w} ${W.h}`}
+      aria-hidden="true"
+      focusable="false"
+      data-field={JSON.stringify({ x0: W.x0, y0: W.y0, xT: W.xT, sigmaT: W.sigmaT, dw: 58 })}
+    >
+      <path class="svg-axis" d={`M${W.x0} ${W.axis} H${W.w - 24}`}></path>
+      <path class="svg-tick" d={[0, 1, 2, 3, 4, 5, 6].map((i) => `M${W.x0 + i * ((W.xT - W.x0) / 6)} ${W.axis} v6`).join(' ')}></path>
+      <path class="svg-guide" d={`M${W.x0} 96 V${W.axis}`}></path>
+      <path class="svg-guide" d={`M${W.xT} 96 V${W.axis}`}></path>
+      <g class="stage__spread" style={`transform-origin: ${origin(W.x0, W.y0, W)}`}>
+        {wide.paths.map((d) => <path class="stage__path" d={d} />)}
+        <path class="stage__envelope" d={wide.upper}></path>
+        <path class="stage__envelope" d={wide.lower}></path>
+        <path class="stage__trace" d="" data-trace></path>
+      </g>
+      <g class="stage__density" style={`transform-origin: ${origin(W.xT, W.y0, W)}`}>
+        <path class="stage__density-curve" d={wide.density}></path>
+      </g>
+      <path class="stage__expected" d={wide.expected}></path>
+      <circle class="stage__now" cx={W.x0} cy={W.y0} r="4.5"></circle>
+      <g class="stage__ambient">
+        <circle class="stage__pulse" cx={W.x0} cy={W.y0} r="4.5" data-pulse></circle>
+        <path class="stage__landing" d="" data-landing></path>
+        <circle class="stage__head" cx={W.x0} cy={W.y0} r="3" data-head></circle>
+      </g>
+      <g class="stage__labels">
+        <text x={W.x0} y={W.axis + 26} text-anchor="middle">Sekarang</text>
+        <text x={W.xT} y={W.axis + 26} text-anchor="middle">T</text>
+        <text x={W.w - 24} y={W.axis - 10} text-anchor="end">Waktu →</text>
+        <text x={W.x0 + 8} y="90">Harga</text>
+        <text class="stage__label-mark" x={W.xT - 6} y={W.y0 - 8} text-anchor="end">E[P]</text>
+      </g>
+    </svg>
+
+    <svg
+      class="stage__svg stage__svg--compact"
+      viewBox={`0 0 ${C.w} ${C.h}`}
+      aria-hidden="true"
+      focusable="false"
+      data-field={JSON.stringify({ x0: C.x0, y0: C.y0, xT: C.xT, sigmaT: C.sigmaT, dw: 40 })}
+    >
+      <path class="stage__cut" d={`M0 ${C.cut} H${C.w}`}></path>
+      <path class="svg-guide" d={`M${C.x0} 452 V${C.axis}`}></path>
+      <path class="svg-axis" d={`M24 ${C.axis} H${C.w - 16}`}></path>
+      <path class="stage__past" d={past}></path>
+      <g class="stage__spread" style={`transform-origin: ${origin(C.x0, C.y0, C)}`}>
+        {compact.paths.map((d) => <path class="stage__path" d={d} />)}
+        <path class="stage__envelope" d={compact.upper}></path>
+        <path class="stage__envelope" d={compact.lower}></path>
+        <path class="stage__trace" d="" data-trace></path>
+      </g>
+      <g class="stage__density" style={`transform-origin: ${origin(C.xT, C.y0, C)}`}>
+        <path class="stage__density-curve" d={compact.density}></path>
+      </g>
+      <path class="stage__expected" d={compact.expected}></path>
+      <circle class="stage__now" cx={C.x0} cy={C.y0} r="4"></circle>
+      <g class="stage__ambient">
+        <circle class="stage__pulse" cx={C.x0} cy={C.y0} r="4" data-pulse></circle>
+        <path class="stage__landing" d="" data-landing></path>
+        <circle class="stage__head" cx={C.x0} cy={C.y0} r="2.6" data-head></circle>
+      </g>
+      <g class="stage__labels">
+        <text x="28" y={C.y0 - 22}>Masa lalu</text>
+        <text x={C.x0} y={C.axis - 8} text-anchor="middle">Sekarang</text>
+        <text x={C.xT} y={C.axis - 8} text-anchor="middle">T</text>
+        <text class="stage__label-mark" x={C.xT - 4} y={C.y0 - 6} text-anchor="end">E[P]</text>
+      </g>
+    </svg>
+
+    <!-- Lapisan 3: emblem resmi. Hanya dipindah & diperbesar; potongan oleh tepi panggung. -->
+    <div class="stage__art">
+      <div class="stage__art-inner">
+        <BrandEmblem variant="plate" />
+      </div>
+    </div>
+
+    <p class="stage__readout label" aria-hidden="true">
+      <span>Horizon <b data-stage-out="horizon">1,0</b>T</span><span class="label__sep">·</span><span>Sebaran ×<b data-stage-out="spread">1,00</b></span>
+    </p>
+  </div>
+
+  <figcaption id="stage-caption" class="stage__caption">
+    <p class="label">
+      <span class="label__index">Fig. 00</span><span class="label__sep" aria-hidden="true">·</span>Waktu × harga
+    </p>
+    <p class="stage__text">
+      Dari jam pasir di tangan figur, masa depan bercabang: setiap garis satu kemungkinan, garis kuningan nilai
+      harapan, kurva di T sebaran hasilnya. Semakin jauh horizon, semakin lebar sebarannya (σ ∝ √t). Ilustrasi
+      konsep, bukan data pasar.
+    </p>
+    <p class="label stage__object">
+      <span class="label__index">Objek 00</span><span class="label__sep" aria-hidden="true">·</span>{`Emblem ${siteConfig.masterBrand}`}
+    </p>
+  </figcaption>
+</figure>
+
+<script>
+  import { horizonAt, nextTraceIndex, traceAt } from '../../lib/outcome-field';
+
+  const fmt = (v: number, digits: number) =>
+    new Intl.NumberFormat('id-ID', { minimumFractionDigits: digits, maximumFractionDigits: digits }).format(v);
+  const r1 = (n: number) => Math.round(n * 10) / 10;
+  // Durasi token dalam ms; minifier CSS menulis ulang `6400ms` menjadi `6.4s`, jadi satuannya harus dibaca.
+  const toMs = (v: string) => {
+    const n = parseFloat(v);
+    if (!Number.isFinite(n)) return 0;
+    return v.trim().endsWith('ms') ? n : v.trim().endsWith('s') ? n * 1000 : n;
+  };
+  // Jalur daun hanya berisi perintah M/L (outcome-field.ts), jadi cukup ambil pasangan angkanya.
+  const toPoints = (d: string): [number, number][] =>
+    [...d.matchAll(/[ML](-?[\d.]+) (-?[\d.]+)/g)].map((m) => [Number(m[1]), Number(m[2])]);
+
+  type Field = { x0: number; y0: number; xT: number; sigmaT: number; dw: number };
+  type Layer = {
+    svg: SVGSVGElement;
+    field: Field;
+    leaves: [number, number][][];
+    trace: SVGPathElement;
+    pulse: SVGCircleElement;
+    head: SVGCircleElement;
+    landing: SVGPathElement;
+    r0: number;
+    index: number;
+  };
+
+  const stage = document.querySelector<HTMLElement>('[data-stage]');
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)');
+  const finePointer = window.matchMedia('(hover: hover) and (pointer: fine)');
+
+  if (stage && 'IntersectionObserver' in window) {
+    const horizonOut = stage.querySelector<HTMLElement>('[data-stage-out="horizon"]')!;
+    const spreadOut = stage.querySelector<HTMLElement>('[data-stage-out="spread"]')!;
+    const layers: Layer[] = [...stage.querySelectorAll<SVGSVGElement>('[data-field]')].map((svg) => {
+      const trace = svg.querySelector<SVGPathElement>('[data-trace]')!;
+      const pulse = svg.querySelector<SVGCircleElement>('[data-pulse]')!;
+      const field = JSON.parse(svg.dataset.field!) as Field;
+      const leaves = [...svg.querySelectorAll('.stage__path')].map((p) => toPoints(p.getAttribute('d') ?? ''));
+      // Siklus pertama: hasil yang paling khas (mendarat paling dekat ke puncak kurva), bukan ekor.
+      const gap = (pts: [number, number][]) => Math.abs(pts[pts.length - 1]![1] - field.y0);
+      const typical = leaves.reduce((best, pts, i) => (gap(pts) < gap(leaves[best]!) ? i : best), 0);
+      return {
+        svg,
+        field,
+        leaves,
+        trace,
+        pulse,
+        head: svg.querySelector<SVGCircleElement>('[data-head]')!,
+        landing: svg.querySelector<SVGPathElement>('[data-landing]')!,
+        r0: Number(pulse.getAttribute('r')),
+        index: typical,
+      };
+    });
+
+    let visible = false;
+    let spread = 1;
+    let last = '';
+    let scrollFrame = 0;
+    let loop = 0;
+    let lastTime = 0;
+    let cycleStart = -1;
+    let cycle = 0;
+    let period = 0;
+    let parallaxOn = false;
+    // Paralaks kursor: target (dari kursor) dan nilai yang dihaluskan menuju target, keduanya −1…1.
+    const target = { x: 0, y: 0 };
+    const eased = { x: 0, y: 0 };
+
+    const readTokens = () => {
+      const css = getComputedStyle(stage);
+      period = toMs(css.getPropertyValue('--motion-ambient'));
+      parallaxOn = finePointer.matches && (parseFloat(css.getPropertyValue('--parallax-pointer')) || 0) > 0;
+    };
+
+    // Gulir (R9.1): kemajuan 0–1 dari jarak gulir halaman (hero ada di puncak).
+    const updateScroll = () => {
+      scrollFrame = 0;
+      const progress = Math.min(1, Math.max(0, window.scrollY / (stage.offsetHeight * 0.9)));
+      const h = horizonAt(progress);
+      spread = h.spread;
+      stage.style.setProperty('--stage-progress', progress.toFixed(3));
+      stage.style.setProperty('--stage-spread', spread.toFixed(3));
+      const text = `${fmt(h.horizon, 1)}|${fmt(spread, 2)}`;
+      if (text !== last) {
+        last = text;
+        horizonOut.textContent = fmt(h.horizon, 1);
+        spreadOut.textContent = fmt(spread, 2);
+      }
+    };
+    const onScroll = () => {
+      if (visible && !scrollFrame) scrollFrame = requestAnimationFrame(updateScroll);
+    };
+
+    const active = () => layers.find((l) => l.svg.getClientRects().length > 0 && getComputedStyle(l.svg).display !== 'none');
+
+    const pickNext = (layer: Layer) => {
+      layer.index = nextTraceIndex(layer.index, layer.leaves.length);
+    };
+
+    // Potongan jalur sampai waktu xNow (jejak maju merata di sumbu waktu) + titik ujungnya (interpolasi).
+    const cut = (pts: [number, number][], xNow: number) => {
+      const out: [number, number][] = [pts[0]!];
+      for (let i = 1; i < pts.length; i++) {
+        const [xa, ya] = pts[i - 1]!;
+        const [xb, yb] = pts[i]!;
+        if (xb <= xNow) {
+          out.push([xb, yb]);
+          continue;
+        }
+        const t = (xNow - xa) / (xb - xa);
+        out.push([xNow, ya + (yb - ya) * t]);
+        break;
+      }
+      return out;
+    };
+
+    // Satu frame siklus jejak pada komposisi yang sedang tampil.
+    const drawTrace = (layer: Layer, u: number) => {
+      const f = traceAt(u);
+      const { x0, y0, xT, sigmaT, dw } = layer.field;
+      layer.pulse.setAttribute('r', r1(layer.r0 + f.pulseGrow * layer.r0 * 3.2).toString());
+      layer.pulse.style.opacity = (f.pulse * 0.85).toFixed(3);
+      const pts = cut(layer.leaves[layer.index]!, x0 + (xT - x0) * f.drawn);
+      layer.trace.setAttribute('d', pts.map(([x, y], i) => `${i ? 'L' : 'M'}${r1(x)} ${r1(y)}`).join(' '));
+      layer.trace.style.opacity = f.opacity.toFixed(3);
+      // Kepala di ujung jejak; grup sebaran diskalakan vertikal di sekitar y0, jadi y ikut diskalakan.
+      const pt = { x: pts[pts.length - 1]![0], y: pts[pts.length - 1]![1] };
+      const y = y0 + (pt.y - y0) * spread;
+      layer.head.setAttribute('cx', r1(pt.x).toString());
+      layer.head.setAttribute('cy', r1(y).toString());
+      layer.head.style.opacity = (f.drawn >= 1 ? f.opacity * 0.6 : f.opacity).toFixed(3);
+      // Pendaratan: garis dari sumbu T ke kurva kepadatan pada hasil yang sama (satu hasil di bawah kurva).
+      if (f.landed) {
+        const z = (pt.y - y0) / sigmaT;
+        const xCurve = xT + (dw * Math.exp(-0.5 * z * z)) / spread;
+        layer.landing.setAttribute('d', `M${r1(xT)} ${r1(y)} H${r1(xCurve)}`);
+        layer.landing.style.opacity = f.opacity.toFixed(3);
+      } else {
+        layer.landing.style.opacity = '0';
+      }
+    };
+
+    const tick = (now: number) => {
+      loop = 0;
+      if (!visible || reduce.matches) return;
+      const dt = lastTime ? Math.min(64, now - lastTime) : 16;
+      lastTime = now;
+
+      if (parallaxOn) {
+        const k = 1 - Math.exp(-dt / 140);
+        eased.x += (target.x - eased.x) * k;
+        eased.y += (target.y - eased.y) * k;
+        stage.style.setProperty('--px', eased.x.toFixed(4));
+        stage.style.setProperty('--py', eased.y.toFixed(4));
+      }
+
+      const layer = period > 0 ? active() : undefined;
+      if (layer) {
+        if (cycleStart < 0) cycleStart = now;
+        const elapsed = (now - cycleStart) / period;
+        const n = Math.floor(elapsed);
+        if (n !== cycle) {
+          cycle = n;
+          pickNext(layer);
+        }
+        drawTrace(layer, elapsed - n);
+      }
+      loop = requestAnimationFrame(tick);
+    };
+
+    const start = () => {
+      if (!loop && visible && !reduce.matches) {
+        lastTime = 0;
+        loop = requestAnimationFrame(tick);
+      }
+    };
+    const stop = () => {
+      if (loop) cancelAnimationFrame(loop);
+      loop = 0;
+    };
+
+    const reset = () => {
+      stop();
+      for (const p of ['--stage-progress', '--stage-spread', '--px', '--py']) stage.style.removeProperty(p);
+      for (const l of layers) {
+        for (const el of [l.pulse, l.trace, l.head, l.landing]) el.style.opacity = '0';
+      }
+      target.x = target.y = eased.x = eased.y = 0;
+      spread = 1;
+      horizonOut.textContent = fmt(1, 1);
+      spreadOut.textContent = fmt(1, 2);
+      last = '';
+    };
+
+    // Kursor di mana pun di atas hero (bukan hanya panggung): posisi relatif terhadap pusat panggung, dibatasi −1…1.
+    const hero = stage.closest('section') ?? stage;
+    hero.addEventListener(
+      'pointermove',
+      (e) => {
+        if (!parallaxOn || e.pointerType !== 'mouse') return;
+        const r = stage.getBoundingClientRect();
+        target.x = Math.max(-1, Math.min(1, (e.clientX - (r.left + r.width / 2)) / (r.width / 2)));
+        target.y = Math.max(-1, Math.min(1, (e.clientY - (r.top + r.height / 2)) / (r.height / 2)));
+      },
+      { passive: true },
+    );
+    hero.addEventListener('pointerleave', () => {
+      target.x = target.y = 0;
+    });
+
+    readTokens();
+    new IntersectionObserver(([entry]) => {
+      visible = !!entry?.isIntersecting && !reduce.matches;
+      if (visible) {
+        onScroll();
+        start();
+      } else stop();
+    }).observe(stage);
+    window.addEventListener('scroll', onScroll, { passive: true });
+    reduce.addEventListener('change', () => {
+      readTokens();
+      if (reduce.matches) {
+        visible = false;
+        reset();
+      } else {
+        visible = stage.getBoundingClientRect().bottom > 0;
+        onScroll();
+        start();
+      }
+    });
+    finePointer.addEventListener('change', readTokens);
+  }
+</script>
+
+<style>
+  .stage {
+    --stage-progress: 0;
+    --stage-spread: 1;
+    --px: 0;
+    --py: 0;
+    container: stage / inline-size;
+    min-width: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    border-inline: 0;
+  }
+
+  /* Bidang panggung: kisi koordinat gelap sangat samar, rasio tetap per komposisi. */
+  .stage__field {
+    position: relative;
+    overflow: hidden;
+    aspect-ratio: 600 / 760;
+  }
+
+  /* Lapisan 1 sebagai elemen semu sendiri (lebih besar satu sel di tiap sisi) agar paralaks kursor tidak membuka tepi. */
+  .stage__field::before {
+    content: '';
+    position: absolute;
+    inset: calc(-1 * var(--grid-cell));
+    background-image:
+      linear-gradient(to right, var(--plate-grid) var(--stroke-hair), transparent var(--stroke-hair)),
+      linear-gradient(to bottom, var(--plate-grid) var(--stroke-hair), transparent var(--stroke-hair));
+    background-size: var(--grid-cell) var(--grid-cell);
+    transform: translate3d(
+      calc(var(--px) * var(--parallax-pointer) * -0.25),
+      calc(var(--py) * var(--parallax-pointer) * -0.25),
+      0
+    );
+  }
+
+  .stage__svg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+    /* Lapisan terdepan: geser penuh + kemiringan kecil ke arah kursor (R9.2). Nol saat diam/gerak dikurangi. */
+    transform: perspective(1600px)
+      translate3d(calc(var(--px) * var(--parallax-pointer) * -1), calc(var(--py) * var(--parallax-pointer) * -1), 0)
+      rotateY(calc(var(--px) * var(--tilt-max))) rotateX(calc(var(--py) * var(--tilt-max) * -1));
+  }
+
+  .stage__svg--wide {
+    display: none;
+  }
+
+  .stage__svg :global(*) {
+    vector-effect: non-scaling-stroke;
+  }
+
+  .stage__path {
+    fill: none;
+    stroke: var(--plate-ink-3);
+    stroke-width: var(--stroke-hair);
+    stroke-opacity: 0.42;
+    stroke-linejoin: round;
+  }
+
+  .stage__past {
+    fill: none;
+    stroke: var(--plate-ink);
+    stroke-width: var(--stroke-trace-bold);
+    stroke-linejoin: round;
+  }
+
+  .stage__envelope {
+    fill: none;
+    stroke: var(--plate-rule-strong);
+    stroke-width: var(--stroke-hair);
+    stroke-dasharray: var(--dash-trace);
+  }
+
+  .stage__density-curve {
+    fill: none;
+    stroke: var(--plate-ink-2);
+    stroke-width: var(--stroke-trace);
+  }
+
+  .stage__expected {
+    fill: none;
+    stroke: var(--plate-mark);
+    stroke-width: var(--stroke-trace-bold);
+  }
+
+  .stage__now {
+    fill: var(--plate);
+    stroke: var(--plate-mark);
+    stroke-width: var(--stroke-trace);
+  }
+
+  /* R9.2: siklus jejak. Tak terlihat tanpa JS / gerak dikurangi (keadaan diam = gambar R9.1). Tanpa blur/glow. */
+  .stage__trace {
+    fill: none;
+    stroke: var(--plate-ink);
+    stroke-width: var(--stroke-trace);
+    stroke-linejoin: round;
+    opacity: 0;
+  }
+
+  .stage__pulse {
+    fill: none;
+    stroke: var(--plate-mark);
+    stroke-width: var(--stroke-hair);
+    opacity: 0;
+  }
+
+  .stage__head {
+    fill: var(--plate-ink);
+    opacity: 0;
+  }
+
+  .stage__landing {
+    fill: none;
+    stroke: var(--plate-ink);
+    stroke-width: var(--stroke-trace);
+    opacity: 0;
+  }
+
+  .stage__cut {
+    fill: none;
+    stroke: var(--plate-rule-strong);
+    stroke-width: var(--stroke-hair);
+  }
+
+  .stage__labels {
+    fill: var(--plate-ink-3);
+    font-family: var(--font-label);
+    font-size: 13px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .stage__label-mark {
+    fill: var(--plate-mark);
+  }
+
+  /* Satu interaksi: sebaran tumbuh ∝ √horizon saat menggulir. Kurva di T melebar dan memendek (luas tetap). */
+  .stage__spread,
+  .stage__density {
+    transform-box: view-box;
+  }
+
+  .stage__spread {
+    transform: scaleY(var(--stage-spread));
+  }
+
+  .stage__density {
+    transform: scale(calc(1 / var(--stage-spread)), var(--stage-spread));
+  }
+
+  /* Emblem: diposisikan dalam persen bidang agar sejajar dengan medan. */
+  .stage__art {
+    position: absolute;
+    inset: 0 0 auto;
+    height: calc(500 / 760 * 100%);
+    overflow: hidden;
+    pointer-events: none;
+  }
+
+  /* `transform` membuat grup terisolasi, jadi blend `screen` dipasang di grup ini (bukan hanya di <img>):
+     latar hitam murni emblem melebur ke panggung, bukan tampil sebagai kotak hitam. */
+  .stage__art-inner {
+    position: absolute;
+    left: calc(-200 / 600 * 100%);
+    top: calc(-10 / 500 * 100%);
+    width: calc(700 / 600 * 100%);
+    mix-blend-mode: screen;
+    /* Gulir (R9.1) + kursor (R9.2, lapisan tengah 55%). */
+    transform: translate3d(
+      calc(var(--px) * var(--parallax-pointer) * -0.55),
+      calc(var(--py) * var(--parallax-pointer) * -0.55 - var(--stage-progress) * var(--parallax-shift)),
+      0
+    );
+  }
+
+  .stage__art-inner :global(.emblem--plate) {
+    width: 100%;
+  }
+
+  /* Ringkas: pembacaan di pita medan, tepat di bawah garis potong (tidak menimpa figur), di sisi kiri yang
+     kosong (di atas jalur masa lalu) agar tidak bertabrakan dengan kurva sebaran saat sebaran melebar. */
+  .stage__readout {
+    position: absolute;
+    top: calc(512 / 760 * 100%);
+    left: var(--space-4);
+    display: flex;
+    gap: var(--space-1);
+    margin: 0;
+    /* Garis bantu "sekarang" berhenti di belakang teks, tidak memotong angka. */
+    padding-inline-end: var(--space-1);
+    background: var(--plate);
+    color: var(--plate-ink-3);
+  }
+
+  .stage__readout b {
+    font-weight: 400;
+    color: var(--plate-ink);
+  }
+
+  .stage__caption {
+    display: grid;
+    gap: var(--space-2);
+    padding: var(--space-4) var(--gutter) var(--space-6);
+    border-top: var(--border-hair) solid var(--plate-rule);
+  }
+
+  .stage__caption p {
+    margin: 0;
+  }
+
+  .stage__text {
+    max-width: var(--measure-narrow);
+    font-size: var(--text-sm);
+    color: var(--plate-ink-2);
+  }
+
+  /* Komposisi lebar ditentukan oleh lebar panggung sendiri (container query), bukan lebar layar: panggung
+     yang sempit selalu memakai komposisi ringkas dan keterangan bertumpuk, jadi teks tidak pernah bertabrakan. */
+  @container stage (min-width: 34rem) {
+    .stage__field {
+      aspect-ratio: 1000 / 720;
+    }
+
+    .stage__svg--wide {
+      display: block;
+    }
+
+    .stage__svg--compact {
+      display: none;
+    }
+
+    .stage__art {
+      height: 100%;
+    }
+
+    .stage__art-inner {
+      left: -15%;
+      top: calc(-6 / 720 * 100%);
+      width: 86%;
+    }
+
+    .stage__readout {
+      top: var(--space-6);
+      right: var(--space-6);
+      left: auto;
+    }
+
+    /* Label figur & objek sebaris, teks keterangan di bawahnya selebar kolom baca. */
+    .stage__caption {
+      grid-template-columns: minmax(0, 1fr) auto;
+      align-items: baseline;
+      gap: var(--space-2) var(--space-6);
+      padding: var(--space-4) var(--space-6) var(--space-6);
+    }
+
+    .stage__text {
+      grid-column: 1 / -1;
+      grid-row: 2;
+    }
+  }
+</style>

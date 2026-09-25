@@ -2,6 +2,7 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { siteConfig } from '../../config/site';
 import KnowledgeGraph from '../../components/KnowledgeGraph.astro';
+import PageHead from '../../components/PageHead.astro';
 import { conceptCategoryLabel, conceptHref, getConcepts, getKnowledgeGraph } from '../../lib/concepts';
 
 const graph = await getKnowledgeGraph();
@@ -14,14 +15,13 @@ const layerOf = new Map(graph.nodes.map((n) => [n.id, n.layer]));
   title="Peta Pengetahuan"
   description={`Peta hubungan prasyarat antar konsep di ${siteConfig.product}: konsep mana yang menjadi dasar bagi konsep lainnya.`}
 >
-  <header class="map-header">
-    <h1>Peta Pengetahuan</h1>
+  <PageHead title="Peta Pengetahuan" index={[`${graph.nodes.length} konsep`, `${graph.layerCount} tingkat`, `${graph.edges.length} prasyarat`]}>
     <p>
       Peta ini menunjukkan konsep mana yang menjadi dasar bagi konsep lainnya.
       Garis mengarah dari <strong>prasyarat</strong> ke konsep yang membutuhkannya.
       Arahkan kursor atau fokuskan sebuah titik untuk melihat ringkasannya, klik untuk membuka konsepnya.
     </p>
-  </header>
+  </PageHead>
 
   <KnowledgeGraph graph={graph} idPrefix="peta" />
 
@@ -59,22 +59,6 @@ const layerOf = new Map(graph.nodes.map((n) => [n.id, n.layer]));
 </BaseLayout>
 
 <style>
-  .map-header {
-    max-width: var(--measure);
-    margin-bottom: 2rem;
-  }
-
-  .map-header h1 {
-    margin: 0 0 0.75rem;
-    font-size: clamp(var(--text-2xl), 5vw, var(--text-3xl));
-  }
-
-  .map-header p {
-    margin: 0;
-    font-size: var(--text-base);
-    color: var(--ink-2);
-  }
-
   .map-table {
     max-width: var(--measure);
     margin-top: 3rem;

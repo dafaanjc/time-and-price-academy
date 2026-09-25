@@ -1,0 +1,153 @@
+---
+// Hero beranda — R9.1 "Jam Pasir Modal", panggung.
+// Nama file & kelas (`landing__*`) sengaja berbeda dari HomeHero lama di `main`: Astro menurunkan ID cakupan CSS
+// dari path file, jadi dev server yang masih memegang CSS HomeHero lama tidak bisa lagi menimpa markup ini.
+// Kiri (dinding terang): merek induk + produk, judul besar kalimat biasa, pertanyaan inti ("apa yang terjadi saat
+// keputusan Anda salah?"), lead, dua pintu masuk (masalah; jam pasir modal di bagian berikutnya).
+// Kanan: panggung gelap (figures/HeroStage) — emblem resmi dalam skala monumental + medan hasil prosedural
+// (waktu, probabilitas, cabang kemungkinan, ketidakpastian). Tanpa kontrol: alat hitung ada di bawah hero.
+// Desktop: panggung menembus sampai tepi kanan layar. Mobile: panggung tepi ke tepi di bawah teks.
+import { siteConfig } from '../config/site';
+import HeroStage from './figures/HeroStage.astro';
+---
+
+<section class="landing" aria-labelledby="hero-title">
+  <div class="landing__text">
+    <p class="landing__brand">
+      <span class="label">{siteConfig.masterBrand}</span>
+      <span class="landing__product">{siteConfig.product}</span>
+    </p>
+    <h1 id="hero-title" class="landing__title">{siteConfig.heroLine}</h1>
+    <p class="landing__question">Pertanyaan yang lebih penting: apa yang terjadi saat keputusan Anda salah?</p>
+    <p class="landing__lead">
+      Setiap posisi punya jam pasirnya sendiri. Seberapa cepat modal habis ditentukan sebelum entry, oleh
+      risiko per transaksi. Mulai dari masalah yang Anda alami, lalu pahami konsep di baliknya.
+    </p>
+    <p class="landing__actions">
+      <a class="button" href="#masalah">Mulai dari masalah</a>
+      <a class="landing__secondary" href="#jam-pasir">Uji jam pasir modal ↓</a>
+    </p>
+  </div>
+
+  <div class="landing__stage">
+    <HeroStage />
+  </div>
+</section>
+
+<style>
+  .landing {
+    display: grid;
+    gap: var(--space-8);
+    padding-block: 0 var(--space-8);
+  }
+
+  /* Merek induk (mono kecil) di atas nama produk (serif): dua tingkat, dipisah garis rambut. */
+  .landing__brand {
+    display: inline-grid;
+    gap: var(--space-1);
+    margin: 0;
+    padding-bottom: var(--space-2);
+    border-bottom: var(--border-hair) solid var(--rule-strong);
+  }
+
+  .landing__product {
+    font-family: var(--font-serif);
+    font-size: var(--text-xl);
+    font-weight: 600;
+    line-height: 1;
+    letter-spacing: var(--tracking-display);
+  }
+
+  /* Judul kalimat biasa, sangat besar dan rapat: satu pernyataan, bukan slogan kapital. */
+  .landing__title {
+    margin: var(--space-6) 0 var(--space-4);
+    font-size: clamp(var(--text-3xl), 11vw, var(--text-5xl));
+    line-height: var(--leading-hero);
+    letter-spacing: var(--tracking-display);
+    text-wrap: balance;
+  }
+
+  .landing__question {
+    max-width: 30ch;
+    margin: 0;
+    font-family: var(--font-serif);
+    font-size: var(--text-lg);
+    font-style: italic;
+    line-height: var(--leading-tight);
+    color: var(--ink-2);
+    text-wrap: balance;
+  }
+
+  .landing__lead {
+    max-width: var(--measure-narrow);
+    margin: var(--space-4) 0 0;
+    color: var(--ink-2);
+  }
+
+  .landing__actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-3) var(--space-6);
+    margin: var(--space-6) 0 0;
+  }
+
+  .button {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.75rem;
+    padding: 0 var(--space-6);
+    font-weight: 600;
+    color: var(--paper);
+    background: var(--ink);
+    border: var(--border-hair) solid var(--ink);
+    border-radius: var(--radius-1);
+    text-decoration: none;
+    transition:
+      color var(--motion-fast) var(--ease),
+      background-color var(--motion-fast) var(--ease);
+  }
+
+  .button:hover {
+    color: var(--ink);
+    background: transparent;
+  }
+
+  .landing__secondary {
+    font-weight: 600;
+    color: var(--ink);
+  }
+
+  /* Mobile/tablet: panggung tepi ke tepi. */
+  .landing__stage {
+    margin-inline: calc(-1 * var(--gutter));
+    min-width: 0;
+  }
+
+  @media (min-width: 64rem) {
+    .landing {
+      grid-template-columns: repeat(var(--grid-columns), minmax(0, 1fr));
+      gap: var(--grid-gap);
+      align-items: center;
+      padding-block: 0 var(--space-16);
+    }
+
+    .landing__text {
+      grid-column: 1 / span 5;
+    }
+
+    .landing__title {
+      font-size: clamp(var(--text-4xl), 5vw, var(--text-6xl));
+    }
+
+    .landing__question {
+      font-size: var(--text-xl);
+    }
+
+    /* Panggung dari kolom 6 sampai tepi kanan layar (melewati gutter dan margin luar kontainer). */
+    .landing__stage {
+      grid-column: 6 / -1;
+      margin-inline: 0 calc(-1 * (max(0px, (100vw - var(--container)) / 2) + var(--gutter)));
+    }
+  }
+</style>

@@ -52,7 +52,7 @@ const sigmaTags = [
       <input id={`${uid}-mean`} name="meanPerPeriod" type="range" min="-2" max="3" step="0.1" value={defaults.meanPerPeriod} />
     </div>
     <div class="field">
-      <span><label for={`${uid}-sd`}>Volatilitas (σ) / periode</label>: <output for={`${uid}-sd`} data-out="sdLabel">{formatNumber(defaults.sdPerPeriod)}%</output></span>
+      <span><label for={`${uid}-sd`}>Volatilitas (<span class="keep-case">σ</span>) / periode</label>: <output for={`${uid}-sd`} data-out="sdLabel">{formatNumber(defaults.sdPerPeriod)}%</output></span>
       <input id={`${uid}-sd`} name="sdPerPeriod" type="range" min="0.5" max="8" step="0.1" value={defaults.sdPerPeriod} />
     </div>
     <div class="field">
@@ -67,8 +67,8 @@ const sigmaTags = [
   </Fragment>
   <Fragment slot="results">
     <dl class="readout">
-      <div><dt>Rentang ±1σ (≈68%)</dt><dd data-out="range1">{range(1)}</dd></div>
-      <div><dt>Rentang ±2σ (≈95%)</dt><dd data-out="range2">{range(2)}</dd></div>
+      <div><dt>Rentang ±1<span class="keep-case">σ</span> (≈68%)</dt><dd data-out="range1">{range(1)}</dd></div>
+      <div><dt>Rentang ±2<span class="keep-case">σ</span> (≈95%)</dt><dd data-out="range2">{range(2)}</dd></div>
       <div><dt>Peluang berakhir rugi</dt><dd data-out="pLoss">{formatChance(pLoss)}</dd></div>
       <div class="readout__primary"><dt>Peluang ≤ ambang, normal</dt><dd data-out="pNormal">{formatChance(pNormal)}</dd></div>
       <div data-out="fatRow" hidden><dt>Peluang ≤ ambang, ekor tebal</dt><dd data-out="pFat">—</dd></div>
@@ -89,7 +89,7 @@ const sigmaTags = [
         <div class="dist__tags" aria-hidden="true">
           {
             sigmaTags.map(([key, text]) => (
-              <span class="plot__tag dist__sigma" data-tag={key} data-edge={labelEdge(chart.at[key])} style={`left: ${chart.at[key]}%`} hidden={!labels.showSigma}>{text}</span>
+              <span class="plot__tag dist__sigma keep-case" data-tag={key} data-edge={labelEdge(chart.at[key])} style={`left: ${chart.at[key]}%`} hidden={!labels.showSigma}>{text}</span>
             ))
           }
           <span class="plot__tag plot__tag--ink" data-tag="threshold" data-edge={labelEdge(chart.at.threshold)} data-row={labels.thresholdRow} style={`left: ${chart.at.threshold}%`}>Ambang</span>

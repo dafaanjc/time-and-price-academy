@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { computeLayers, layoutGraph, NODE_HEIGHT, NODE_WIDTH, wrapText, wrapTitle, type GraphLayout } from '../src/lib/graph';
+import { computeLayers, layoutGraph, markerPath, NODE_HEIGHT, NODE_WIDTH, wrapText, wrapTitle, type GraphLayout } from '../src/lib/graph';
 
 const n = (id: string, prerequisites: string[] = []) => ({ id, title: id, href: `/${id}`, prerequisites });
 
@@ -88,10 +88,42 @@ describe('graf prasyarat', () => {
     expect(laneCrossings(g)).toEqual([]);
   });
 
-  it('judul dibungkus maksimal dua baris × 22 karakter', () => {
+  it('semua garis tetap di dalam lebar graf; jalur lompatan memakai sisi terdekat', () => {
+    // Lompatan dari simpul paling kiri dan paling kanan: satu jalur kiri, satu jalur kanan.
+    const g = layoutGraph([
+      n('a'),
+      n('b'),
+      n('c'),
+      n('l', ['a']),
+      n('m', ['l']),
+      n('z', ['a']),
+      n('y', ['z', 'c']),
+      n('x', ['y']),
+      n('p', ['a']),
+      n('q', ['c']),
+      n('deep-l', ['a', 'm']),
+      n('deep-r', ['c', 'x']),
+    ]);
+    let left = false;
+    let right = false;
+    const minX = Math.min(...g.nodes.map((node) => node.x));
+    const maxX = Math.max(...g.nodes.map((node) => node.x + NODE_WIDTH));
+    for (const e of g.edges) {
+      for (const [x] of corners(e.d)) {
+        expect(x).toBeGreaterThanOrEqual(0);
+        expect(x).toBeLessThanOrEqual(g.width);
+        if (x < minX) left = true;
+        if (x > maxX) right = true;
+      }
+    }
+    expect(left && right).toBe(true);
+    expect(laneCrossings(g)).toEqual([]);
+  });
+
+  it('judul dibungkus maksimal dua baris × 18 karakter', () => {
     expect(wrapTitle('Risiko vs Ketidakpastian')).toEqual(['Risiko vs', 'Ketidakpastian']);
     for (const line of wrapTitle('Sangat Panjang Sekali Judul Konsep Yang Tidak Biasa Ini')) {
-      expect(line.length).toBeLessThanOrEqual(22);
+      expect(line.length).toBeLessThanOrEqual(18);
     }
   });
 
@@ -102,5 +134,26 @@ describe('graf prasyarat', () => {
     expect(cut[1]!.length).toBeLessThanOrEqual(9);
     expect(cut[1]!.endsWith('…')).toBe(true);
     expect(wrapText('', 9, 2)).toEqual([]);
+  });
+});
+
+describe('markerPath', () => {
+  it('setiap bentuk menghasilkan path tertutup di dalam kotak ±r (+15%)', () => {
+    for (const shape of ['circle', 'square', 'diamond', 'triangle', 'cross'] as const) {
+      const d = markerPath(shape, 10, 20, 6);
+      expect(d.endsWith('Z')).toBe(true);
+      for (const [, x, y] of d.matchAll(/[ML](-?[\d.]+) (-?[\d.]+)/g)) {
+        expect(Math.abs(Number(x) - 10)).toBeLessThanOrEqual(6 * 1.15 + 0.1);
+        expect(Math.abs(Number(y) - 20)).toBeLessThanOrEqual(6 * 1.15 + 0.1);
+      }
+    }
+  });
+});
+
+describe('penanda kategori', () => {
+  it('setiap kategori punya bentuk berbeda', async () => {
+    const { categories } = await import('../src/data/categories');
+    const markers = categories.map((c) => c.marker);
+    expect(new Set(markers).size).toBe(markers.length);
   });
 });

@@ -9,6 +9,7 @@ import TableOfContents from '../components/TableOfContents.astro';
 import ConceptLinkList from '../components/ConceptLinkList.astro';
 import SourceList from '../components/SourceList.astro';
 import PathNav from '../components/PathNav.astro';
+import PathPosition from '../components/PathPosition.astro';
 import ConceptMap from '../components/ConceptMap.astro';
 import ProblemList from '../components/ProblemList.astro';
 import { getCategory } from '../data/categories';
@@ -53,6 +54,7 @@ const shareUrl = absoluteUrl(Astro.url.pathname, Astro.site);
 >
   <article class="concept">
     <ConceptHeader concept={concept} url={shareUrl} />
+    {pathContext && <PathPosition context={pathContext} />}
 
     {
       status === 'draft' && (

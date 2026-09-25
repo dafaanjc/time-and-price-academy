@@ -1,0 +1,83 @@
+---
+// Kepala halaman navigasi (R10): baris indeks mono → judul serif → lead → garis ukur yang digambar sekali
+// saat halaman dibuka (kosakata gerak "masuk halaman"). Slot `figure` opsional di kanan (desktop), mis.
+// motif kategori. Dipakai halaman kategori, jalur belajar, dan peta. Halaman konsep & masalah punya kepala sendiri.
+interface Props {
+  title: string;
+  /** Bagian baris indeks, digabung dengan pemisah "·"; bagian pertama tampil kuningan. */
+  index?: string[];
+}
+
+const { title, index = [] } = Astro.props;
+const hasFigure = Astro.slots.has('figure');
+---
+
+<header class:list={['page-head', { 'page-head--figure': hasFigure }]}>
+  <div class="page-head__text">
+    {
+      index.length > 0 && (
+        <p class="label">
+          {index.map((part, i) => (
+            <>
+              {i > 0 && <span class="label__sep" aria-hidden="true">·</span>}
+              {i === 0 ? <span class="label__index">{part}</span> : <span>{part}</span>}
+            </>
+          ))}
+        </p>
+      )
+    }
+    <h1 class="page-head__title">{title}</h1>
+    <div class="page-head__lead"><slot /></div>
+  </div>
+  {hasFigure && <div class="page-head__figure" aria-hidden="true"><slot name="figure" /></div>}
+  <hr class="rule-measure page-head__rule" />
+</header>
+
+<style>
+  .page-head {
+    display: grid;
+    gap: var(--space-6) var(--grid-gap);
+    margin-bottom: var(--space-12);
+  }
+
+  .page-head__title {
+    margin: var(--space-3) 0 var(--space-4);
+    font-size: clamp(var(--text-2xl), 6vw, var(--text-4xl));
+    line-height: var(--leading-display);
+    letter-spacing: var(--tracking-display);
+  }
+
+  .page-head__lead {
+    max-width: var(--measure-narrow);
+    font-size: var(--text-lg);
+    color: var(--ink-2);
+  }
+
+  .page-head__lead :global(p) {
+    margin: 0;
+  }
+
+  .page-head__lead :global(p + p) {
+    margin-top: var(--space-3);
+  }
+
+  .page-head__figure {
+    max-width: 16rem;
+  }
+
+  .page-head__rule {
+    grid-column: 1 / -1;
+  }
+
+  @media (min-width: 64rem) {
+    .page-head--figure {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 16rem);
+      align-items: end;
+    }
+
+    .page-head__figure {
+      justify-self: end;
+      width: 100%;
+    }
+  }
+</style>
