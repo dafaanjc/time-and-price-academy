@@ -21,6 +21,20 @@ import { siteConfig } from '../../config/site';
 import { outcomeField } from '../../lib/outcome-field';
 import BrandEmblem from '../BrandEmblem.astro';
 
+// Lapisan 2b (progresif): medan hasil di atas ("sekarang" bercabang, sebaran, kurva) tetap sebagai gambar
+// SVG lengkap tanpa-JS/cadangan; bila WebGL & perangkat memungkinkan, kanvas Risk Field (three.js,
+// src/lib/risk-field/{geometry,quality,scene}.ts — geometri waktu × harga × kepadatan yang sama, diuji)
+// dimuat di atasnya dan SVG memudar. Warna dibaca dari token --field-* pada elemen `.plate` ini sendiri,
+// yang sudah otomatis memetakan ke --plate-* (lihat .plate di global.css), jadi tanpa token baru.
+const label3d = [
+  { key: 'price', text: 'Harga', align: 'above' },
+  { key: 'time', text: 'Waktu', align: 'right' },
+  { key: 'now', text: 'Sekarang', align: 'below' },
+  { key: 'horizon', text: 'T', align: 'below' },
+  { key: 'density', text: 'Kepadatan', align: 'right' },
+  { key: 'ev', text: 'E[P]', align: 'right', mark: true },
+] as const;
+
 // Komposisi lebar: 1000×720. Titik "sekarang" tepat di kanan jam pasir figur.
 const W = { w: 1000, h: 720, x0: 684, y0: 347, xT: 905, sigmaT: 66, axis: 664 };
 const wide = outcomeField({ x0: W.x0, y0: W.y0, xT: W.xT, sigmaT: W.sigmaT, densityWidth: 58, seed: 11 });
@@ -118,6 +132,20 @@ const origin = (x: number, y: number, box: { w: number; h: number }) => `${pct(x
       </g>
     </svg>
 
+    <!-- Lapisan 2b: Risk Field 3D (progresif). Kosong/tak terlihat sampai dimuat; SVG di atas tetap tampil. -->
+    <canvas class="stage__canvas" data-risk-canvas role="img" aria-hidden="true"></canvas>
+    <div class="stage__labels3d" aria-hidden="true">
+      {
+        label3d.map((l) => (
+          <span class="stage__anchor3d" data-anchor3d={l.key}>
+            <span class:list={['stage__label3d', `stage__label3d--${l.align}`, { 'stage__label3d--mark': 'mark' in l }]}>
+              {l.text}
+            </span>
+          </span>
+        ))
+      }
+    </div>
+
     <!-- Lapisan 3: emblem resmi. Hanya dipindah & diperbesar; potongan oleh tepi panggung. -->
     <div class="stage__art">
       <div class="stage__art-inner">
@@ -202,6 +230,107 @@ const origin = (x: number, y: number, box: { w: number; h: number }) => `${pct(x
       };
     });
 
+    // Risk Field 3D (progresif): SVG di atas adalah keadaan awal & cadangan lengkap (tanpa geser tata
+    // letak, tanpa JS/WebGL, gerak dikurangi, perangkat lemah). Dimuat lewat import() dinamis hanya bila
+    // kualitas ≠ "low" dan panggung terlihat, lalu saat browser senggang; three.js tidak pernah diunduh
+    // di jalur "low". Warna dibaca dari `stage` sendiri (`.plate`), bukan document.documentElement, agar
+    // --field-* memetakan ke --plate-* seperti seharusnya.
+    void (async () => {
+      const stageEl = stage;
+      if (!stageEl) return;
+      const { pickQuality, qualitySettings } = await import('../../lib/risk-field/quality');
+      const canvas3d = stageEl.querySelector<HTMLCanvasElement>('[data-risk-canvas]');
+      if (!canvas3d) return;
+      const nav = navigator as Navigator & { deviceMemory?: number; connection?: { saveData?: boolean } };
+      const quality = pickQuality({
+        webgl: 'WebGLRenderingContext' in window,
+        reducedMotion: reduce.matches,
+        saveData: nav.connection?.saveData === true,
+        coarsePointer: window.matchMedia('(pointer: coarse)').matches,
+        viewportWidth: window.innerWidth,
+        deviceMemory: nav.deviceMemory,
+        cores: nav.hardwareConcurrency,
+      });
+      if (quality === 'low') return;
+
+      const token3d = (name: string) => getComputedStyle(stageEl).getPropertyValue(name).trim();
+      const readPalette3d = () => ({
+        grid: token3d('--field-grid'),
+        lineFaint: token3d('--field-line-faint'),
+        line: token3d('--field-line'),
+        axis: token3d('--field-axis'),
+        trace: token3d('--field-trace'),
+        highlight: token3d('--field-highlight'),
+        fill: token3d('--field-fill'),
+      });
+      const durationMs3d = (value: string) => {
+        const n = parseFloat(value);
+        if (!Number.isFinite(n)) return 0;
+        return value.trim().endsWith('ms') ? n : n * 1000;
+      };
+      const whenIdle3d = () =>
+        new Promise<void>((resolve) => {
+          if ('requestIdleCallback' in window) window.requestIdleCallback(() => resolve(), { timeout: 1500 });
+          else setTimeout(resolve, 200);
+        });
+
+      type SceneModule = typeof import('../../lib/risk-field/scene');
+      let controller3d: ReturnType<SceneModule['mountRiskField']> | undefined;
+      let loading3d = false;
+      let visible3d = false;
+      const syncActive3d = () => controller3d?.setActive(visible3d && !document.hidden);
+
+      const fallBack3d = () => {
+        controller3d?.dispose();
+        controller3d = undefined;
+        observer3d.disconnect();
+        stageEl.dataset.fieldState = 'fallback';
+      };
+
+      async function load3d(): Promise<void> {
+        loading3d = true;
+        await whenIdle3d();
+        try {
+          const { mountRiskField } = (await import('../../lib/risk-field/scene')) as SceneModule;
+          const labels3d: Parameters<SceneModule['mountRiskField']>[0]['labels'] = {};
+          stageEl.querySelectorAll<HTMLElement>('[data-anchor3d]').forEach((el) => {
+            labels3d[el.dataset.anchor3d as keyof typeof labels3d] = el;
+          });
+          controller3d = mountRiskField({
+            canvas: canvas3d!,
+            labels: labels3d,
+            settings: qualitySettings[quality as 'high' | 'medium'],
+            palette: readPalette3d(),
+            driftPeriodMs: durationMs3d(token3d('--field-drift-period')) || 48_000,
+            revealMs: durationMs3d(token3d('--motion-slow')) * 3,
+            motion: !reduce.matches,
+            onFirstFrame: () => {
+              stageEl.dataset.fieldState = 'live';
+            },
+            onContextLost: fallBack3d,
+          });
+          syncActive3d();
+        } catch {
+          fallBack3d();
+        }
+      }
+
+      const observer3d = new IntersectionObserver(
+        ([entry]) => {
+          visible3d = entry?.isIntersecting ?? false;
+          if (visible3d && !loading3d) void load3d();
+          syncActive3d();
+        },
+        { rootMargin: '120px 0px' },
+      );
+      observer3d.observe(stage);
+      document.addEventListener('visibilitychange', syncActive3d);
+      window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => controller3d?.setPalette(readPalette3d()));
+      reduce.addEventListener('change', () => {
+        if (reduce.matches) fallBack3d();
+      });
+    })();
+
     let visible = false;
     let spread = 1;
     let last = '';
@@ -241,7 +370,10 @@ const origin = (x: number, y: number, box: { w: number; h: number }) => `${pct(x
       if (visible && !scrollFrame) scrollFrame = requestAnimationFrame(updateScroll);
     };
 
-    const active = () => layers.find((l) => l.svg.getClientRects().length > 0 && getComputedStyle(l.svg).display !== 'none');
+    const active = () =>
+      stage.dataset.fieldState === 'live'
+        ? undefined
+        : layers.find((l) => l.svg.getClientRects().length > 0 && getComputedStyle(l.svg).display !== 'none');
 
     const pickNext = (layer: Layer) => {
       layer.index = nextTraceIndex(layer.index, layer.leaves.length);
@@ -437,6 +569,75 @@ const origin = (x: number, y: number, box: { w: number; h: number }) => `${pct(x
 
   .stage__svg :global(*) {
     vector-effect: non-scaling-stroke;
+  }
+
+  /* Lapisan 2b: kanvas Risk Field 3D, di atas SVG (posisi sama) & di bawah emblem; kosong sampai "live". */
+  .stage__canvas {
+    position: absolute;
+    inset: 0;
+    display: block;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity var(--motion-slow) var(--ease);
+  }
+
+  .stage__labels3d {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity var(--motion-slow) var(--ease);
+  }
+
+  .stage__anchor3d {
+    position: absolute;
+    top: 0;
+    left: 0;
+    will-change: transform;
+  }
+
+  .stage__label3d {
+    position: absolute;
+    font-family: var(--font-label);
+    font-size: var(--text-2xs);
+    letter-spacing: var(--tracking-mono);
+    text-transform: uppercase;
+    line-height: 1;
+    white-space: nowrap;
+    color: var(--plate-ink-3);
+  }
+
+  .stage__label3d--above {
+    transform: translate(-50%, -100%);
+  }
+
+  .stage__label3d--below {
+    transform: translate(-50%, 0);
+  }
+
+  .stage__label3d--right {
+    transform: translate(0.5em, -50%);
+  }
+
+  .stage__label3d--mark {
+    color: var(--plate-mark);
+  }
+
+  /* Panggung "live": kanvas 3D & label proyeksinya tampil, SVG (dan siklus jejaknya) memudar keluar. */
+  [data-field-state='live'] .stage__canvas,
+  [data-field-state='live'] .stage__labels3d {
+    opacity: 1;
+  }
+
+  [data-field-state='live'] .stage__svg {
+    opacity: 0;
+    visibility: hidden;
+    transition:
+      opacity var(--motion-slow) var(--ease),
+      visibility 0s linear var(--motion-slow);
   }
 
   .stage__path {
