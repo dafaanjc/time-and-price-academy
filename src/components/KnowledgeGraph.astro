@@ -1,7 +1,9 @@
 ---
 // Graf prasyarat sebagai diagram teknis: garis hairline siku, simpul lingkaran kecil, tautan ke halaman konsep.
-// Simpul yang disorot (hover/fokus keyboard) menyala kuningan, garis prasyaratnya ikut, dan kartu
-// keterangan (nama + ringkasan) muncul halus. Tanpa JS graf tetap utuh; hanya sorotan & keterangan yang hilang.
+// Simpul yang disorot (hover/fokus keyboard) menyala kuningan, garis prasyaratnya ikut, simpul yang tidak
+// berhubungan meredup, dan kartu keterangan (nama + ringkasan) muncul halus. Tanpa JS graf tetap utuh;
+// hanya sorotan & keterangan yang hilang. Di layar sempit graf dipertahankan pada ukuran terbacanya dan
+// digeser mendatar (bukan diperkecil sampai teksnya tak terbaca).
 import { NODE_ANCHOR_X, NODE_HEIGHT, NODE_RADIUS, NODE_WIDTH, wrapText, wrapTitle, type GraphLayout } from '../lib/graph';
 
 interface Props {
@@ -39,133 +41,209 @@ const tips = graph.nodes.map((n) => {
 ---
 
 <div class="graph" data-graph data-marker={`url(#${markerId})`} data-marker-active={`url(#${markerActiveId})`}>
-  <svg
-    width={graph.width}
-    height={graph.height}
-    viewBox={`0 0 ${graph.width} ${graph.height}`}
-    aria-labelledby={`${titleId} ${descId}`}
-  >
-    <title id={titleId}>Peta pengetahuan: hubungan prasyarat antar konsep</title>
-    <desc id={descId}>
-      Garis mengarah dari konsep prasyarat ke konsep yang membutuhkannya. Setiap titik adalah tautan ke halaman
-      konsep.
-    </desc>
-    <defs>
-      <marker id={markerId} viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
-        <path class="arrow" d="M 0 0 L 10 5 L 0 10 z"></path>
-      </marker>
-      <marker id={markerActiveId} viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
-        <path class="arrow arrow--active" d="M 0 0 L 10 5 L 0 10 z"></path>
-      </marker>
-    </defs>
+  <!-- Dapat difokuskan agar pengguna keyboard bisa menggeser graf di layar sempit. -->
+  <div class="graph__scroll" tabindex="0" role="region" aria-labelledby={titleId}>
+    <svg
+      width={graph.width}
+      height={graph.height}
+      viewBox={`0 0 ${graph.width} ${graph.height}`}
+      aria-labelledby={`${titleId} ${descId}`}
+    >
+      <title id={titleId}>Peta pengetahuan: hubungan prasyarat antar konsep</title>
+      <desc id={descId}>
+        Garis mengarah dari konsep prasyarat ke konsep yang membutuhkannya. Setiap titik adalah tautan ke halaman
+        konsep.
+      </desc>
+      <defs>
+        <marker id={markerId} viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+          <path class="arrow" d="M 0 0 L 10 5 L 0 10 z"></path>
+        </marker>
+        <marker id={markerActiveId} viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+          <path class="arrow arrow--active" d="M 0 0 L 10 5 L 0 10 z"></path>
+        </marker>
+      </defs>
 
-    <g class="edges" aria-hidden="true">
-      {
-        graph.edges.map((e) => (
-          <path class="edge" d={e.d} data-from={e.from} data-to={e.to} marker-end={`url(#${markerId})`} />
-        ))
-      }
-    </g>
+      <g class="edges" aria-hidden="true">
+        {
+          graph.edges.map((e) => (
+            <path class="edge" d={e.d} data-from={e.from} data-to={e.to} marker-end={`url(#${markerId})`} />
+          ))
+        }
+      </g>
 
-    <g class="nodes">
-      {
-        graph.nodes.map((n) => (
-          <a href={n.href} class="node" data-node={n.id} aria-label={n.title}>
-            <g transform={`translate(${n.x} ${n.y})`}>
-              <rect class="node__hit" width={NODE_WIDTH} height={NODE_HEIGHT} />
-              <circle class="node__ring" cx={NODE_ANCHOR_X} cy={NODE_HEIGHT / 2} r={NODE_RADIUS + 5} />
-              <circle class="node__dot" cx={NODE_ANCHOR_X} cy={NODE_HEIGHT / 2} r={NODE_RADIUS} />
-              <text x={LABEL_X} dominant-baseline="central" aria-hidden="true">
-                {n.lines.map((line, i) => (
-                  <tspan x={LABEL_X} y={lineY(n.lines.length, i)}>
-                    {line}
-                  </tspan>
-                ))}
-              </text>
+      <g class="nodes">
+        {
+          graph.nodes.map((n) => (
+            <a href={n.href} class="node" data-node={n.id} aria-label={n.title}>
+              <g transform={`translate(${n.x} ${n.y})`}>
+                <rect class="node__hit" width={NODE_WIDTH} height={NODE_HEIGHT} />
+                <circle class="node__ring" cx={NODE_ANCHOR_X} cy={NODE_HEIGHT / 2} r={NODE_RADIUS + 5} />
+                <circle class="node__dot" cx={NODE_ANCHOR_X} cy={NODE_HEIGHT / 2} r={NODE_RADIUS} />
+                <text x={LABEL_X} dominant-baseline="central" aria-hidden="true">
+                  {n.lines.map((line, i) => (
+                    <tspan x={LABEL_X} y={lineY(n.lines.length, i)}>
+                      {line}
+                    </tspan>
+                  ))}
+                </text>
+              </g>
+            </a>
+          ))
+        }
+      </g>
+
+      <!-- Kartu keterangan digambar terakhir agar selalu di atas simpul lain. Dekoratif: teksnya juga ada di halaman konsep. -->
+      <g class="tips" aria-hidden="true">
+        {
+          tips.map((t) => (
+            <g class="tip" data-tip={t.id} transform={`translate(${t.x} ${t.y})`}>
+              <g class="tip__body">
+                <rect class="tip__plate" width={TIP_WIDTH} height={t.height} />
+                <path class="tip__rule" d={`M0 0 H${TIP_WIDTH}`} />
+                <text class="tip__title" x={TIP_PAD} dominant-baseline="hanging">
+                  {t.title.map((line, i) => (
+                    <tspan x={TIP_PAD} y={TIP_PAD + i * TIP_TITLE_LINE}>
+                      {line}
+                    </tspan>
+                  ))}
+                </text>
+                <text class="tip__text" x={TIP_PAD} dominant-baseline="hanging">
+                  {t.text.map((line, i) => (
+                    <tspan x={TIP_PAD} y={TIP_PAD + t.title.length * TIP_TITLE_LINE + 6 + i * TIP_TEXT_LINE}>
+                      {line}
+                    </tspan>
+                  ))}
+                </text>
+              </g>
             </g>
-          </a>
-        ))
-      }
-    </g>
+          ))
+        }
+      </g>
+    </svg>
+  </div>
 
-    <!-- Kartu keterangan digambar terakhir agar selalu di atas simpul lain. Dekoratif: teksnya juga ada di halaman konsep. -->
-    <g class="tips" aria-hidden="true">
-      {
-        tips.map((t) => (
-          <g class="tip" data-tip={t.id} transform={`translate(${t.x} ${t.y})`}>
-            <g class="tip__body">
-              <rect class="tip__plate" width={TIP_WIDTH} height={t.height} />
-              <path class="tip__rule" d={`M0 0 H${TIP_WIDTH}`} />
-              <text class="tip__title" x={TIP_PAD} dominant-baseline="hanging">
-                {t.title.map((line, i) => (
-                  <tspan x={TIP_PAD} y={TIP_PAD + i * TIP_TITLE_LINE}>
-                    {line}
-                  </tspan>
-                ))}
-              </text>
-              <text class="tip__text" x={TIP_PAD} dominant-baseline="hanging">
-                {t.text.map((line, i) => (
-                  <tspan x={TIP_PAD} y={TIP_PAD + t.title.length * TIP_TITLE_LINE + 6 + i * TIP_TEXT_LINE}>
-                    {line}
-                  </tspan>
-                ))}
-              </text>
-            </g>
-          </g>
-        ))
-      }
-    </g>
-  </svg>
+  <!-- Legenda dekoratif; artinya sudah dijelaskan di <desc> dan teks halaman. -->
+  <p class="graph__legend label" aria-hidden="true">
+    <span class="graph__key graph__key--node"></span><span>Konsep</span>
+    <span class="label__sep">·</span>
+    <span class="graph__key graph__key--edge"></span><span>Prasyarat → konsep</span>
+    <span class="graph__hint"><span class="label__sep">·</span>Geser mendatar untuk melihat seluruh peta</span>
+  </p>
 </div>
 
 <script>
-  // Sorotan simpul: simpul, garis prasyarat yang terhubung, dan kartu keterangannya menyala bersama.
+  // Sorotan simpul: simpul, garis prasyarat yang terhubung, tetangga langsung, dan kartu keterangannya
+  // menyala bersama; sisanya meredup.
   document.querySelectorAll<HTMLElement>('[data-graph]').forEach((root) => {
     const marker = root.dataset.marker ?? '';
     const markerActive = root.dataset.markerActive ?? '';
     const edges = [...root.querySelectorAll<SVGPathElement>('.edge')];
     const tips = new Map([...root.querySelectorAll<SVGGElement>('.tip')].map((t) => [t.dataset.tip, t]));
+    const nodes = new Map([...root.querySelectorAll<SVGAElement>('.node')].map((n) => [n.dataset.node, n]));
 
     const setActive = (id: string, on: boolean) => {
+      root.classList.toggle('has-active', on);
       tips.get(id)?.classList.toggle('is-on', on);
-      root.querySelector(`.node[data-node="${CSS.escape(id)}"]`)?.classList.toggle('is-active', on);
+      nodes.get(id)?.classList.toggle('is-active', on);
       for (const edge of edges) {
         if (edge.dataset.from !== id && edge.dataset.to !== id) continue;
         edge.classList.toggle('is-linked', on);
         edge.setAttribute('marker-end', on ? markerActive : marker);
+        // Tetangga langsung (prasyarat dan konsep turunan) tetap terang.
+        nodes.get(edge.dataset.from === id ? edge.dataset.to : edge.dataset.from)?.classList.toggle('is-related', on);
       }
     };
 
-    root.querySelectorAll<SVGAElement>('.node').forEach((node) => {
-      const id = node.dataset.node ?? '';
+    nodes.forEach((node, id) => {
       for (const [on, events] of [
         [true, ['pointerenter', 'focus']],
         [false, ['pointerleave', 'blur']],
       ] as const) {
-        for (const type of events) node.addEventListener(type, () => setActive(id, on));
+        for (const type of events) {
+          node.addEventListener(type, (e) => {
+            // Sentuhan langsung membuka tautan; tidak perlu sorotan yang tertinggal.
+            if (e instanceof PointerEvent && e.pointerType === 'touch') return;
+            setActive(id ?? '', on);
+          });
+        }
       }
     });
   });
 </script>
 
 <style>
+  /* Ukuran asli graf dijaga; bila lebih lebar dari layar, area ini yang digeser. */
+  .graph__scroll {
+    overflow-x: auto;
+    padding: var(--space-2);
+    background: var(--surface);
+    border: var(--border-hair) solid var(--rule);
+  }
+
+  .graph__scroll:focus-visible {
+    outline-offset: 4px;
+  }
+
   .graph svg {
     display: block;
-    max-width: 100%;
-    height: auto;
-    overflow: visible;
+    max-width: none;
+    margin-inline: auto;
+  }
+
+  .graph__legend {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-1) var(--space-2);
+    margin: var(--space-3) 0 0;
+  }
+
+  .graph__key {
+    display: inline-block;
+    flex: none;
+  }
+
+  .graph__key--node {
+    width: var(--space-2);
+    height: var(--space-2);
+    border: var(--stroke-trace) solid var(--ink-3);
+    border-radius: 50%;
+  }
+
+  .graph__key--edge {
+    width: var(--space-4);
+    height: 0;
+    border-top: var(--stroke-hair) solid var(--rule-strong);
+  }
+
+  /* Petunjuk geser hanya di layar sempit. */
+  .graph__hint {
+    display: none;
+  }
+
+  @media (max-width: 47.99rem) {
+    .graph__hint {
+      display: inline;
+    }
   }
 
   .edge {
     fill: none;
     stroke: var(--rule-strong);
     stroke-width: var(--stroke-hair);
-    transition: stroke var(--motion-base) var(--ease);
+    transition:
+      stroke var(--motion-base) var(--ease),
+      opacity var(--motion-base) var(--ease);
   }
 
   .edge.is-linked {
     stroke: var(--mark);
     stroke-width: var(--stroke-trace);
+  }
+
+  /* Fokus pada satu simpul: yang tidak berhubungan mundur ke latar. */
+  .has-active .edge:not(.is-linked) {
+    opacity: 0.35;
   }
 
   .arrow {
@@ -183,6 +261,11 @@ const tips = graph.nodes.map((n) => {
 
   .node {
     cursor: pointer;
+    transition: opacity var(--motion-base) var(--ease);
+  }
+
+  .has-active .node:not(.is-active):not(.is-related) {
+    opacity: 0.45;
   }
 
   .node__dot {
@@ -211,6 +294,10 @@ const tips = graph.nodes.map((n) => {
     transition: fill var(--motion-base) var(--ease);
   }
 
+  .node.is-related .node__dot {
+    stroke: var(--mark);
+  }
+
   .node:hover .node__dot,
   .node:focus-visible .node__dot,
   .node.is-active .node__dot {
@@ -232,6 +319,13 @@ const tips = graph.nodes.map((n) => {
 
   .node:focus-visible {
     outline: none;
+  }
+
+  /* Fokus keyboard: cincin + garis bawah label, jadi tidak hanya bergantung pada warna. */
+  .node:focus-visible text {
+    text-decoration: underline;
+    text-decoration-thickness: var(--stroke-hair);
+    text-underline-offset: 0.2em;
   }
 
   .tip {

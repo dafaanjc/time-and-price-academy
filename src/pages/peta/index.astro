@@ -106,6 +106,11 @@ const layerOf = new Map(graph.nodes.map((n) => [n.id, n.layer]));
     font-size: var(--text-sm);
   }
 
+  /* Tabel tetap terbaca di layar sempit: geser mendatar dengan lebar minimum. */
+  table {
+    min-width: 32rem;
+  }
+
   th,
   td {
     padding: 0.5rem 0.75rem;

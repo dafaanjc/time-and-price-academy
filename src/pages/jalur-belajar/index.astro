@@ -23,13 +23,17 @@ const totalMinutes = (path: (typeof paths)[number]) =>
   </header>
 
   {
-    paths.map((path) => (
+    paths.map((path, i) => (
       <section class="path" aria-labelledby={`jalur-${path.id}`}>
+        <p class="label path__index">
+          <span class="label__index">
+            Jalur {String(i + 1).padStart(2, '0')} / {String(paths.length).padStart(2, '0')}
+          </span>
+          <span class="label__sep" aria-hidden="true">·</span><span>{path.steps.length} konsep</span>
+          <span class="label__sep" aria-hidden="true">·</span><span>{totalMinutes(path)} mnt baca</span>
+        </p>
         <h2 id={`jalur-${path.id}`}>{path.title}</h2>
         <p class="path__desc">{path.description}</p>
-        <p class="path__meta">
-          {path.steps.length} konsep · sekitar {totalMinutes(path)} menit baca
-        </p>
         <LearningPath path={path} />
       </section>
     ))
@@ -54,24 +58,21 @@ const totalMinutes = (path: (typeof paths)[number]) =>
   }
 
   .path + .path {
-    margin-top: 3rem;
+    margin-top: var(--space-16);
+  }
+
+  .path__index {
+    margin-bottom: var(--space-2);
   }
 
   .path h2 {
-    margin: 0 0 0.5rem;
+    margin: 0 0 var(--space-2);
     font-size: var(--text-xl);
   }
 
   .path__desc {
     max-width: var(--measure);
-    margin: 0;
+    margin: 0 0 var(--space-6);
     color: var(--ink-2);
-  }
-
-  .path__meta {
-    margin: 0.25rem 0 1.5rem;
-    font-size: var(--text-sm);
-    font-weight: 600;
-    color: var(--accent);
   }
 </style>

@@ -46,7 +46,7 @@ const pad = (n: number) => String(n).padStart(2, '0');
     display: inline-block;
     padding: var(--space-1) var(--space-3);
     border: var(--border-hair) solid var(--rule-strong);
-    border-radius: var(--space-4);
+    border-radius: var(--radius-0);
     background: var(--surface);
   }
 
@@ -145,6 +145,24 @@ const pad = (n: number) => String(n).padStart(2, '0');
     border-color: var(--mark);
   }
 
+  /* Keyboard: seluruh langkah (nomor + kartu) menyala, bukan hanya kartu. */
+  .step:has(.step__card:focus-visible) .step__number {
+    border-color: var(--mark);
+    background: var(--mark-soft);
+  }
+
+  .step__card:focus-visible .step__title {
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-decoration-color: var(--mark);
+    text-underline-offset: 0.2em;
+  }
+
+  /* Deskripsi dibatasi ke lebar keterangan agar baris pendek tetap nyaman dibaca. */
+  .step__desc {
+    max-width: var(--measure-narrow);
+  }
+
   .step:hover .step__number {
     border-color: var(--mark);
     background: var(--mark-soft);
@@ -175,6 +193,23 @@ const pad = (n: number) => String(n).padStart(2, '0');
 
     .step__card {
       padding: var(--space-3) var(--space-4);
+      overflow-wrap: anywhere;
+    }
+  }
+
+  @media (max-width: 20rem) {
+    .step {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    /* Layar sangat sempit: rel turun ke atas kartu sebagai nomor saja. */
+    .step__rail {
+      flex-direction: row;
+      justify-content: flex-start;
+    }
+
+    .step__line {
+      display: none;
     }
   }
 </style>
