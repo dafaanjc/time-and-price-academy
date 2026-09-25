@@ -157,10 +157,14 @@
   --motion-slow: 480ms; /* mis. jejak grafik digambar sekali */
   --motion-reveal: 560ms;
   --reveal-shift: 8px;
-  --parallax-shift: 18px; /* geser emblem di panggung hero saat menggulir */
-  --parallax-pointer: 10px; /* R9.2: paralaks kursor di panggung hero */
-  --tilt-max: 1.2deg; /* R9.2: kemiringan maksimum medan hasil mengikuti kursor */
-  --motion-ambient: 6400ms; /* R9.2: satu siklus jejak di panggung hero */
+  /* Hero "Pelat Ukiran" (Tahap 3): satu-satunya momen gerak utama. Geser lapisan saat menggulir (positif =
+     tertinggal dari pelat = terasa jauh), kemiringan kursor, dan paralaks kursor per lapisan. */
+  --hero-shift-back: 56px; /* kisi + spiral emas */
+  --hero-shift-mid: 28px; /* emblem */
+  --hero-shift-front: -12px; /* cabang kemungkinan (mendahului pelat) */
+  --hero-tilt: 4deg; /* kemiringan maksimum mengikuti kursor (desktop) */
+  --hero-pointer: 12px; /* paralaks kursor lapisan depan; belakang 30 %, tengah 60 % */
+  --hero-sheen: rgb(236 230 218 / 0.09); /* kilau tipis yang menyapu pelat, seperti logam terkena lampu */
   --ease: cubic-bezier(0.2, 0, 0, 1);
 
   /* Tata letak — grid editorial */
@@ -175,6 +179,15 @@
   --grid-gap: var(--space-4);
 
   color-scheme: light;
+}
+
+/* Mobile: paralaks gulir dikurangi (tanpa kemiringan: skripnya hanya aktif di desktop dengan kursor). */
+@media (max-width: 63.99rem) {
+  :root {
+    --hero-shift-back: 24px;
+    --hero-shift-mid: 12px;
+    --hero-shift-front: -6px;
+  }
 }
 
 @media (min-width: 48rem) {
@@ -199,10 +212,11 @@
     --motion-slow: 0ms;
     --motion-reveal: 0ms;
     --reveal-shift: 0px;
-    --parallax-shift: 0px;
-    --parallax-pointer: 0px;
-    --tilt-max: 0deg;
-    --motion-ambient: 0ms;
+    --hero-shift-back: 0px;
+    --hero-shift-mid: 0px;
+    --hero-shift-front: 0px;
+    --hero-tilt: 0deg;
+    --hero-pointer: 0px;
   }
 }
 

@@ -1,4 +1,4 @@
-// Medan hasil (R9.1): gambar prosedural di panggung hero. Fungsi murni, diuji Vitest.
+// Medan hasil: lapisan depan pelat hero (figures/HeroStage). Fungsi murni, diuji Vitest.
 //
 // Dari satu titik "sekarang" (jam pasir di tangan figur emblem), masa depan bercabang ke kanan (waktu → kanan):
 // jalur-jalur acak yang BERCABANG (4 → 12 → 24), selubung ±2σ yang melebar ∝ √t, garis E[P] (tanpa drift:
@@ -109,61 +109,4 @@ export function outcomeField({
     densityBase: `M${r1(xT)} ${r1(y0 - 3 * sigmaT)} V${r1(y0 + 3 * sigmaT)}`,
     branchXs,
   };
-}
-
-/**
- * Evolusi saat menggulir: horizon bertambah dari 1T sampai `maxHorizon`·T, sebaran tumbuh ∝ √horizon.
- * `progress` 0–1. Mengembalikan faktor skala sebaran dan teks pembacaan.
- */
-export function horizonAt(progress: number, maxHorizon = 2): { horizon: number; spread: number } {
-  const p = Math.min(1, Math.max(0, progress));
-  const horizon = 1 + p * (maxHorizon - 1);
-  return { horizon, spread: Math.sqrt(horizon) };
-}
-
-export interface TraceFrame {
-  /** Cincin denyut di "sekarang": 0–1 (0 = tak terlihat); jari-jari tumbuh seiring `pulseGrow`. */
-  pulse: number;
-  pulseGrow: number;
-  /** Bagian jalur yang sudah ditempuh, 0–1. */
-  drawn: number;
-  /** Opasitas jejak, kepala, dan penanda pendaratan di kurva kepadatan. */
-  opacity: number;
-  /** Penanda pendaratan di T terlihat (kepala sudah tiba). */
-  landed: boolean;
-}
-
-const smooth = (t: number) => t * t * (3 - 2 * t);
-const window01 = (u: number, from: number, to: number) => Math.min(1, Math.max(0, (u - from) / (to - from)));
-
-/**
- * Siklus ambien panggung (R9.2): satu jalur dipilih, denyut di "sekarang" (butir pasir keluar dari jam pasir),
- * jejak menempuh jalur itu sampai T, mendarat di kurva kepadatan, lalu pudar. `u` = posisi dalam siklus, 0–1.
- * Fase: denyut 0–0,24 · tempuh 0,08–0,66 · tahan 0,66–0,78 · pudar 0,78–0,94 · jeda sampai 1.
- */
-export function traceAt(u: number): TraceFrame {
-  const p = ((u % 1) + 1) % 1;
-  const pulseT = window01(p, 0, 0.24);
-  const drawn = smooth(window01(p, 0.08, 0.66));
-  const fadeIn = window01(p, 0.08, 0.14);
-  const fadeOut = 1 - smooth(window01(p, 0.78, 0.94));
-  return {
-    pulse: pulseT < 1 ? 1 - pulseT : 0,
-    pulseGrow: pulseT,
-    drawn,
-    opacity: Math.min(fadeIn, fadeOut),
-    landed: drawn >= 1 && fadeOut > 0,
-  };
-}
-
-/** Urutan jalur yang dilacak: langkah koprima terhadap jumlah jalur, jadi setiap jalur mendapat giliran. */
-export function nextTraceIndex(current: number, count: number, step = 7): number {
-  if (count <= 0) return 0;
-  let s = step % count || 1;
-  while (gcd(s, count) !== 1) s++;
-  return (current + s) % count;
-}
-
-function gcd(a: number, b: number): number {
-  return b ? gcd(b, a % b) : a;
 }

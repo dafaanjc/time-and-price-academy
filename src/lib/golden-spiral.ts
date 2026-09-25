@@ -58,6 +58,15 @@ export function goldenSpiral(width: number, iterations: number): GoldenSpiral {
   return { width, height, squares, arcs };
 }
 
+/**
+ * "Mata" spiral: titik yang didekati spiral bila dipotong tanpa henti (pusat persegi ke-48, sudah konvergen
+ * jauh di bawah satu satuan). Dipakai untuk menambatkan spiral pada satu titik, mis. jam pasir di hero.
+ */
+export function spiralEye(width: number): [number, number] {
+  const last = goldenSpiral(width, 48).squares.at(-1);
+  return last ? [last.x + last.size / 2, last.y + last.size / 2] : [0, 0];
+}
+
 const r = (n: number) => Math.round(n * 1000) / 1000;
 
 /** Satu path kontinu untuk seluruh spiral (seperempat lingkaran searah jarum jam). */

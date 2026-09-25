@@ -1,12 +1,12 @@
 ---
-// Hero beranda — R9.1 "Jam Pasir Modal", panggung.
+// Hero beranda — Tahap 3 "Pelat Ukiran" (docs/redesign-brief.md). Teks hero tidak berubah sejak R9.1.
 // Nama file & kelas (`landing__*`) sengaja berbeda dari HomeHero lama di `main`: Astro menurunkan ID cakupan CSS
 // dari path file, jadi dev server yang masih memegang CSS HomeHero lama tidak bisa lagi menimpa markup ini.
 // Kiri (dinding terang): merek induk + produk, judul besar kalimat biasa, pertanyaan inti ("apa yang terjadi saat
 // keputusan Anda salah?"), lead, dua pintu masuk (masalah; jam pasir modal di bagian berikutnya).
-// Kanan: panggung gelap (figures/HeroStage) — emblem resmi dalam skala monumental + medan hasil prosedural
-// (waktu, probabilitas, cabang kemungkinan, ketidakpastian). Tanpa kontrol: alat hitung ada di bawah hero.
-// Desktop: panggung menembus sampai tepi kanan layar. Mobile: panggung tepi ke tepi di bawah teks.
+// Kanan: pelat ukiran (figures/HeroStage) — spiral emas & kisi, emblem resmi, cabang kemungkinan dari jam pasir;
+// benang merah dari "Sekarang" turun ke bagian "00 Anggaran salah". Tanpa kontrol: alat hitung ada di bawah hero.
+// Desktop: pelat utuh berbingkai di kolom 6–12 (di atas kertas). Mobile: pelat tepi ke tepi di bawah teks.
 import { siteConfig } from '../config/site';
 import HeroStage from './figures/HeroStage.astro';
 ---
@@ -118,8 +118,10 @@ import HeroStage from './figures/HeroStage.astro';
     color: var(--ink);
   }
 
-  /* Mobile/tablet: panggung tepi ke tepi. */
+  /* Mobile/tablet: pelat tepi ke tepi. Benang merah = padding bawah hero + padding atas bagian berikutnya
+     (src/pages/index.astro → .home-section). */
   .landing__stage {
+    --stage-thread-length: calc(var(--space-8) + var(--space-16));
     margin-inline: calc(-1 * var(--gutter));
     min-width: 0;
   }
@@ -144,10 +146,11 @@ import HeroStage from './figures/HeroStage.astro';
       font-size: var(--text-xl);
     }
 
-    /* Panggung dari kolom 6 sampai tepi kanan layar (melewati gutter dan margin luar kontainer). */
+    /* Pelat utuh di kolom 6–12: bingkainya terlihat di keempat sisi. */
     .landing__stage {
+      --stage-thread-length: calc(var(--space-16) + var(--space-24));
       grid-column: 6 / -1;
-      margin-inline: 0 calc(-1 * (max(0px, (100vw - var(--container)) / 2) + var(--gutter)));
+      margin-inline: 0;
     }
   }
 </style>

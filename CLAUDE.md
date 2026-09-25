@@ -19,7 +19,8 @@ Hard rules that already exist in the codebase:
 
 ## Redesign "Kabinet Risiko" (active — `docs/redesign-brief.md`)
 The brief is the source of truth for the visual redesign and **overrides the "Visual Design System" section
-below wherever they conflict**; work one stage (Tahap) at a time. Done: Stage 1 (foundation), Stage 2 (logo system).
+below wherever they conflict**; work one stage (Tahap) at a time. Done: Stage 1 (foundation), Stage 2 (logo system),
+Stage 3 (hero "Pelat Ukiran").
 - Substance never changes: no edits to MDX, copy, argument order, data or formulas. Only layout, type, colour,
   illustration, motion, visual components and the logo.
 - One theme only: light (`color-scheme: light`, no dark variants). Palette: `--paper`, `--paper-deep`, `--ink`,
@@ -136,25 +137,22 @@ axis, graph traces, tick marks, dashed guides, measurement annotations.
   the hero or anything above the fold, never stagger children, never re-animate on scroll back.
 - **Capital hourglass sand:** moves only when the user acts (changes risk, takes another loss, resets),
   once per action, `--motion-slow`. Never idle, never a looping trickle.
-- **Hero stage (the one scroll-linked interaction, R9.1):** while the page scrolls past the hero, the outcome
-  field's horizon grows 1T → 2T and its spread widens ∝ √t (CSS `scale` on SVG groups driven by
-  `--stage-spread`), the readout updates, and the emblem shifts by at most `--parallax-shift`.
-  rAF-throttled, passive listener, only while the stage is intersecting; off under
-  reduced motion (static 1T state, `--parallax-shift: 0`).
-- **Hero stage depth & ambient trace (R9.2, requested by the owner; the only continuous motion on the site):**
-  confined to `figures/HeroStage`, one rAF loop that runs only while the stage intersects (and the tab is visible),
-  never under reduced motion (tokens collapse to 0 and the loop never starts; static R9.1 state).
-  - *Pointer parallax* (mouse + fine pointer only): layers shift by `--parallax-pointer` × depth — grid 25 %,
-    emblem 55 %, outcome field 100 % — and the field tilts at most `--tilt-max`. Eased (~140 ms), `transform` only.
-    These and the scroll shift are the only parallax on the site.
-  - *Trace cycle* (`traceAt`, `nextTraceIndex` in `lib/outcome-field.ts`, tested; period `--motion-ambient`):
-    a hairline brass ring pulses once at "now" (sand leaving the hourglass) → one leaf path is walked at uniform
-    speed along the time axis in `--plate-ink` → a landing mark joins T to the density curve at that outcome →
-    fade; the next cycle takes another path. Opacity/geometry only: no blur, no glow filter, no brass tracer
-    (the E[P] line stays the one brass trajectory). The emblem itself is only moved, never animated inside.
+- **Hero "Pelat Ukiran" (Tahap 3; the one motion moment, replaces the R9.1 scroll readout and the R9.2
+  ambient trace loop):** confined to `figures/HeroStage`. CSS scroll-driven only (`view-timeline: --stage` on the
+  plate for mobile/tablet; `scroll(root)` from the top on desktop), inside `@supports (animation-timeline: view())`
+  + `prefers-reduced-motion: no-preference`; otherwise the plate is static and complete (final state).
+  - *Scroll:* layers shift at different speeds (`translate`; `--hero-shift-back/mid/front`, halved on mobile);
+    branches draw from the hourglass and the golden spiral unwinds from its eye in the hourglass
+    (`stroke-dashoffset`, `pathLength="1"`); then one thin sheen (`--hero-sheen`) sweeps the plate; the brass
+    thread from "Sekarang" down to `00 Anggaran salah` draws on its own `view()`.
+  - *Pointer (desktop, fine pointer, ≥ 64rem only):* tilt ≤ `--hero-tilt` (4°) + per-layer shift
+    (`--hero-pointer`: back 30 %, middle 60 %, front 100 %), `transform` only. Tiny script attached on
+    `requestIdleCallback`; rAF only until the value settles (no continuous loop).
+  - Write animation **longhands** (`animation-name`, `-timing-function`, `-fill-mode`, `-timeline`,
+    `-range`): the CSS minifier merges `animation:` + `animation-timeline` into a shorthand Chrome rejects.
 - **Risk Field camera:** a very slow drift (`--field-drift-period`, about ±3°) plus small pointer/scroll
   parallax, only inside the Risk Field figure and only while it is on screen. Never a rotation/spin.
-  (The figure is not mounted anywhere since R9; the only continuous motion is the R9.2 hero stage cycle.)
+  (The figure is not mounted anywhere since R9; the site has no continuous motion.)
 - **R10 motion vocabulary** (tokens + classes in `global.css`; each word has one meaning):
   1. *Page entrance* — `.rule-measure`: the measuring rule under a page header draws once from the left
      (`PageHead`). Content pages use this, never `data-reveal` (which stays homepage-only).
@@ -164,8 +162,8 @@ axis, graph traces, tick marks, dashed guides, measurement annotations.
   3. *Consequence* — `.value-changed`: a brass underline shrinks once under a result number that changed
      because the user acted (ToolFrame arms it on the first input/change/click; never on load).
   4. *State* — hover/focus/open transitions (`--motion-fast` / `--motion-base`).
-- Otherwise no decorative entrance animations, parallax, looping motion or scroll-jacking (the R9.2 hero stage is
-  the one exception, above).
+- Otherwise no decorative entrance animations, parallax, looping motion or scroll-jacking (the Tahap 3 hero plate
+  is the one exception, above).
 - All durations collapse to 0 under `prefers-reduced-motion` (handled in the tokens).
 
 ### Content concept order (respect it in navigation, paths and visuals)
@@ -174,18 +172,21 @@ Visuals should build along this chain (e.g. a band of outcomes → a probability
 weighted mean marker → a ±σ spread), not present the ideas as unrelated cards. The chain lives in
 `src/data/concept-chain.ts` (label, question, glyph); `LearningSystem` + `figures/ChainGlyph` draw it.
 
-### Hero: stage (R9.1) + Capital Hourglass section
+### Hero: engraved plate (Tahap 3) + Capital Hourglass section
 The hero establishes Time & Price Academy → Risk Lab, states the philosophy and poses the question; the
 section directly below lets the visitor answer it.
 - Hero left, on the wall: brand line (`masterBrand` mono over `product` serif), `siteConfig.heroLine`
   ("Trading bukan cuma soal entry."), the question in serif italic, a lead, two links (problems; `#jam-pasir`).
   No stats row, no controls.
-- Hero right: `figures/HeroStage`, one `.plate` that bleeds to the right viewport edge on desktop (edge to
-  edge on mobile). Layers in one fixed-aspect coordinate space (wide 1000×720, compact 600×760): faint dark
-  grid → procedural **outcome field** (`src/lib/outcome-field.ts`, tested: from "now" at the figure's
+- Hero right: `figures/HeroStage`, one `.plate` with a double frame, whole on the paper in columns 6–12 on
+  desktop (edge to edge on mobile). Layers in one fixed-aspect coordinate space (wide 1000×720, compact 600×760):
+  back = faint dark grid + `figures/GoldenSpiral` anchored with its eye on the figure's hourglass (`spiralEye`)
+  → middle = the emblem art (`BrandEmblem`) → front = procedural **outcome field** (`src/lib/outcome-field.ts`, tested: from "now" at the figure's
   hourglass, 4 → 12 → 24 branching paths, ±2σ envelope ∝ √t, flat brass E[P] — no drift implied — and a
-  density curve at T; compact adds one past path) → the emblem at monumental scale (frame crop only).
-  Caption: FIG. 00 (what the field means) + OBJEK 00. It is an artefact, not a widget: no inputs.
+  density curve at T; compact adds one past path). Emblem at monumental scale (frame crop only).
+  Caption: FIG. 00 (what the field means) + OBJEK 00. It is an artefact, not a widget: no inputs. Below the plate a
+  brass thread continues the "Sekarang" guide down to the `00 Anggaran salah` heading, ending in
+  `HourglassGlyph` (length = hero bottom padding + next section top padding, `--stage-thread-length`).
 - Section `00 Anggaran salah` (directly under the hero): **Instrumen 00** (`figures/CapitalHourglass`) on a
   light surface panel, theme-neutral tokens. Sand = capital; each wrong decision drops a fixed % of *current* capital
   (same maths as `losingStreak(…, 'fixed')`); the neck opening = risk per trade; the scale is calibrated

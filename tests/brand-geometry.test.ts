@@ -11,7 +11,7 @@ import {
   inscriptionArc,
   type EmblemVariant,
 } from '../src/lib/emblem';
-import { PHI, goldenSpiral, spiralPath } from '../src/lib/golden-spiral';
+import { PHI, goldenSpiral, spiralEye, spiralPath } from '../src/lib/golden-spiral';
 import { MONOGRAM_VIEWBOX, monogramSvg } from '../src/lib/monogram';
 
 const variants: EmblemVariant[] = ['hero', 'footer', 'og'];
@@ -89,6 +89,19 @@ describe('golden spiral', () => {
       expect(s.x + s.size).toBeLessThanOrEqual(spiral.width + 1e-9);
       expect(s.y + s.size).toBeLessThanOrEqual(spiral.height + 1e-9);
     }
+  });
+
+  it('mata spiral di dalam persegi panjang yang dikelilingi tiap empat persegi terakhir (titik konvergensi)', () => {
+    const [ex, ey] = spiralEye(1000);
+    for (const n of [4, 8, 12]) {
+      const last4 = goldenSpiral(1000, n).squares.slice(-4);
+      expect(ex).toBeGreaterThanOrEqual(Math.min(...last4.map((q) => q.x)));
+      expect(ex).toBeLessThanOrEqual(Math.max(...last4.map((q) => q.x + q.size)));
+      expect(ey).toBeGreaterThanOrEqual(Math.min(...last4.map((q) => q.y)));
+      expect(ey).toBeLessThanOrEqual(Math.max(...last4.map((q) => q.y + q.size)));
+    }
+    // Skala linear terhadap lebar.
+    expect(spiralEye(2000)[0]).toBeCloseTo(ex * 2, 6);
   });
 
   it('path: satu M lalu satu busur per persegi', () => {
