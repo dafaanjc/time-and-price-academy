@@ -11,9 +11,11 @@ import TimePriceFigure from './TimePriceFigure.astro';
 
 interface Props {
   number?: string;
+  /** false: tanpa figcaption (wadah, mis. panggung hero, menulis keterangannya sendiri). */
+  caption?: boolean;
 }
 
-const { number = '01' } = Astro.props;
+const { number = '01', caption = true } = Astro.props;
 
 const labels = [
   { anchor: 'price', text: 'Harga', align: 'above' },
@@ -50,22 +52,28 @@ const labels = [
     </div>
   </div>
 
-  <figcaption class="risk-field__caption">
-    <span class="label"><span class="label__index">Fig. {number}</span><span class="label__sep">·</span>Medan Risiko · Waktu × Harga</span>
-    <span class="risk-field__caption-text">
-      Masa lalu hanya satu jalur; masa depan adalah sebaran kemungkinan. Relief menunjukkan kepadatan
-      probabilitas harga yang melebar seiring waktu. Garis kuningan adalah nilai harapan.
-    </span>
-  </figcaption>
+  {
+    caption && (
+      <figcaption class="risk-field__caption">
+        <span class="label"><span class="label__index">Fig. {number}</span><span class="label__sep">·</span>Medan Risiko · Waktu × Harga</span>
+        <span class="risk-field__caption-text">
+          Masa lalu hanya satu jalur; masa depan adalah sebaran kemungkinan. Relief menunjukkan kepadatan
+          probabilitas harga yang melebar seiring waktu. Garis kuningan adalah nilai harapan.
+        </span>
+      </figcaption>
+    )
+  }
 </figure>
 
 <script>
   import { pickQuality, qualitySettings } from '../../lib/risk-field/quality';
   import type { AnchorKey, FieldPalette, RiskFieldController } from '../../lib/risk-field/scene';
 
-  const token = (name: string) => getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+  // Token dibaca dari elemen figur sendiri (bukan <html>), jadi wadah bisa menimpa --field-* — mis. panggung
+  // hero yang gelap memetakan relief ke tinta pelat.
+  const tokenOf = (el: Element) => (name: string) => getComputedStyle(el).getPropertyValue(name).trim();
 
-  const readPalette = (): FieldPalette => ({
+  const readPalette = (token: (name: string) => string): FieldPalette => ({
     grid: token('--field-grid'),
     lineFaint: token('--field-line-faint'),
     line: token('--field-line'),
@@ -90,6 +98,7 @@ const labels = [
     });
 
   function boot(root: HTMLElement): void {
+    const token = tokenOf(root);
     const stage = root.querySelector<HTMLElement>('.risk-field__stage')!;
     const canvas = root.querySelector<HTMLCanvasElement>('[data-canvas]')!;
     const fallback = root.querySelector<HTMLElement>('[data-fallback]')!;
@@ -140,7 +149,7 @@ const labels = [
           canvas,
           labels,
           settings: qualitySettings[quality as 'high' | 'medium'],
-          palette: readPalette(),
+          palette: readPalette(token),
           driftPeriodMs: durationMs(token('--field-drift-period')) || 48_000,
           revealMs: durationMs(token('--motion-slow')) * 3,
           motion: !reduceMotion.matches,
@@ -168,7 +177,7 @@ const labels = [
     observer.observe(stage);
 
     document.addEventListener('visibilitychange', syncActive);
-    darkScheme.addEventListener('change', () => controller?.setPalette(readPalette()));
+    darkScheme.addEventListener('change', () => controller?.setPalette(readPalette(token)));
     reduceMotion.addEventListener('change', () => {
       if (reduceMotion.matches) fallBack();
     });

@@ -1,14 +1,17 @@
 // Risk Field — adegan three.js untuk hero beranda. Modul ini HANYA dimuat lewat import() dinamis dari
 // RiskField.astro setelah kualitas ≠ "low" dan kanvas terlihat, jadi three.js tidak ikut bundel awal.
 // Geometri dari ./geometry (murni, teruji); warna dari token CSS (--field-*) yang dibaca komponen.
-// Gaya: garis rambut grafit di atas dinding galeri, satu lintasan kuningan (nilai harapan), tanpa
-// pendaran, tanpa bayangan, tanpa putaran — kamera hanya melayang pelan dan bergeser sedikit.
+// Gaya: garis rambut grafit, satu lintasan kuningan (nilai harapan), tanpa pendaran, tanpa bayangan,
+// tanpa putaran — kamera hanya melayang pelan dan bergeser sedikit.
+// Gerak (hanya bila `motion`): drift kamera, paralaks penunjuk & gulir, "napas" medan (tinggi kepadatan
+// ±3,5 % berdenyut pelan, lantai tetap), dan satu penanda kuningan kecil yang berjalan pelan di lintasan E[P].
 import {
   BufferAttribute,
   BufferGeometry,
   CatmullRomCurve3,
   Color,
   DoubleSide,
+  Group,
   Line,
   LineBasicMaterial,
   LineDashedMaterial,
@@ -159,10 +162,15 @@ export function mountRiskField(options: MountOptions): RiskFieldController {
     highlightGuide: new LineDashedMaterial({ dashSize: 0.035, gapSize: 0.035 }),
   };
 
+  // Permukaan medan (semua yang berada di atas lantai): satu grup, diskalakan pada sumbu tinggi (y) untuk
+  // "napas". Lantai waktu × harga (y = 0) tidak ikut bergerak.
+  const surface = new Group();
+  scene.add(surface);
+
   // --- Relief kawat ---
   const terrainSeg = buildTerrain(detail);
   const terrainGeometry = segmentsGeometry(terrainSeg, true);
-  scene.add(new LineSegments(terrainGeometry, mat.terrain));
+  surface.add(new LineSegments(terrainGeometry, mat.terrain));
 
   // --- Lantai waktu × harga: kisi samar, sumbu dari satu titik asal, tick ---
   scene.add(new LineSegments(segmentsGeometry(buildWallGrid(), false), mat.wall));
@@ -178,10 +186,10 @@ export function mountRiskField(options: MountOptions): RiskFieldController {
   for (let p = -pRange; p <= pRange + 1e-9; p += 0.2) axis.push(tPast, p, 0, tPast - 0.045, p, 0);
   scene.add(new LineSegments(segmentsGeometry({ positions: axis, weights: [] }, false), mat.axis));
 
-  const dashed = (points: Vec3[], material: LineDashedMaterial) => {
+  const dashed = (points: Vec3[], material: LineDashedMaterial, parent: Object3D = scene) => {
     const line = new Line(polylineGeometry(points), material);
     line.computeLineDistances();
-    scene.add(line);
+    parent.add(line);
   };
   dashed([[0, -pRange, 0], [0, pRange, 0]], mat.guide); // "sekarang"
   dashed([[tHorizon, -pRange, 0], [tHorizon, pRange, 0]], mat.guide); // horizon T
@@ -189,10 +197,10 @@ export function mountRiskField(options: MountOptions): RiskFieldController {
   // --- Kurva probabilitas: tiga irisan tebal; di T dengan isian lembut ---
   const curveSamples = Math.max(32, detail.samples);
   for (const t of [tHorizon / 3, (2 * tHorizon) / 3]) {
-    scene.add(new Line(polylineGeometry(densityCurve(t, curveSamples)), mat.curveFaint));
+    surface.add(new Line(polylineGeometry(densityCurve(t, curveSamples)), mat.curveFaint));
   }
   const horizonCurve = densityCurve(tHorizon, curveSamples);
-  scene.add(new Line(polylineGeometry(horizonCurve), mat.curve));
+  surface.add(new Line(polylineGeometry(horizonCurve), mat.curve));
   const fillPositions: number[] = [];
   for (let i = 0; i < horizonCurve.length - 1; i++) {
     const [x0, y0, z0] = horizonCurve[i]!;
@@ -201,11 +209,11 @@ export function mountRiskField(options: MountOptions): RiskFieldController {
   }
   const fillGeometry = new BufferGeometry();
   fillGeometry.setAttribute('position', new BufferAttribute(worldPositions(fillPositions), 3));
-  scene.add(new Mesh(fillGeometry, mat.fill));
+  surface.add(new Mesh(fillGeometry, mat.fill));
 
   // --- Jalur bercabang (kemungkinan masa depan) ---
   for (const path of branchPaths(detail.branchDepth, Math.round(detail.samples / (detail.branchDepth + 1)))) {
-    scene.add(new Line(polylineGeometry(path), mat.branch));
+    surface.add(new Line(polylineGeometry(path), mat.branch));
   }
 
   // --- Masa lalu: satu jalur tebal di lantai, berakhir di titik "sekarang" ---
@@ -216,14 +224,19 @@ export function mountRiskField(options: MountOptions): RiskFieldController {
   scene.add(nowDot);
 
   // --- Nilai harapan: lintasan kuningan di punggung relief (digambar sekali) + penanda E[P] di T ---
-  const meanGeometry = tube(meanPath(80), 0.014, 160);
-  scene.add(new Mesh(meanGeometry, mat.highlight));
+  const meanCurve = new CatmullRomCurve3(toVectors(meanPath(80)));
+  const meanGeometry = new TubeGeometry(meanCurve, 160, 0.014, 6, false);
+  surface.add(new Mesh(meanGeometry, mat.highlight));
+  // Penanda kecil yang menempuh E[P] dari "sekarang" ke T, pelan, lalu mulai lagi (hanya bila motion).
+  const runner = new Mesh(new SphereGeometry(0.024, 12, 10), mat.highlight);
+  runner.visible = false;
+  surface.add(runner);
   const meanIndexCount = meanGeometry.index?.count ?? 0;
   const evPoint: Vec3 = [tHorizon, meanAt(tHorizon), densityAt(tHorizon, meanAt(tHorizon))];
   const evDot = new Mesh(new SphereGeometry(0.042, 16, 12), mat.highlight);
   evDot.position.copy(toVector(evPoint));
-  scene.add(evDot);
-  dashed([evPoint, [tHorizon, evPoint[1], 0]], mat.highlightGuide);
+  surface.add(evDot);
+  dashed([evPoint, [tHorizon, evPoint[1], 0]], mat.highlightGuide, surface);
 
   function applyPalette(): void {
     paintTerrain(terrainGeometry, terrainSeg.weights, palette);
@@ -256,6 +269,7 @@ export function mountRiskField(options: MountOptions): RiskFieldController {
     const hfov = 2 * Math.atan(Math.tan(vfov / 2) * camera.aspect);
     distance = (bounds.radius / Math.sin(Math.min(vfov, hfov) / 2)) * 0.7;
     camera.updateProjectionMatrix();
+    measureLabels();
     requestFrame();
   }
 
@@ -277,14 +291,29 @@ export function mountRiskField(options: MountOptions): RiskFieldController {
 
   const anchors = labelAnchors();
   const projected = new Vector3();
+  // Batas horizontal tiap label (px dari jangkar): diukur sekali per ukuran kanvas, bukan setiap frame.
+  const extents = new Map<HTMLElement, { left: number; right: number }>();
+  function measureLabels(): void {
+    for (const el of Object.values(labels)) {
+      const text = el?.firstElementChild as HTMLElement | null;
+      if (!el || !text) continue;
+      const w = text.offsetWidth;
+      const pad = parseFloat(getComputedStyle(text).fontSize) * 0.5;
+      const right = text.className.includes('--right');
+      extents.set(el, right ? { left: 0, right: w + pad } : { left: w / 2, right: w / 2 });
+    }
+  }
   function placeLabels(): void {
     const width = canvas.clientWidth;
     const height = canvas.clientHeight;
     for (const [key, el] of Object.entries(labels) as [AnchorKey, HTMLElement | undefined][]) {
       if (!el) continue;
       projected.set(...toWorld(anchors[key])).project(camera);
-      const x = ((projected.x + 1) / 2) * width;
-      const y = ((1 - projected.y) / 2) * height;
+      // Dijepit ke dalam kanvas sesuai lebar labelnya: jangkar yang terproyeksi dekat/di luar tepi (mis. sumbu
+      // kepadatan di kiri, "sekarang" di ponsel) tidak membuat teks terpotong; label hanya digeser masuk.
+      const ext = extents.get(el) ?? { left: 0, right: 0 };
+      const x = Math.min(width - 8 - ext.right, Math.max(8 + ext.left, ((projected.x + 1) / 2) * width));
+      const y = Math.min(height - 8, Math.max(8, ((1 - projected.y) / 2) * height));
       el.style.transform = `translate(${x.toFixed(1)}px, ${y.toFixed(1)}px)`;
     }
   }
@@ -322,7 +351,18 @@ export function mountRiskField(options: MountOptions): RiskFieldController {
     scroll.v += (scroll.t - scroll.v) * ease;
     lastFrame = now;
     const revealing = setReveal(now);
-    placeCamera(now - start);
+    const elapsed = now - start;
+    // Napas medan: periode = ¼ drift kamera; penanda E[P]: satu lintasan per ½ drift kamera.
+    if (motion) {
+      surface.scale.y = 1 + 0.035 * Math.sin((2 * Math.PI * elapsed) / (options.driftPeriodMs / 4));
+      const u = (elapsed / (options.driftPeriodMs / 2)) % 1;
+      runner.visible = !revealing && u < 0.94;
+      if (runner.visible) runner.position.copy(meanCurve.getPointAt(u));
+    } else {
+      surface.scale.y = 1;
+      runner.visible = false;
+    }
+    placeCamera(elapsed);
     renderer.render(scene, camera);
     placeLabels();
     if (!firstFrameDone) {

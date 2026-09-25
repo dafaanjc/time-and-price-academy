@@ -9,10 +9,9 @@ Hard rules that already exist in the codebase:
 - Brand, product, author and tagline strings only via `siteConfig` (`src/config/site.ts`);
   `scripts/check-branding.mjs` fails the build otherwise.
 - Internal links via `withBase()` / `routes` (`src/lib/url.ts`).
-- Brand emblem at most once per page (home: Objek 00 on the hero stage, `figures/HeroStage`, black version;
-  other pages: footer), never in the header, never redrawn, recoloured, stretched, bevelled/3D/metallic.
-  The only allowed crop is the hero stage's **frame crop** (lower drapery and far-left shoulder); the head and
-  the hourglass are always fully visible.
+- Brand emblem at most once per page: footer of every page except home (since R9.3 the homepage carries no
+  emblem — the hero is purely abstract), never in the header, never cropped, redrawn, recoloured, stretched,
+  bevelled/3D/metallic.
 - Do not edit content MDX (`src/content/**`) as part of design work.
 
 ## Visual Design System
@@ -49,7 +48,7 @@ are kept on purpose: retune values there instead of renaming.
 | `--tint` | Soft fill: inline code, active item |
 | `--mark` / `--mark-soft` | **The only expressive colour**: instrument brass (echoes the hourglass). For pointers, major ticks, index numbers, selection. Never large fills. |
 | `--loss` / `--gain` / `--caution(-bg)` | Muted data semantics, only inside examples and calculations. Never decoration. |
-| `--plate`, `--plate-ink(-2/-3)`, `--plate-rule(-strong)`, `--plate-mark`, `--plate-sand`, `--plate-grid` | **The plate**: at most one dark field per page, only where the page *is* the exhibit — home: the hero stage; problem pages: the decision band. Concept, category, path, map and tool surfaces stay light. Dark in both themes so the black emblem can appear large without recolouring. The `.plate` class remaps ink/rule/mark/sand tokens inside it. Never for ordinary sections. |
+| `--plate`, `--plate-ink(-2/-3)`, `--plate-rule(-strong)`, `--plate-mark`, `--plate-sand`, `--plate-grid` | **The plate**: at most one dark field per page, only where the page *is* the exhibit — home: the hero stage; problem pages: the decision band. Concept, category, path, map and tool surfaces stay light. Dark in both themes. The `.plate` class remaps ink/rule/mark/sand tokens inside it. Never for ordinary sections. |
 | `--sand` | Hourglass sand (capital) outside the plate; `.plate` maps it to `--plate-sand`. The only brass *mass* on the site, always edged in `--mark`. |
 
 Rules: monochrome first. Links are distinguished by underline, not colour. Every text/background
@@ -88,7 +87,7 @@ axis, graph traces, tick marks, dashed guides, measurement annotations.
   one brass pointer at most. No fills beyond `--surface` / `--mark-soft`.
 - **Inline or local SVG only.** No stock illustrations, no image assets from external websites,
   no icon fonts, no raster art (except the official emblem in `src/assets/Logo/`). The single exception
-  is the **Risk Field** (three.js, procedural geometry; see "3D: Risk Field"), currently not mounted.
+  is the **Risk Field** (three.js, procedural geometry; see "3D: Risk Field"), mounted in the homepage hero stage.
 - Every figure has a text equivalent (`<title>`/`aria-label` or an adjacent caption).
 - Not trading charts: no candlesticks, no volume bars, no indicator overlays unless a concept is
   literally about them.
@@ -114,25 +113,15 @@ axis, graph traces, tick marks, dashed guides, measurement annotations.
   the hero or anything above the fold, never stagger children, never re-animate on scroll back.
 - **Capital hourglass sand:** moves only when the user acts (changes risk, takes another loss, resets),
   once per action, `--motion-slow`. Never idle, never a looping trickle.
-- **Hero stage (the one scroll-linked interaction, R9.1):** while the page scrolls past the hero, the outcome
-  field's horizon grows 1T → 2T and its spread widens ∝ √t (CSS `scale` on SVG groups driven by
-  `--stage-spread`), the readout updates, and the emblem shifts by at most `--parallax-shift`.
-  rAF-throttled, passive listener, only while the stage is intersecting; off under
-  reduced motion (static 1T state, `--parallax-shift: 0`).
-- **Hero stage depth & ambient trace (R9.2, requested by the owner; the only continuous motion on the site):**
-  confined to `figures/HeroStage`, one rAF loop that runs only while the stage intersects (and the tab is visible),
-  never under reduced motion (tokens collapse to 0 and the loop never starts; static R9.1 state).
-  - *Pointer parallax* (mouse + fine pointer only): layers shift by `--parallax-pointer` × depth — grid 25 %,
-    emblem 55 %, outcome field 100 % — and the field tilts at most `--tilt-max`. Eased (~140 ms), `transform` only.
-    These and the scroll shift are the only parallax on the site.
-  - *Trace cycle* (`traceAt`, `nextTraceIndex` in `lib/outcome-field.ts`, tested; period `--motion-ambient`):
-    a hairline brass ring pulses once at "now" (sand leaving the hourglass) → one leaf path is walked at uniform
-    speed along the time axis in `--plate-ink` → a landing mark joins T to the density curve at that outcome →
-    fade; the next cycle takes another path. Opacity/geometry only: no blur, no glow filter, no brass tracer
-    (the E[P] line stays the one brass trajectory). The emblem itself is only moved, never animated inside.
+- **Hero stage = Risk Field (R9.3; the only continuous motion on the site):** confined to the hero's
+  `figures/RiskField`, one rAF loop that runs only while the stage intersects and the tab is visible; under
+  reduced motion (or no WebGL / Save-Data) three.js is never loaded and the static SVG shows instead.
+  Vocabulary: very slow camera drift (`--field-drift-period`, ±3°), small scroll-driven elevation (and pointer
+  parallax on the `high` tier only), the field *breathing* (surface height ±3.5 %, floor fixed), and one small
+  brass marker travelling along the E[P] trajectory (one pass per half drift period). No spin, no fly-through,
+  no particles, no glow.
 - **Risk Field camera:** a very slow drift (`--field-drift-period`, about ±3°) plus small pointer/scroll
   parallax, only inside the Risk Field figure and only while it is on screen. Never a rotation/spin.
-  (The figure is not mounted anywhere since R9; the only continuous motion is the R9.2 hero stage cycle.)
 - **R10 motion vocabulary** (tokens + classes in `global.css`; each word has one meaning):
   1. *Page entrance* — `.rule-measure`: the measuring rule under a page header draws once from the left
      (`PageHead`). Content pages use this, never `data-reveal` (which stays homepage-only).
@@ -142,8 +131,8 @@ axis, graph traces, tick marks, dashed guides, measurement annotations.
   3. *Consequence* — `.value-changed`: a brass underline shrinks once under a result number that changed
      because the user acted (ToolFrame arms it on the first input/change/click; never on load).
   4. *State* — hover/focus/open transitions (`--motion-fast` / `--motion-base`).
-- Otherwise no decorative entrance animations, parallax, looping motion or scroll-jacking (the R9.2 hero stage is
-  the one exception, above).
+- Otherwise no decorative entrance animations, parallax, looping motion or scroll-jacking (the hero Risk Field
+  is the one exception, above).
 - All durations collapse to 0 under `prefers-reduced-motion` (handled in the tokens).
 
 ### Content concept order (respect it in navigation, paths and visuals)
@@ -159,11 +148,13 @@ section directly below lets the visitor answer it.
   ("Trading bukan cuma soal entry."), the question in serif italic, a lead, two links (problems; `#jam-pasir`).
   No stats row, no controls.
 - Hero right: `figures/HeroStage`, one `.plate` that bleeds to the right viewport edge on desktop (edge to
-  edge on mobile). Layers in one fixed-aspect coordinate space (wide 1000×720, compact 600×760): faint dark
-  grid → procedural **outcome field** (`src/lib/outcome-field.ts`, tested: from "now" at the figure's
-  hourglass, 4 → 12 → 24 branching paths, ±2σ envelope ∝ √t, flat brass E[P] — no drift implied — and a
-  density curve at T; compact adds one past path) → the emblem at monumental scale (frame crop only).
-  Caption: FIG. 00 (what the field means) + OBJEK 00. It is an artefact, not a widget: no inputs.
+  edge on mobile): a faint dark technical grid and a purely abstract **Risk Field** — TIME × PRICE ×
+  UNCERTAINTY. Past = one realised path on the floor ending at "now"; future = a wireframe probability field
+  that widens toward horizon T (σ ∝ √t), branching paths draped on it, one brass E[P] trajectory. No figures,
+  no hourglass, no symbolic objects: the geometry carries the meaning. `HeroStage` only maps `--field-*` to
+  plate inks (graphite lines, brass as the single accent) and writes the FIG. 00 caption. It is an artefact,
+  not a widget: no inputs. Mobile uses the `medium` tier (sparser mesh, 30 fps, half drift); reduced motion /
+  no WebGL → the static SVG (`TimePriceFigure`).
 - Section `00 Anggaran salah` (directly under the hero): **Instrumen 00** (`figures/CapitalHourglass`) on a
   light surface panel, theme-neutral tokens. Sand = capital; each wrong decision drops a fixed % of *current* capital
   (same maths as `losingStreak(…, 'fixed')`); the neck opening = risk per trade; the scale is calibrated
@@ -175,10 +166,10 @@ section directly below lets the visitor answer it.
   Server-rendered complete state + `<desc>` text; the controls appear only with JS; `aria-live` announces
   each change.
 
-### 3D: Risk Field (not mounted since R9)
-Retired from the homepage hero in R9 for performance and focus (no three.js on any page now). Code and
-tests are kept; the candidate place to revisit is the **Distribusi → Varians** part of the concept chain.
-The rules below apply if it is mounted again.
+### 3D: Risk Field (homepage hero stage since R9.3)
+Unmounted in R9, remounted in R9.3 inside the dark hero stage (`figures/HeroStage`). three.js is still loaded
+only on the homepage, lazily, never under reduced motion / Save-Data / no WebGL. Labels are clamped inside the
+canvas by their measured width.
 FIG. 01 is a **wireframe probability terrain**: the time × price plane is the floor, density is height.
 The past is one dark path on the floor ending at "now"; the future is a ridge that widens and flattens
 (σ ∝ √t), with branching paths draped on it, three upright probability curves (the one at horizon T
@@ -258,6 +249,10 @@ Labels are rendered in markup, never via CSS `content`, so they stay accessible.
 - **R9.2 — hero stage motion & depth (done):** pointer parallax per layer + field tilt, ambient trace cycle
   (pulse at "now" → one path walked → landing on the density curve), grid moved to `.stage__field::before`
   so it can shift without exposing edges. Layout boxes unchanged (verified against R9.1 at 1440 and 390 px).
+- **R9.3 — abstract hero (done):** the classical figure, the hourglass and the 2D outcome fan are removed
+  from the hero (and `lib/outcome-field.ts`, the emblem's `plate` variant and the R9.2 motion tokens with them);
+  the stage now shows the procedural Risk Field on the dark plate, with field breathing and a brass marker on
+  E[P]. The homepage carries no emblem.
 - **R9 follow-ups (done):**
   - Problem pages on the editorial grid: header + body in columns 1–7; "Di halaman ini" and a sticky
     `LossBudget` ("Anggaran salah": remaining capital after 10 losses at 1/2/5/10 %, links to `#jam-pasir`)
