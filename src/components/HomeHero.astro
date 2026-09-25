@@ -1,21 +1,13 @@
 ---
-// Hero beranda: tagline sebagai judul kapital bergaya huruf pahatan museum (5 kolom kiri) dan
-// FIG. 01 Medan Risiko (7 kolom kanan): figur 3D three.js dengan fallback SVG teknis.
-// Di bawah tombol, baris spesifikasi bergaya label museum; angkanya dihitung dari data, bukan ditulis.
+// Hero beranda — arah R9 "Jam Pasir Modal".
+// Kiri (dinding terang): judul besar kalimat biasa, pertanyaan inti ("apa yang terjadi saat keputusan Anda salah?"),
+// dan pintu masuk. Kanan: SATU pelat gelap berisi dua objek — emblem resmi (Objek 00, versi hitam, utuh; satu-satunya
+// emblem di beranda) dan instrumen jam pasir modal yang bisa dioperasikan (Instrumen 00).
+// Mobile: instrumen tampil di layar pertama, emblem menyusul di bawahnya di dalam pelat yang sama.
+// Risk Field 3D tidak lagi dipasang di sini (lihat CLAUDE.md → "3D: Risk Field").
 import { siteConfig } from '../config/site';
-import { categories } from '../data/categories';
-import { getConcepts } from '../lib/concepts';
-import { getProblems } from '../lib/problems';
-import RiskField from './figures/RiskField.astro';
-import { toolComponents } from './tools';
-
-const pad = (n: number) => String(n).padStart(2, '0');
-const specs = [
-  { label: 'Konsep', value: (await getConcepts()).length },
-  { label: 'Masalah trader', value: (await getProblems()).length },
-  { label: 'Alat hitung', value: Object.keys(toolComponents).length },
-  { label: 'Kategori', value: categories.length },
-];
+import BrandEmblem from './BrandEmblem.astro';
+import CapitalHourglass from './figures/CapitalHourglass.astro';
 ---
 
 <section class="hero" aria-labelledby="hero-title">
@@ -23,56 +15,61 @@ const specs = [
     <p class="label">
       {siteConfig.masterBrand}<span class="label__sep" aria-hidden="true">·</span>{siteConfig.product}
     </p>
-    <h1 id="hero-title" class="hero__title">
-      {siteConfig.taglineParts.map((part) => <span>{part}</span>)}
-    </h1>
+    <h1 id="hero-title" class="hero__title">{siteConfig.heroLine}</h1>
+    <p class="hero__question">Pertanyaan yang lebih penting: apa yang terjadi saat keputusan Anda salah?</p>
     <p class="hero__lead">
-      Mulai dari masalah yang Anda alami saat trading, lalu pahami konsep risiko di baliknya: definisinya,
-      contoh hitungannya, dan cara menerapkannya.
+      Setiap posisi punya jam pasirnya sendiri. Seberapa cepat modal habis ditentukan sebelum entry, oleh
+      risiko per transaksi. Mulai dari masalah yang Anda alami, lalu pahami konsep di baliknya.
     </p>
     <p class="hero__actions">
       <a class="button" href="#masalah">Mulai dari masalah</a>
       <a class="hero__secondary" href="#sistem">Lihat sistem belajar →</a>
     </p>
-    <dl class="hero__specs">
-      {
-        specs.map((s) => (
-          <div>
-            <dt class="label">{s.label}</dt>
-            <dd>{pad(s.value)}</dd>
-          </div>
-        ))
-      }
-    </dl>
   </div>
 
-  <div class="hero__figure">
-    <RiskField number="01" />
+  <div class="hero__plate plate">
+    <div class="hero__instrument">
+      <CapitalHourglass />
+    </div>
+    <figure class="hero__object">
+      <BrandEmblem variant="plate" />
+      <figcaption class="label">
+        <span class="label__index">Objek 00</span><span class="label__sep" aria-hidden="true">·</span>{`Emblem ${siteConfig.masterBrand}`}
+      </figcaption>
+    </figure>
   </div>
 </section>
 
 <style>
   .hero {
     display: grid;
-    gap: var(--space-12);
-    padding-block: var(--space-4) var(--space-8);
+    gap: var(--space-8);
+    padding-block: 0 var(--space-8);
   }
 
-  /* Judul kapital serif: tegas tapi tenang — tracking sedikit dibuka, baris rapat. */
+  /* Judul kalimat biasa, sangat besar dan rapat: satu pernyataan, bukan slogan kapital. */
   .hero__title {
-    display: flex;
-    flex-direction: column;
-    margin: var(--space-6) 0 var(--space-6);
-    font-size: clamp(var(--text-2xl), 8.5vw, var(--text-4xl));
-    line-height: var(--leading-caps-display);
-    letter-spacing: var(--tracking-caps-display);
-    text-transform: uppercase;
+    margin: var(--space-4) 0 var(--space-4);
+    font-size: clamp(var(--text-3xl), 11vw, var(--text-5xl));
+    line-height: var(--leading-hero);
+    letter-spacing: var(--tracking-display);
+    text-wrap: balance;
+  }
+
+  .hero__question {
+    max-width: 30ch;
+    margin: 0;
+    font-family: var(--font-serif);
+    font-size: var(--text-lg);
+    font-style: italic;
+    line-height: var(--leading-tight);
+    color: var(--ink-2);
+    text-wrap: balance;
   }
 
   .hero__lead {
     max-width: var(--measure-narrow);
-    margin: 0;
-    font-size: var(--text-lg);
+    margin: var(--space-4) 0 0;
     color: var(--ink-2);
   }
 
@@ -81,7 +78,7 @@ const specs = [
     flex-wrap: wrap;
     align-items: center;
     gap: var(--space-3) var(--space-6);
-    margin: var(--space-8) 0 0;
+    margin: var(--space-6) 0 0;
   }
 
   .button {
@@ -110,36 +107,43 @@ const specs = [
     color: var(--ink);
   }
 
-  /* Baris spesifikasi: empat sel dengan garis tick di atas, seperti skala pada penggaris. */
-  .hero__specs {
+  /* Pelat: tepi ke tepi di mobile (menembus gutter), bingkai di dalam grid di desktop. */
+  .hero__plate {
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: var(--space-4) var(--space-6);
-    max-width: 32rem;
-    margin: var(--space-12) 0 0;
+    gap: var(--space-8);
+    margin-inline: calc(-1 * var(--gutter));
+    padding: var(--space-6) var(--gutter) var(--space-8);
+    border-inline: 0;
   }
 
-  .hero__specs div {
-    padding-top: var(--space-2);
-    border-top: var(--stroke-hair) solid var(--rule-strong);
+  .hero__object {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    margin: 0;
+    padding-top: var(--space-6);
+    border-top: var(--border-hair) solid var(--plate-rule);
   }
 
-  .hero__specs dd {
-    margin: var(--space-1) 0 0;
-    font-family: var(--font-serif);
-    font-size: var(--text-xl);
-    font-weight: 600;
-    line-height: 1;
+  .hero__object :global(.emblem--plate) {
+    width: 7.5rem;
   }
 
-  .hero__figure {
-    width: 100%;
-    min-width: 0;
-  }
+  @media (min-width: 48rem) {
+    .hero__plate {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      align-items: start;
+    }
 
-  @media (min-width: 30rem) {
-    .hero__specs {
-      grid-template-columns: repeat(4, minmax(0, 1fr));
+    .hero__object {
+      flex-direction: column;
+      align-items: flex-start;
+      padding-top: 0;
+      border-top: 0;
+    }
+
+    .hero__object :global(.emblem--plate) {
+      width: min(280px, 100%);
     }
   }
 
@@ -148,7 +152,7 @@ const specs = [
       grid-template-columns: repeat(var(--grid-columns), minmax(0, 1fr));
       gap: var(--grid-gap);
       align-items: center;
-      padding-block: var(--space-8) var(--space-16);
+      padding-block: var(--space-4) var(--space-16);
     }
 
     .hero__text {
@@ -156,11 +160,31 @@ const specs = [
     }
 
     .hero__title {
-      font-size: clamp(var(--text-3xl), 3.6vw, var(--text-4xl));
+      font-size: clamp(var(--text-4xl), 5vw, var(--text-6xl));
     }
 
-    .hero__figure {
+    .hero__question {
+      font-size: var(--text-xl);
+    }
+
+    .hero__plate {
       grid-column: 6 / -1;
+      grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
+      gap: var(--space-8);
+      margin-inline: 0;
+      padding: var(--space-8);
+      border-inline: var(--border-hair) solid var(--plate-rule);
+    }
+
+    /* Desktop: emblem (asal-usul) di kiri, instrumen (alat kerja) di kanan. */
+    .hero__object {
+      order: -1;
+      align-self: center;
+      gap: var(--space-4);
+    }
+
+    .hero__object :global(.emblem--plate) {
+      width: 100%;
     }
   }
 </style>

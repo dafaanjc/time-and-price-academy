@@ -8,6 +8,7 @@ const masterBrand = 'Time & Price Academy';
 const product = 'Risk Lab';
 const author = 'Muhamad Daffa';
 const taglineParts = ['Pahami Risiko.', 'Pahami Keputusan.'] as const;
+const heroLine = 'Trading bukan cuma soal entry.';
 const summary = 'Perpustakaan riset dan sistem belajar interaktif tentang risiko, probabilitas, dan pengambilan keputusan.';
 
 export const siteConfig = {
@@ -30,6 +31,8 @@ export const siteConfig = {
   /** Dua bagian tagline; hero menampilkannya dalam dua baris. */
   taglineParts,
   tagline: taglineParts.join(' '),
+  /** Judul hero beranda (disetujui R9). Tagline tetap dipakai untuk <title> dan gambar OG. */
+  heroLine,
   /** Ringkasan platform tanpa nama merek (mis. untuk gambar OG, di mana merek sudah tampil). */
   summary,
   description: `${product} dari ${masterBrand}: ${summary.charAt(0).toLowerCase()}${summary.slice(1)}`,

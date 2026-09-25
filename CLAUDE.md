@@ -9,8 +9,8 @@ Hard rules that already exist in the codebase:
 - Brand, product, author and tagline strings only via `siteConfig` (`src/config/site.ts`);
   `scripts/check-branding.mjs` fails the build otherwise.
 - Internal links via `withBase()` / `routes` (`src/lib/url.ts`).
-- Brand emblem at most once per page (home: exhibit object in `HomePhilosophy`; other pages: footer),
-  never in the header, never recoloured.
+- Brand emblem at most once per page (home: Objek 00 on the hero plate in `HomeHero`, black version,
+  uncropped; other pages: footer), never in the header, never cropped, never recoloured.
 - Do not edit content MDX (`src/content/**`) as part of design work.
 
 ## Visual Design System
@@ -47,6 +47,7 @@ are kept on purpose: retune values there instead of renaming.
 | `--tint` | Soft fill: inline code, active item |
 | `--mark` / `--mark-soft` | **The only expressive colour**: instrument brass (echoes the hourglass). For pointers, major ticks, index numbers, selection. Never large fills. |
 | `--loss` / `--gain` / `--caution(-bg)` | Muted data semantics, only inside examples and calculations. Never decoration. |
+| `--plate`, `--plate-ink(-2/-3)`, `--plate-rule(-strong)`, `--plate-mark`, `--plate-sand` | **The plate**: one dark exhibit surface per page (home: the hero). Dark in both themes so the black emblem can appear large without recolouring. The `.plate` class remaps ink/rule/mark tokens inside it. Never for ordinary sections. `--plate-sand` is the only brass mass (the hourglass sand), always edged in `--plate-mark`. |
 
 Rules: monochrome first. Links are distinguished by underline, not colour. Every text/background
 pair ≥ 4.5:1 in both themes (values are annotated in the stylesheet; recompute after any change).
@@ -54,7 +55,8 @@ Both light and dark themes are required (`prefers-color-scheme`).
 
 ### Typography
 - **Serif** (`--font-serif`, Source Serif 4): headings and display. `h1` uses `--tracking-display`;
-  exhibit titles may use `--text-5xl` with `--leading-display` on desktop only.
+  exhibit titles may use `--text-5xl` with `--leading-display` on desktop only. The homepage hero title
+  (`siteConfig.heroLine`) is sentence case, up to `--text-6xl` with `--leading-hero`, desktop only.
 - **Sans** (`--font-sans`, Source Sans 3): body and UI. Highly readable: `--text-base` (17px),
   `--leading-body` 1.6, line length `--measure` (66ch), leads `--measure-narrow`.
 - **Mono** (`--font-label`): metadata and labels, always **small, uppercase, tracked**. Use the
@@ -83,7 +85,7 @@ axis, graph traces, tick marks, dashed guides, measurement annotations.
   one brass pointer at most. No fills beyond `--surface` / `--mark-soft`.
 - **Inline or local SVG only.** No stock illustrations, no image assets from external websites,
   no icon fonts, no raster art (except the official emblem in `src/assets/Logo/`). The single exception
-  is the homepage **Risk Field** (three.js, procedural geometry; see "3D: Risk Field").
+  is the **Risk Field** (three.js, procedural geometry; see "3D: Risk Field"), currently not mounted.
 - Every figure has a text equivalent (`<title>`/`aria-label` or an adjacent caption).
 - Not trading charts: no candlesticks, no volume bars, no indicator overlays unless a concept is
   literally about them.
@@ -107,9 +109,11 @@ axis, graph traces, tick marks, dashed guides, measurement annotations.
   script in `BaseLayout` sets `.js-reveal` on `<html>` + IntersectionObserver; styles in `global.css`.
   Progressive enhancement: without JS or with reduced motion, content is simply visible. Never put it on
   the hero or anything above the fold, never stagger children, never re-animate on scroll back.
-- **Risk Field camera (the one sanctioned continuous motion):** a very slow drift
-  (`--field-drift-period`, about ±3°) plus small pointer/scroll parallax, only in the hero figure and only
-  while it is on screen. Never a rotation/spin, never anywhere else.
+- **Capital hourglass sand:** moves only when the user acts (changes risk, takes another loss, resets),
+  once per action, `--motion-slow`. Never idle, never a looping trickle.
+- **Risk Field camera:** a very slow drift (`--field-drift-period`, about ±3°) plus small pointer/scroll
+  parallax, only inside the Risk Field figure and only while it is on screen. Never a rotation/spin.
+  (The figure is not mounted anywhere since R9, so the site currently has no continuous motion.)
 - Otherwise no decorative entrance animations, parallax, looping motion or scroll-jacking.
 - All durations collapse to 0 under `prefers-reduced-motion` (handled in the tokens).
 
@@ -119,7 +123,25 @@ Visuals should build along this chain (e.g. a band of outcomes → a probability
 weighted mean marker → a ±σ spread), not present the ideas as unrelated cards. The chain lives in
 `src/data/concept-chain.ts` (label, question, glyph); `LearningSystem` + `figures/ChainGlyph` draw it.
 
-### 3D: Risk Field (homepage hero only)
+### Hero: Capital Hourglass (R9 "Jam Pasir Modal")
+The homepage hero answers "what happens when your decision is wrong?" with an object the visitor operates.
+- Left, on the wall: label, `siteConfig.heroLine` ("Trading bukan cuma soal entry."), the question in
+  serif italic, a lead, and the two entry links. No stats row.
+- Right: one `.plate` holding **Objek 00** (the emblem, `BrandEmblem variant="plate"`) and **Instrumen 00**
+  (`figures/CapitalHourglass`). Sand = capital; each wrong decision drops a fixed % of *current* capital
+  (same maths as `losingStreak(…, 'fixed')`); the neck opening = risk per trade; the scale is calibrated
+  by bulb area, not height; the one brass pointer marks remaining capital; a dashed guide shows the same
+  number of losses at 1%. Controls: risk 1 / 2 / 5 / 10 %, "Salah sekali lagi", "Ulang dari nol".
+  Default state 5 % × 10 losses = 59,9 % (matches the loss-streak table in the problem content).
+- It is a **loss budget** only: never show gains, P&L colours, prices or anything that reads as a signal.
+- Code: `src/lib/hourglass.ts` (geometry, levels, text equivalent; tested in `tests/hourglass.test.ts`).
+  Server-rendered complete state + `<desc>` text; the controls appear only with JS; `aria-live` announces
+  each change. On mobile the instrument is in the first viewport and the emblem follows inside the plate.
+
+### 3D: Risk Field (not mounted since R9)
+Retired from the homepage hero in R9 for performance and focus (no three.js on any page now). Code and
+tests are kept; the candidate place to revisit is the **Distribusi → Varians** part of the concept chain.
+The rules below apply if it is mounted again.
 FIG. 01 is a **wireframe probability terrain**: the time × price plane is the floor, density is height.
 The past is one dark path on the floor ending at "now"; the future is a ridge that widens and flattens
 (σ ∝ √t), with branching paths draped on it, three upright probability curves (the one at horizon T
@@ -168,8 +190,15 @@ Labels are rendered in markup, never via CSS `content`, so they stay accessible.
 - **Phase 2 (done):** homepage: `HomeHero` + `figures/TimePriceFigure` (FIG. 01, isometric
   Time × Price; geometry in `src/lib/iso.ts`, tested), `RiskLabTransition` (emblem as exhibit object +
   concept chain on a time axis, `src/data/concept-chain.ts`), `CategoryGrid` + `figures/CategoryMotif`.
-- **Homepage redesign with 3D (done):** `HomeHero` + `figures/RiskField` (three.js, fallback
+- **Homepage redesign with 3D (done, hero superseded by R9):** `HomeHero` + `figures/RiskField` (three.js, fallback
   `TimePriceFigure`), `HomePhilosophy` (statement + emblem + principles), `HomeProblems`,
   `LearningSystem` + `figures/ChainGlyph`, instrument variant of `UkuranPosisi`/`ToolFrame` (with risk
   gauge), `CategoryIndex`. Replaced `RiskLabTransition`, `CategoryGrid`, `LearningPathStrip`.
+- **R9 "Jam Pasir Modal" — hero (done):** plate tokens + `.plate`, `HomeHero` rebuilt around
+  `figures/CapitalHourglass` + emblem (`BrandEmblem variant="plate"`), emblem removed from
+  `HomePhilosophy`, `siteConfig.heroLine`, Risk Field unmounted.
+- **R9 follow-ups (not started):** problem pages use `col-aside` (stakes note / small hourglass readout);
+  one calculator style everywhere (instrument variant on problem/concept pages); DRAF notice as a hairline
+  line instead of a beige panel; knowledge-map edges kept inside the frame + node coding; hourglass glyph
+  as a small site-wide motif.
 - **Next phases:** only after the user explicitly says `PROCEED`.

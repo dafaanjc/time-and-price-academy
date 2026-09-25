@@ -71,13 +71,14 @@ Semua identitas ada di `src/config/site.ts` dan diekspor sebagai `siteConfig`:
 
 | Field | Nilai | Dipakai oleh |
 |---|---|---|
-| `masterBrand` | Time & Price Academy | `SiteHeader` (wordmark), `SiteFooter`, label hero, `HomePhilosophy`, alt emblem |
+| `masterBrand` | Time & Price Academy | `SiteHeader` (wordmark), `SiteFooter`, label hero, keterangan emblem, `HomePhilosophy`, alt emblem |
 | `product` | Risk Lab | `SiteHeader`, `SiteFooter`, hero, deskripsi halaman |
 | `author` | Muhamad Daffa | `<meta name="author">`, `article:author` |
 | `name` | Risk Lab — Time & Price Academy | `<title>`, `og:site_name`, `og:title` default |
 | `attribution` | By Muhamad Daffa - Time & Price Academy | `Byline` (setiap konsep), `SiteFooter` (setiap halaman) |
 | `lang` / `locale` | `id` / `id_ID` | `<html lang>`, `og:locale` |
-| `taglineParts` / `tagline` | Pahami Risiko. Pahami Keputusan. | hero, `<title>` beranda |
+| `taglineParts` / `tagline` | Pahami Risiko. Pahami Keputusan. | `<title>` beranda, gambar OG |
+| `heroLine` | Trading bukan cuma soal entry. | judul hero beranda (`HomeHero`) |
 | `description` | (diturunkan dari `product` dan `masterBrand`) | meta description default |
 
 Namanya sengaja `siteConfig`, bukan `site`, agar tidak tertukar dengan `Astro.site` (URL dari `SITE_URL`).
@@ -106,12 +107,15 @@ Aturan pakai:
 
 - **Header:** tidak memakai emblem, karena detailnya hilang di 24–32px. Header memakai wordmark
   tipografis dari `siteConfig`. Ini penulisan nama, bukan logo baru.
-- **Emblem maksimal satu kali per halaman:** sebagai objek pameran di bagian transisi beranda
-  (`HomePhilosophy`, varian `exhibit`, 300px desktop / 240px mobile) atau di
+- **Emblem maksimal satu kali per halaman:** di beranda sebagai Objek 00 di pelat gelap hero
+  (`HomeHero`, varian `plate`, utuh tanpa dipotong, hingga 280px; 120px di mobile), atau di
   footer halaman lain (96px, `alt=""` karena atribusi sudah tertulis di sebelahnya).
-- **Latar dilebur tanpa kotak** (`BrandEmblem.astro`, `<picture>` per tema):
-  - tema gelap: `black logo.png` + `mix-blend-mode: screen`. Hitam murni menjadi transparan tanpa filter;
-  - tema terang: `logos.jpeg` + `filter: brightness(1.16)` + `mix-blend-mode: multiply`. Kecerahan
+- **Latar dilebur tanpa kotak** (`BrandEmblem.astro`):
+  - varian `plate` (kedua tema): selalu `black logo.png` (satu-satunya sumber yang tajam di ukuran besar)
+    di atas `--plate` + `mix-blend-mode: screen`. Pelat selalu gelap, jadi aset tidak diwarnai ulang;
+  - varian `footer`, `<picture>` per tema:
+    - tema gelap: `black logo.png` + `mix-blend-mode: screen`. Hitam murni menjadi transparan tanpa filter;
+    - tema terang: `logos.jpeg` + `filter: brightness(1.16)` + `mix-blend-mode: multiply`. Kecerahan
     menaikkan latar terendah (221) menjadi putih, lalu `multiply` membuat putih transparan di atas kertas.
     Garis etsa hampir tidak berubah; hanya sorotan paling terang yang terpotong ke putih.
 - **Gambar OG:** versi terang dengan teknik yang sama (sharp `linear(1.16)` + composite `multiply`) di
@@ -121,7 +125,7 @@ Aturan pakai:
 - **Dilarang:** memotong jam pasir menjadi ikon, mewarnai ulang, masker bentuk, watermark, latar
   bagian, atau memakai emblem sebagai dekorasi berulang.
 - `scripts/check-branding.mjs` memeriksa: wordmark ada di header, header tanpa gambar, emblem ≤ 1 per
-  halaman, beranda punya emblem pameran (`emblem--exhibit`), dan `favicon.svg` (ikon buatan lama) tidak kembali.
+  halaman, beranda punya emblem di pelat hero (`emblem--plate`), dan `favicon.svg` (ikon buatan lama) tidak kembali.
 
 ## Sistem konten
 
@@ -154,7 +158,7 @@ Detail skema dan cara menambah konsep ada di [`content-model.md`](./content-mode
 | `BaseLayout` | Struktur halaman, `lang="id"`, skip link. Prop `sidebar`: indeks konsep di kiri (hanya halaman konsep/kategori); tanpa itu kontainer di tengah (`--container`) |
 | `SeoHead` | `<title>`, description, canonical, OpenGraph, Twitter card |
 | `SiteHeader` | Wordmark tipografis "TIME & PRICE ACADEMY │ Risk Lab" (dua baris di layar < 30rem) dan tombol menu mobile |
-| `BrandEmblem` | Artwork emblem resmi (varian `exhibit` / `footer`), dilebur ke tema dengan blend mode |
+| `BrandEmblem` | Artwork emblem resmi (varian `plate` / `footer`), dilebur ke latar dengan blend mode |
 | `PrimaryNav` | Navigasi utama dari `src/lib/nav.ts` (Konsep / Jalur Belajar / Peta): baris di header desktop, kolom di menu mobile |
 | `ConceptNav` | Indeks konsep bergaya daftar isi bernomor; kategori kosong digabung jadi satu baris "Segera hadir" |
 | `ConceptIndex` | Indeks semua kategori untuk `/konsep/`; tiap kategori memakai `ConceptRows` |
@@ -166,9 +170,10 @@ Detail skema dan cara menambah konsep ada di [`content-model.md`](./content-mode
 | `SiteFooter` | Atribusi "By Muhamad Daffa - Time & Price Academy" dan disclaimer |
 | `LearningPath` | Langkah bernomor dengan deskripsi (`/jalur-belajar/`) |
 | `SectionHeading` | Judul bagian bernomor bergaya dokumen cetak ("01 MASALAH TRADER ─ Semua →") |
-| `HomeHero` | Hero beranda: label merek, tagline kapital, tombol, baris spesifikasi (angka dari data) + `figures/RiskField` |
-| `figures/RiskField` | FIG. 01 Medan Risiko: relief kepadatan 3D (three.js, dimuat malas lewat `import()`); kualitas high/medium/low dari `src/lib/risk-field/quality.ts`, geometri murni di `geometry.ts`, adegan di `scene.ts`; fallback & isi HTML awal = `TimePriceFigure bare` |
-| `HomePhilosophy` | Pernyataan Waktu × Harga + garis ukur "satu jalur → sebaran", emblem sebagai objek pameran, tiga prinsip |
+| `HomeHero` | Hero beranda (R9 "Jam Pasir Modal"): judul `siteConfig.heroLine`, pertanyaan inti, tombol + pelat gelap berisi emblem (Objek 00) dan `figures/CapitalHourglass` (Instrumen 00) |
+| `figures/CapitalHourglass` | Instrumen jam pasir modal: pasir = modal, tiap keputusan salah menjatuhkan risiko % dari modal berjalan; skala dikalibrasi dari luas tabung, pembanding 1%, kontrol risiko 1/2/5/10% + "Salah sekali lagi". Geometri & hitungan murni di `src/lib/hourglass.ts` (diuji); tanpa JS keadaan awal tetap tergambar + teks setara |
+| `figures/RiskField` | (Tidak dipasang sejak R9; disimpan untuk kemungkinan dipakai di Distribusi.) FIG. 01 Medan Risiko: relief kepadatan 3D (three.js, dimuat malas lewat `import()`); kualitas high/medium/low dari `src/lib/risk-field/quality.ts`, geometri murni di `geometry.ts`, adegan di `scene.ts`; fallback & isi HTML awal = `TimePriceFigure bare` |
+| `HomePhilosophy` | Pernyataan Waktu × Harga + garis ukur "satu jalur → sebaran", tiga prinsip sebagai catatan tepi |
 | `HomeProblems` | Masalah trader di beranda: pengantar menempel (kiri) + entri bernomor di sumbu tegak (kanan) |
 | `LearningSystem` | Rantai konsep Risiko → … → Varians (`src/data/concept-chain.ts`) sebagai diagram bertick dengan `figures/ChainGlyph` |
 | `figures/ChainGlyph` | Glyph teknis bertumpuk per langkah rantai (path, band, slice, curve, mean, spread) |

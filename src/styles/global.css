@@ -68,6 +68,18 @@
   --mark: #7b5a1f; /* 5.6:1 pada paper */
   --mark-soft: #ece3cf;
 
+  /* Pelat — bidang gelap untuk SATU objek pameran per halaman (beranda: hero jam pasir modal + emblem).
+     Gelap di kedua tema: emblem resmi versi hitam hanya bisa tampil besar di atas latar gelap
+     (tidak diwarnai ulang). Bukan untuk section biasa; bukan kaca, tanpa blur/bayangan. */
+  --plate: #16181b;
+  --plate-ink: #ece8df; /* 14.6:1 pada plate */
+  --plate-ink-2: #bdb8ae; /* 9.0:1 */
+  --plate-ink-3: #9d988e; /* 6.2:1 — label/meta di pelat */
+  --plate-rule: #3a3e43; /* garis dekoratif di pelat */
+  --plate-rule-strong: #6e7277; /* garis ukur/bingkai kaca: 3.7:1 */
+  --plate-mark: #cfae6b; /* kuningan di pelat: 8.4:1 */
+  --plate-sand: #6b5a3a; /* isian pasir (modal); tepinya selalu digaris --plate-mark */
+
   /* Warna — semantik data (hanya di contoh/kalkulasi). Diredam, bukan merah/hijau terminal. */
   --loss: #9b3a2c; /* 6.1:1 */
   --gain: #2e6a4e; /* 5.7:1 */
@@ -119,11 +131,13 @@
   --text-2xl: 2.0625rem; /* 33 */
   --text-3xl: 2.625rem; /* 42 */
   --text-4xl: 3.25rem; /* 52 */
-  --text-5xl: 4.125rem; /* 66 — judul pameran (hero), hanya desktop */
+  --text-5xl: 4.125rem; /* 66 — judul pameran, hanya desktop */
+  --text-6xl: 5.25rem; /* 84 — judul hero beranda, hanya desktop */
   --text-label: 0.75rem; /* 12 — label mono; mono tampak lebih besar dari sans di ukuran sama */
   --leading-body: 1.6;
   --leading-tight: 1.15;
   --leading-display: 1.04;
+  --leading-hero: 0.98; /* judul hero kalimat biasa (bukan kapital) di ukuran --text-6xl */
   --tracking-label: 0.08em; /* label sans kapital */
   --tracking-mono: 0.1em; /* label mono kapital */
   --tracking-display: -0.022em;
@@ -182,6 +196,9 @@
     --tint: #1d2125;
     --mark: #cfae6b; /* 8.9:1 */
     --mark-soft: #2a2418;
+    --plate: #1b1e22; /* sedikit lebih terang dari paper gelap; dibatasi --plate-rule */
+    --plate-ink-3: #9d988e; /* 5.8:1 */
+    --plate-rule-strong: #6e7277; /* 3.5:1 */
     --loss: #e08a7a;
     --gain: #7cc3a0;
     --caution: #e3c07a;
@@ -460,6 +477,26 @@ svg {
     linear-gradient(to bottom, var(--grid-line-major) var(--stroke-hair), transparent var(--stroke-hair));
   background-size: var(--grid-cell) var(--grid-cell);
   border: var(--border-hair) solid var(--rule);
+}
+
+/* Pelat: bidang gelap untuk satu objek pameran (lihat token --plate-*). Garis rambut, sudut tegas,
+   tanpa bayangan. Label, tautan, dan fokus di dalamnya memakai tinta pelat agar kontras tetap ≥ 4.5:1. */
+.plate {
+  --accent: var(--plate-ink);
+  --axis: var(--plate-rule-strong);
+  --tick: var(--plate-ink-3);
+  --trace: var(--plate-ink);
+  --trace-2: var(--plate-ink-3);
+  --rule: var(--plate-rule);
+  --rule-strong: var(--plate-rule-strong);
+  --mark: var(--plate-mark);
+  --ink: var(--plate-ink);
+  --ink-2: var(--plate-ink-2);
+  --ink-3: var(--plate-ink-3);
+  color: var(--plate-ink);
+  background: var(--plate);
+  border: var(--border-hair) solid var(--plate-rule);
+  border-radius: var(--radius-0);
 }
 
 /* Kelas untuk elemen SVG inline agar ilustrasi mengikuti tema tanpa warna tertulis di markup. */

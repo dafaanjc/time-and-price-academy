@@ -1,9 +1,7 @@
 ---
 // Filosofi beranda: satu pernyataan editorial besar (Waktu × Harga), garis ukur "satu jalur → sebaran",
-// emblem merek induk sebagai objek pameran (satu-satunya emblem di beranda), lalu tiga prinsip sebagai
-// catatan bernomor. Menggantikan bagian transisi lama; rantai konsep pindah ke LearningSystem.
+// lalu tiga prinsip sebagai catatan bernomor di kolom kanan. Emblem pindah ke pelat hero (R9): satu emblem per halaman.
 import { siteConfig } from '../config/site';
-import BrandEmblem from './BrandEmblem.astro';
 
 const principles = [
   {
@@ -50,13 +48,6 @@ const pad = (n: number) => String(n).padStart(2, '0');
     <p class="philosophy__lead">
       {siteConfig.masterBrand} membaca pasar lewat dua sumbu: waktu dan harga. {siteConfig.product} adalah ruangnya
       untuk risiko, tempat ketidakpastian diukur lebih dulu sebelum keputusan diambil.
-    </p>
-  </div>
-
-  <div class="philosophy__object">
-    <BrandEmblem variant="exhibit" />
-    <p class="label philosophy__object-caption">
-      <span class="label__index">Objek 00</span><span class="label__sep" aria-hidden="true">·</span>{`Emblem ${siteConfig.masterBrand}`}
     </p>
   </div>
 
@@ -130,17 +121,6 @@ const pad = (n: number) => String(n).padStart(2, '0');
     color: var(--ink-2);
   }
 
-  .philosophy__object {
-    justify-self: center;
-    display: grid;
-    justify-items: center;
-    gap: var(--space-3);
-  }
-
-  .philosophy__object-caption {
-    text-align: center;
-  }
-
   .principles {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr));
@@ -169,7 +149,7 @@ const pad = (n: number) => String(n).padStart(2, '0');
   @media (min-width: 64rem) {
     .philosophy {
       grid-template-columns: repeat(var(--grid-columns), minmax(0, 1fr));
-      align-items: center;
+      align-items: start;
       padding-top: var(--space-24);
     }
 
@@ -177,18 +157,17 @@ const pad = (n: number) => String(n).padStart(2, '0');
       grid-column: 1 / span 7;
     }
 
-    .philosophy__object {
-      grid-column: 9 / -1;
-    }
 
     .philosophy__title {
       font-size: clamp(var(--text-3xl), 3.8vw, var(--text-5xl));
       line-height: var(--leading-display);
     }
 
+    /* Prinsip sebagai catatan tepi di kolom kanan, sejajar pernyataan. */
     .principles {
-      grid-column: 1 / -1;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
+      grid-column: 9 / -1;
+      grid-template-columns: minmax(0, 1fr);
+      margin-top: var(--space-8);
     }
   }
 </style>
