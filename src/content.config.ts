@@ -27,6 +27,8 @@ const concepts = defineCollection({
     termEn: z.string().optional(),
     slug,
     category: z.enum(categoryIds),
+    /** Sub-kategori (opsional): id dari `topics` kategori ini di data/categories.ts. */
+    topic: slug.optional(),
     /** Urutan dalam kategori (menaik). */
     order: z.number().int().nonnegative(),
     difficulty: z.enum(['beginner', 'intermediate', 'advanced']),

@@ -11,6 +11,7 @@ Bahasa konten: **Bahasa Indonesia**. Istilah asli bahasa Inggris dicantumkan di 
 | `termEn` | tidak | string | Istilah asli, mis. `Expected Value` |
 | `slug` | ya | kebab-case | Harus sama dengan nama file. Dipakai di URL `/konsep/<slug>/` |
 | `category` | ya | enum | `foundations`, `risk-management`, `psychology`, `behavioral-finance`, `decision-theory` |
+| `topic` | tidak | kebab-case | Sub-kategori: salah satu `topics` milik kategori ini di `src/data/categories.ts` (lihat "Peta kurikulum") |
 | `order` | ya | integer ≥ 0 | Urutan dalam kategori |
 | `difficulty` | ya | enum | `beginner` (Dasar), `intermediate` (Menengah), `advanced` (Lanjutan) |
 | `description` | ya | string ≤ 220 | Deskripsi singkat untuk kartu, meta description, dan OpenGraph |
@@ -149,7 +150,7 @@ teks yang terdengar akademis tetapi tidak berdasar.
 
 3. Tulis body dengan tujuh heading di atas.
 4. (Opsional) Tambahkan slug ke jalur belajar di `src/data/learning-paths.ts`. Slug harus muncul
-   setelah semua prasyaratnya.
+   setelah semua prasyaratnya, di jalur itu sendiri atau di jalur yang tercantum di `requires`.
 5. Jalankan `npm run validate`. Build gagal dengan pesan yang jelas bila ada rujukan yang salah,
    siklus prasyarat, sumber placeholder, atau urutan jalur yang tidak sesuai.
 6. Ubah `status` ke `review`, lalu `published`, setelah isi dan sumber diverifikasi.
@@ -189,3 +190,37 @@ menulis heading dengan nama itu.
 
 Tambahkan id ke `categoryIds` dan entri ke `categories` di `src/data/categories.ts`. Skema otomatis
 menerima id baru.
+
+Sub-kategori: tambahkan `topics: [{ id, title }]` ke entri kategori, lalu isi `topic` di frontmatter
+konsep. Halaman kategori otomatis dikelompokkan per topik (urutan array); konsep tanpa topik masuk ke
+kelompok "Lainnya". `topic` yang tidak dikenal untuk kategorinya menggagalkan build.
+
+## Peta kurikulum
+
+Tiga tahap, masing-masing satu jalur di `src/data/learning-paths.ts`. Tahap dihitung dari `requires`
+(`pathTiers()`), bukan ditulis manual.
+
+| Tahap | Jalur | Kategori · topik | Langkah (slug) |
+|---|---|---|---|
+| 1 | Fondasi Risiko | Fondasi | risk → risk-vs-uncertainty → probability → probability-distribution → expected-value → variance-and-volatility |
+| 2 | Heuristik dan Bias (`requires: fondasi-risiko`) | Psikologi · Rasionalitas Terbatas / Heuristik Penilaian / Bias Kognitif | bounded-rationality → heuristics → representativeness → availability → anchoring → overconfidence |
+| 3 | Keputusan di Bawah Risiko (`requires: heuristik-dan-bias`) | Keuangan Perilaku · Keputusan di Bawah Risiko / Perilaku Investor | reference-point → loss-aversion → prospect-theory → framing-effect → disposition-effect |
+
+Jembatan antar-tahap (prasyarat lintas kategori) yang membuat urutan ini terbaca di peta pengetahuan:
+
+- expected-value → bounded-rationality (patokan "pilihan optimal" yang dibatasi) dan → reference-point
+- probability → heuristics (heuristik adalah cara cepat menilai peluang)
+- variance-and-volatility → overconfidence (rentang perkiraan yang terlalu sempit)
+- bounded-rationality → prospect-theory (model deskriptif, bukan normatif)
+
+Konsep tahap 2 dan 3 selain `loss-aversion` saat ini **kerangka**: frontmatter lengkap, body berisi tujuh
+heading wajib dengan tanda `_Draf: bagian ini belum ditulis._`, `sources: []`. Saat menulisnya, ganti tanda
+draf dan pasang sumber yang sudah diverifikasi.
+
+Kandidat rujukan utama (**belum diverifikasi**; periksa judul, tahun, dan DOI sebelum dipasang di `sources`):
+Simon (1955) "A Behavioral Model of Rational Choice"; Tversky & Kahneman (1974) "Judgment under
+Uncertainty: Heuristics and Biases"; Tversky & Kahneman (1973) tentang ketersediaan; Kahneman & Tversky
+(1972) tentang keterwakilan; Kahneman & Tversky (1979) "Prospect Theory: An Analysis of Decision under
+Risk"; Tversky & Kahneman (1981) "The Framing of Decisions and the Psychology of Choice"; Tversky &
+Kahneman (1992) tentang *cumulative prospect theory*; Shefrin & Statman (1985) dan Odean (1998) tentang
+efek disposisi; Moore & Healy (2008) "The Trouble with Overconfidence".

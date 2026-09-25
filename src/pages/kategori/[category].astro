@@ -3,7 +3,7 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import ConceptRows from '../../components/ConceptRows.astro';
 import ProblemList from '../../components/ProblemList.astro';
 import { categories, type Category } from '../../data/categories';
-import { getConceptsByCategory } from '../../lib/concepts';
+import { getConceptsByCategory, groupByTopic } from '../../lib/concepts';
 import { getProblems } from '../../lib/problems';
 
 export function getStaticPaths() {
@@ -20,6 +20,9 @@ interface Props {
 const { category } = Astro.props;
 const concepts = (await getConceptsByCategory()).get(category.id) ?? [];
 const conceptIds = new Set(concepts.map((c) => c.id));
+// Kategori bertopik: satu daftar per topik. Tanpa topik (atau hanya kelompok tanpa judul): satu daftar.
+const groups = groupByTopic(category, concepts);
+const titled = groups.some((g) => g.topic);
 // Masalah trader yang merujuk setidaknya satu konsep di kategori ini.
 const problems = (await getProblems()).filter((p) => p.data.concepts.some((id) => conceptIds.has(id)));
 ---
@@ -32,7 +35,20 @@ const problems = (await getProblems()).filter((p) => p.data.concepts.some((id) =
     <p class="category-header__count">{concepts.length > 0 ? `${concepts.length} konsep` : 'Segera hadir'}</p>
   </header>
 
-  {concepts.length > 0 && <ConceptRows concepts={concepts} />}
+  {concepts.length > 0 && !titled && <ConceptRows concepts={concepts} />}
+  {
+    titled &&
+      groups.map((group, i) => (
+        <section class="topic" aria-labelledby={`topik-${group.topic?.id ?? 'lainnya'}`}>
+          <p class="label">
+            <span class="label__index">{String(i + 1).padStart(2, '0')}</span>
+            <span class="label__sep" aria-hidden="true">·</span><span>{group.concepts.length} konsep</span>
+          </p>
+          <h2 id={`topik-${group.topic?.id ?? 'lainnya'}`}>{group.topic?.title ?? 'Lainnya'}</h2>
+          <ConceptRows concepts={group.concepts} />
+        </section>
+      ))
+  }
   {concepts.length === 0 && <p class="empty">Konsep untuk kategori ini sedang disiapkan.</p>}
 
   {
@@ -71,6 +87,15 @@ const problems = (await getProblems()).filter((p) => p.data.concepts.some((id) =
     letter-spacing: var(--tracking-label);
     text-transform: uppercase;
     color: var(--ink-3);
+  }
+
+  .topic + .topic {
+    margin-top: var(--space-12);
+  }
+
+  .topic h2 {
+    margin: var(--space-1) 0 var(--space-4);
+    font-size: var(--text-xl);
   }
 
   .empty {

@@ -31,8 +31,8 @@ src/
   content.config.ts     Definisi koleksi `concepts` + skema Zod
   content/concepts/     Satu file .mdx per konsep; nama file = slug
   data/                 Data terstruktur non-MDX
-    categories.ts       5 kategori (urutan = urutan tampil = nomor "01 / 05"; `motif` SVG)
-    learning-paths.ts   Jalur belajar (daftar slug, divalidasi)
+    categories.ts       5 kategori (urutan = urutan tampil = nomor "01 / 05"; `motif` SVG; `topics` = sub-kategori opsional)
+    learning-paths.ts   Jalur belajar bertahap (daftar slug + `requires` antar-jalur, divalidasi; `pathTiers()`)
     source-types.ts     6 jenis sumber + label Indonesia
     concept-chain.ts    Rantai konsep inti beranda (Risiko → … → Nilai Harapan)
   lib/
@@ -133,7 +133,10 @@ Aturan pakai:
    - tidak ada siklus prasyarat,
    - sumber tidak berupa placeholder dan dapat ditelusuri (url / doi / isbn / publisher),
    - heading di body tidak bentrok dengan ID bagian otomatis (Konsep Terkait / Prasyarat / Sumber),
-   - setiap langkah jalur belajar adalah konsep yang ada dan muncul setelah semua prasyaratnya.
+   - `topic` konsep (bila ada) adalah salah satu `topics` milik kategorinya,
+   - setiap langkah jalur belajar adalah konsep yang ada dan muncul setelah semua prasyaratnya; prasyarat
+     boleh dipenuhi oleh jalur yang dibutuhkan (`requires`, berantai). `requires` harus merujuk jalur yang
+     ada dan muncul lebih awal di array (sehingga tidak bisa bersiklus); id jalur unik.
 4. Semua halaman mengambil konsep melalui `getConcepts()` di `src/lib/concepts.ts`, yang menjalankan
    validasi sekali (di-cache). **Jika validasi gagal, build gagal** dengan daftar pesan error.
 
@@ -188,7 +191,7 @@ Detail skema dan cara menambah konsep ada di [`content-model.md`](./content-mode
 | `SourceList` | Bagian "Sumber": urutan per jenis dan keadaan kosong |
 | `SourceCard` | Satu sumber: label jenis, judul (tautan URL/DOI, tab baru), penulis · tahun, publisher/DOI/ISBN, catatan |
 | `KnowledgeGraph` | Graf prasyarat sebagai SVG; setiap simpul tautan ke konsep |
-| `PathNav` | "Sebelumnya / Berikutnya" dan posisi langkah, berdasarkan jalur belajar pertama yang memuat konsep |
+| `PathNav` | "Sebelumnya / Berikutnya" dan posisi langkah, berdasarkan jalur belajar pertama yang memuat konsep; di langkah terakhir menunjuk "Jalur berikutnya" (jalur yang `requires` jalur ini) |
 
 ID bagian yang dirender layout (`konsep-terkait`, `prasyarat`, `sumber`) didefinisikan sekali di
 `src/lib/sections.ts` dan dipakai oleh layout maupun validasi.
@@ -202,8 +205,8 @@ ID bagian yang dirender layout (`konsep-terkait`, `prasyarat`, `sumber`) didefin
 | `/masalah/<slug>/` | `pages/masalah/[slug].astro`, satu halaman per masalah |
 | `/konsep/` | `pages/konsep/index.astro`, indeks semua konsep per kategori |
 | `/konsep/<slug>/` | `pages/konsep/[slug].astro`, satu halaman per konsep |
-| `/kategori/<id>/` | `pages/kategori/[category].astro`, satu halaman per kategori (termasuk yang masih kosong) |
-| `/jalur-belajar/` | `pages/jalur-belajar/index.astro`, semua jalur dari `src/data/learning-paths.ts` |
+| `/kategori/<id>/` | `pages/kategori/[category].astro`, satu halaman per kategori (termasuk yang masih kosong); dikelompokkan per `topics` bila kategori punya topik |
+| `/jalur-belajar/` | `pages/jalur-belajar/index.astro`, semua jalur dari `src/data/learning-paths.ts`, dengan tahap dan "Lanjutan dari" |
 | `/peta/` | `pages/peta/index.astro`, graf prasyarat + tabel alternatif |
 | `/cari/` | `pages/cari/index.astro`, pencarian sisi klien, mendukung `?q=` |
 | `/search-index.json` | `pages/search-index.json.ts`, endpoint statis yang dibuat saat build |

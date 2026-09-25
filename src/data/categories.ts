@@ -19,11 +19,22 @@ export type CategoryId = (typeof categoryIds)[number];
 export const categoryMotifs = ['axes', 'band', 'oscillation', 'kink', 'tree'] as const;
 export type CategoryMotif = (typeof categoryMotifs)[number];
 
+/**
+ * Sub-kategori (topik) di dalam satu kategori. Konsep memilihnya lewat frontmatter `topic`
+ * (divalidasi terhadap kategori konsep di lib/validate.ts). Urutan array = urutan tampil di halaman
+ * kategori. Kategori tanpa `topics` menampilkan konsepnya sebagai satu daftar.
+ */
+export interface CategoryTopic {
+  id: string;
+  title: string;
+}
+
 export interface Category {
   id: CategoryId;
   title: string;
   description: string;
   motif: CategoryMotif;
+  topics?: readonly CategoryTopic[];
 }
 
 // Urutan array ini adalah urutan tampil di sidebar dan homepage.
@@ -46,12 +57,21 @@ export const categories: Category[] = [
     title: 'Psikologi',
     motif: 'oscillation',
     description: 'Bagaimana emosi dan kondisi mental memengaruhi cara kita menghadapi risiko.',
+    topics: [
+      { id: 'bounded-rationality', title: 'Rasionalitas Terbatas' },
+      { id: 'judgment-heuristics', title: 'Heuristik Penilaian' },
+      { id: 'cognitive-biases', title: 'Bias Kognitif' },
+    ],
   },
   {
     id: 'behavioral-finance',
     title: 'Keuangan Perilaku',
     motif: 'kink',
     description: 'Pola perilaku dan bias yang muncul ketika manusia mengambil keputusan keuangan.',
+    topics: [
+      { id: 'decision-under-risk', title: 'Keputusan di Bawah Risiko' },
+      { id: 'investor-behavior', title: 'Perilaku Investor' },
+    ],
   },
   {
     id: 'decision-theory',
@@ -71,4 +91,9 @@ export function getCategory(id: CategoryId): Category {
 export function categoryIndexLabel(id: CategoryId): string {
   const pad = (n: number) => String(n).padStart(2, '0');
   return `${pad(categories.findIndex((c) => c.id === id) + 1)} / ${pad(categories.length)}`;
+}
+
+/** Topik sebuah kategori, atau undefined bila id tidak dikenal di kategori itu. */
+export function getTopic(categoryId: CategoryId, topicId: string): CategoryTopic | undefined {
+  return getCategory(categoryId).topics?.find((t) => t.id === topicId);
 }

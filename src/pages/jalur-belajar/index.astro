@@ -2,7 +2,7 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { siteConfig } from '../../config/site';
 import LearningPath from '../../components/LearningPath.astro';
-import { getLearningPaths } from '../../lib/concepts';
+import { getLearningPaths, pathAnchor } from '../../lib/concepts';
 import { readingMinutes } from '../../lib/reading-time';
 
 const paths = await getLearningPaths();
@@ -18,22 +18,36 @@ const totalMinutes = (path: (typeof paths)[number]) =>
     <h1>Jalur Belajar</h1>
     <p>
       Setiap jalur menyusun konsep berdasarkan prasyaratnya, sehingga setiap langkah dibangun di atas langkah
-      sebelumnya. Anda tetap bebas membuka konsep mana pun secara langsung.
+      sebelumnya. Jalur bertahap: fondasi probabilitas lebih dulu, lalu psikologi penilaian, lalu keputusan di
+      bawah risiko. Anda tetap bebas membuka konsep mana pun secara langsung.
     </p>
   </header>
 
   {
     paths.map((path, i) => (
-      <section class="path" aria-labelledby={`jalur-${path.id}`}>
+      <section class="path" aria-labelledby={pathAnchor(path.id)}>
         <p class="label path__index">
           <span class="label__index">
             Jalur {String(i + 1).padStart(2, '0')} / {String(paths.length).padStart(2, '0')}
           </span>
+          <span class="label__sep" aria-hidden="true">·</span><span>Tahap {path.tier}</span>
           <span class="label__sep" aria-hidden="true">·</span><span>{path.steps.length} konsep</span>
           <span class="label__sep" aria-hidden="true">·</span><span>{totalMinutes(path)} mnt baca</span>
         </p>
-        <h2 id={`jalur-${path.id}`}>{path.title}</h2>
+        <h2 id={pathAnchor(path.id)}>{path.title}</h2>
         <p class="path__desc">{path.description}</p>
+        {path.requires.length > 0 && (
+          <p class="path__requires">
+            Lanjutan dari{' '}
+            {path.requires.map((r, j) => (
+              <>
+                {j > 0 && ', '}
+                <a href={`#${pathAnchor(r.id)}`}>{r.title}</a>
+              </>
+            ))}
+            . Prasyarat dari jalur itu dianggap sudah dipelajari.
+          </p>
+        )}
         <LearningPath path={path} />
       </section>
     ))
@@ -74,5 +88,16 @@ const totalMinutes = (path: (typeof paths)[number]) =>
     max-width: var(--measure);
     margin: 0 0 var(--space-6);
     color: var(--ink-2);
+  }
+
+  .path__desc:has(+ .path__requires) {
+    margin-bottom: var(--space-2);
+  }
+
+  .path__requires {
+    max-width: var(--measure);
+    margin: 0 0 var(--space-6);
+    font-size: var(--text-sm);
+    color: var(--ink-3);
   }
 </style>

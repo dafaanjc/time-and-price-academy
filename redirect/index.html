@@ -1,0 +1,74 @@
+<!doctype html>
+<!--
+  Halaman pengalih (redirect) untuk GitHub Pages.
+  Unggah file ini ke ROOT repo "dafaanjc.github.io" (situs pengguna), BUKAN ke repo
+  "time-and-price-academy": aplikasinya sendiri berada di /time-and-price-academy/, sehingga
+  redirect ke alamat itu dari dalam repo yang sama akan berputar tanpa henti.
+-->
+<html lang="id">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Risk Lab — Time &amp; Price Academy</title>
+    <meta name="description" content="Mengalihkan ke Risk Lab — Time &amp; Price Academy." />
+    <!-- Halaman pengalih tidak perlu diindeks; mesin pencari diarahkan ke alamat asli. -->
+    <meta name="robots" content="noindex" />
+    <link rel="canonical" href="https://dafaanjc.github.io/time-and-price-academy/" />
+    <!-- Cadangan tanpa JavaScript: pindah segera. -->
+    <meta http-equiv="refresh" content="0; url=https://dafaanjc.github.io/time-and-price-academy/" />
+    <script>
+      // replace() agar halaman pengalih tidak masuk riwayat (tombol Kembali tidak memantul ke sini).
+      // Query dan hash ikut dibawa, mis. ?q=margin atau #bagian.
+      window.location.replace(
+        'https://dafaanjc.github.io/time-and-price-academy/' + window.location.search + window.location.hash,
+      );
+    </script>
+    <style>
+      :root {
+        color-scheme: light dark;
+        --paper: #f6f3ec;
+        --ink: #16191d;
+        --ink-2: #454c54;
+      }
+
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --paper: #121417;
+          --ink: #ece8e0;
+          --ink-2: #b7bcc2;
+        }
+      }
+
+      body {
+        display: grid;
+        place-items: center;
+        min-height: 100vh;
+        margin: 0;
+        padding: 1rem;
+        background: var(--paper);
+        color: var(--ink);
+        font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif;
+        text-align: center;
+      }
+
+      p {
+        margin: 0.5rem 0;
+        color: var(--ink-2);
+      }
+
+      a {
+        color: var(--ink);
+        font-weight: 600;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <p>Mengalihkan ke <strong>Risk Lab — Time &amp; Price Academy</strong>…</p>
+      <p>
+        Bila tidak berpindah otomatis, buka
+        <a href="https://dafaanjc.github.io/time-and-price-academy/">dafaanjc.github.io/time-and-price-academy</a>.
+      </p>
+    </main>
+  </body>
+</html>

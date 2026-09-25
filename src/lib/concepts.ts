@@ -1,6 +1,13 @@
 import { getCollection, type CollectionEntry } from 'astro:content';
-import { categories, type Category, type CategoryId } from '../data/categories';
-import { learningPaths, type LearningPath } from '../data/learning-paths';
+import {
+  categories,
+  getCategory,
+  getTopic,
+  type Category,
+  type CategoryId,
+  type CategoryTopic,
+} from '../data/categories';
+import { learningPaths, pathTiers, type LearningPath } from '../data/learning-paths';
 import { validateConcepts } from './validate';
 import { layoutGraph, type GraphLayout } from './graph';
 import { withBase } from './url';
@@ -56,12 +63,36 @@ export async function getConceptsByCategory(): Promise<Map<CategoryId, Concept[]
   return new Map(categories.map((c) => [c.id, concepts.filter((x) => x.data.category === c.id)]));
 }
 
-export interface ResolvedPath extends Omit<LearningPath, 'steps'> {
+/** Rujukan ringan ke jalur lain (untuk "Lanjutan dari" / "Jalur berikutnya"). */
+export interface PathRef {
+  id: string;
+  title: string;
+}
+
+export interface ResolvedPath extends Omit<LearningPath, 'steps' | 'requires'> {
   steps: Concept[];
+  /** Tahap 1 = tanpa `requires`; selebihnya 1 + tahap terdalam jalur yang dibutuhkan. */
+  tier: number;
+  requires: PathRef[];
 }
 
 export async function getLearningPaths(): Promise<ResolvedPath[]> {
-  return Promise.all(learningPaths.map(async (p) => ({ ...p, steps: await getConceptsByIds(p.steps) })));
+  await getConcepts(); // validasi jalur berjalan di sini
+  const tiers = pathTiers(learningPaths);
+  const titles = new Map(learningPaths.map((p) => [p.id, p.title]));
+  return Promise.all(
+    learningPaths.map(async (p) => ({
+      ...p,
+      steps: await getConceptsByIds(p.steps),
+      tier: tiers.get(p.id) ?? 1,
+      requires: (p.requires ?? []).map((id) => ({ id, title: titles.get(id) ?? id })),
+    })),
+  );
+}
+
+/** Id anchor sebuah jalur di halaman /jalur-belajar/. */
+export function pathAnchor(id: string): string {
+  return `jalur-${id}`;
 }
 
 /** Konsep untuk daftar slug, dengan urutan slug dipertahankan. Slug sudah divalidasi. */
@@ -76,16 +107,30 @@ export interface PathContext {
   index: number;
   prev?: Concept;
   next?: Concept;
+  /** Di langkah terakhir: jalur yang membutuhkan jalur ini (tahap berikutnya), bila ada. */
+  nextPaths: PathRef[];
 }
 
 /** Posisi konsep di jalur belajar pertama yang memuatnya, bila ada. */
 export async function getPathContext(id: string): Promise<PathContext | undefined> {
-  for (const path of await getLearningPaths()) {
+  const paths = await getLearningPaths();
+  for (const path of paths) {
     const index = path.steps.findIndex((c) => c.id === id);
     if (index === -1) continue;
-    return { path, index, prev: path.steps[index - 1], next: path.steps[index + 1] };
+    const isLast = index === path.steps.length - 1;
+    const nextPaths = isLast
+      ? paths.filter((p) => p.requires.some((r) => r.id === path.id)).map((p) => ({ id: p.id, title: p.title }))
+      : [];
+    return { path, index, prev: path.steps[index - 1], next: path.steps[index + 1], nextPaths };
   }
   return undefined;
+}
+
+/** Label kategori konsep, dengan topiknya bila ada: "Psikologi · Heuristik Penilaian". */
+export function conceptCategoryLabel(concept: Concept): string {
+  const { category, topic } = concept.data;
+  const topicTitle = topic ? getTopic(category, topic)?.title : undefined;
+  return [getCategory(category).title, topicTitle].filter(Boolean).join(' · ');
 }
 
 /** Tata letak graf prasyarat untuk semua konsep, dalam urutan kategori dan `order`. */
@@ -98,8 +143,30 @@ export async function getKnowledgeGraph(): Promise<GraphLayout> {
       description: c.data.description,
       href: conceptHref(c.id),
       prerequisites: c.data.prerequisites,
+      group: c.data.category,
+      meta: conceptCategoryLabel(c),
     })),
   );
+}
+
+export interface TopicGroup {
+  /** undefined = konsep tanpa topik (atau kategori tanpa topik). */
+  topic?: CategoryTopic;
+  concepts: Concept[];
+}
+
+/**
+ * Konsep satu kategori dikelompokkan per topik, dalam urutan `topics`; topik kosong dilewati.
+ * Konsep tanpa topik dikumpulkan di kelompok terakhir tanpa judul.
+ */
+export function groupByTopic(category: Category, concepts: Concept[]): TopicGroup[] {
+  const groups: TopicGroup[] = (category.topics ?? []).map((topic) => ({
+    topic,
+    concepts: concepts.filter((c) => c.data.topic === topic.id),
+  }));
+  const known = new Set(groups.map((g) => g.topic?.id));
+  groups.push({ concepts: concepts.filter((c) => !c.data.topic || !known.has(c.data.topic)) });
+  return groups.filter((g) => g.concepts.length > 0);
 }
 
 export interface CategoryIndex {

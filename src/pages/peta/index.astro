@@ -2,8 +2,7 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { siteConfig } from '../../config/site';
 import KnowledgeGraph from '../../components/KnowledgeGraph.astro';
-import { getCategory } from '../../data/categories';
-import { conceptHref, getConcepts, getKnowledgeGraph } from '../../lib/concepts';
+import { conceptCategoryLabel, conceptHref, getConcepts, getKnowledgeGraph } from '../../lib/concepts';
 
 const graph = await getKnowledgeGraph();
 const concepts = await getConcepts();
@@ -48,7 +47,7 @@ const layerOf = new Map(graph.nodes.map((n) => [n.id, n.layer]));
                 <th scope="row">
                   <a href={conceptHref(c.id)}>{c.data.title}</a>
                 </th>
-                <td>{getCategory(c.data.category).title}</td>
+                <td>{conceptCategoryLabel(c)}</td>
                 <td>{c.data.prerequisites.map((p) => titles.get(p) ?? p).join(', ') || '—'}</td>
               </tr>
             ))

@@ -29,14 +29,19 @@ const TIP_WIDTH = 224;
 const TIP_PAD = 12;
 const TIP_TITLE_LINE = 17;
 const TIP_TEXT_LINE = 16;
+// Baris kategori/topik: label mono kapital kecil (~7,7px per karakter pada 11px + tracking) → 26 karakter.
+const TIP_META_LINE = 14;
 const tips = graph.nodes.map((n) => {
+  const meta = wrapText(n.meta, 26, 2);
   const title = wrapTitle(n.title, 28);
   const text = wrapText(n.description, 30, 4);
-  const height = TIP_PAD * 2 + title.length * TIP_TITLE_LINE + (text.length > 0 ? 6 + text.length * TIP_TEXT_LINE : 0);
+  const metaHeight = meta.length > 0 ? meta.length * TIP_META_LINE + 6 : 0;
+  const height =
+    TIP_PAD * 2 + metaHeight + title.length * TIP_TITLE_LINE + (text.length > 0 ? 6 + text.length * TIP_TEXT_LINE : 0);
   const x = Math.max(0, Math.min(n.x, graph.width - TIP_WIDTH));
   const below = n.layer < graph.layerCount - 1;
   const y = below ? n.y + NODE_HEIGHT / 2 + NODE_RADIUS + 10 : n.y + NODE_HEIGHT / 2 - NODE_RADIUS - 10 - height;
-  return { id: n.id, title, text, height, x, y };
+  return { id: n.id, meta, metaHeight, title, text, height, x, y };
 });
 ---
 
@@ -74,7 +79,7 @@ const tips = graph.nodes.map((n) => {
       <g class="nodes">
         {
           graph.nodes.map((n) => (
-            <a href={n.href} class="node" data-node={n.id} aria-label={n.title}>
+            <a href={n.href} class="node" data-node={n.id} data-category={n.group} aria-label={n.title}>
               <g transform={`translate(${n.x} ${n.y})`}>
                 <rect class="node__hit" width={NODE_WIDTH} height={NODE_HEIGHT} />
                 <circle class="node__ring" cx={NODE_ANCHOR_X} cy={NODE_HEIGHT / 2} r={NODE_RADIUS + 5} />
@@ -100,16 +105,25 @@ const tips = graph.nodes.map((n) => {
               <g class="tip__body">
                 <rect class="tip__plate" width={TIP_WIDTH} height={t.height} />
                 <path class="tip__rule" d={`M0 0 H${TIP_WIDTH}`} />
+                {t.meta.length > 0 && (
+                  <text class="tip__meta" x={TIP_PAD} dominant-baseline="hanging">
+                    {t.meta.map((line, i) => (
+                      <tspan x={TIP_PAD} y={TIP_PAD + i * TIP_META_LINE}>
+                        {line}
+                      </tspan>
+                    ))}
+                  </text>
+                )}
                 <text class="tip__title" x={TIP_PAD} dominant-baseline="hanging">
                   {t.title.map((line, i) => (
-                    <tspan x={TIP_PAD} y={TIP_PAD + i * TIP_TITLE_LINE}>
+                    <tspan x={TIP_PAD} y={TIP_PAD + t.metaHeight + i * TIP_TITLE_LINE}>
                       {line}
                     </tspan>
                   ))}
                 </text>
                 <text class="tip__text" x={TIP_PAD} dominant-baseline="hanging">
                   {t.text.map((line, i) => (
-                    <tspan x={TIP_PAD} y={TIP_PAD + t.title.length * TIP_TITLE_LINE + 6 + i * TIP_TEXT_LINE}>
+                    <tspan x={TIP_PAD} y={TIP_PAD + t.metaHeight + t.title.length * TIP_TITLE_LINE + 6 + i * TIP_TEXT_LINE}>
                       {line}
                     </tspan>
                   ))}
@@ -355,6 +369,14 @@ const tips = graph.nodes.map((n) => {
     fill: none;
     stroke: var(--mark);
     stroke-width: var(--border-mark);
+  }
+
+  .tip__meta {
+    fill: var(--ink-3);
+    font-family: var(--font-label);
+    font-size: var(--text-2xs);
+    letter-spacing: var(--tracking-mono);
+    text-transform: uppercase;
   }
 
   .tip__title {

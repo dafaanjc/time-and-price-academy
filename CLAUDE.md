@@ -149,6 +149,9 @@ Single source of truth: `src/data/categories.ts` (`foundations`, `risk-managemen
 `behavioral-finance`, `decision-theory`). Array order = display order = index number, rendered by
 `categoryIndexLabel()` as `01 / 05` (the total follows the array length). Each entry has a `motif`
 (`axes`, `band`, `oscillation`, `kink`, `tree`) drawn by `components/figures/CategoryMotif.astro`.
+Optional `topics` = sub-categories (concept frontmatter `topic`, validated per category; the category page
+groups by topic). Learning paths are tiered via `requires` in `src/data/learning-paths.ts`
+(Fondasi → Heuristik dan Bias → Keputusan di Bawah Risiko); curriculum map in `docs/content-model.md`.
 Containers carry `data-category="<id>"` (hook for `--category-accent` and any per-category tweak in
 `global.css`). To add a category: one entry in `categories.ts` (plus a new motif value and its branch
 in `CategoryMotif` if none of the existing ones fits). `CategoryIndex` (the editorial list on the homepage) picks it up automatically.

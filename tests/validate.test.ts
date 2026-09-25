@@ -42,6 +42,47 @@ describe('validateConcepts', () => {
     const errors = validateConcepts([concept('a'), concept('b', { prerequisites: ['a'] })], [path(['b', 'a'])]);
     expect(errors.join('\n')).toContain('sebelum prasyaratnya');
   });
+
+  describe('jalur bertingkat (requires)', () => {
+    const chain = [concept('a'), concept('b', { prerequisites: ['a'] }), concept('c', { prerequisites: ['b'] })];
+    const tiered = (id: string, steps: string[], requires?: string[]) => ({ id, title: '', description: '', steps, requires });
+
+    it('prasyarat boleh dipenuhi jalur yang dibutuhkan, termasuk berantai', () => {
+      const paths = [tiered('p1', ['a']), tiered('p2', ['b'], ['p1']), tiered('p3', ['c'], ['p2'])];
+      expect(validateConcepts(chain, paths)).toEqual([]);
+    });
+
+    it('tanpa requires, prasyarat di jalur lain tidak dihitung', () => {
+      const errors = validateConcepts(chain, [tiered('p1', ['a']), tiered('p2', ['b'])]);
+      expect(errors.join('\n')).toContain('sebelum prasyaratnya (a)');
+    });
+
+    it.each([
+      ['jalur tidak ada', [tiered('p1', ['a'], ['zzz'])], 'tidak ada'],
+      ['jalur muncul belakangan', [tiered('p1', ['a'], ['p2']), tiered('p2', ['a'])], 'lebih awal'],
+      ['id ganda', [tiered('p1', ['a']), tiered('p1', ['a'])], 'ganda'],
+    ])('%s', (_, paths, message) => {
+      expect(validateConcepts(chain, paths).join('\n')).toContain(message);
+    });
+  });
+
+  describe('topic', () => {
+    const withTopic = (category: string, topic: string): ConceptLike => ({
+      ...concept('a'),
+      data: { ...concept('a').data, category, topic },
+    });
+
+    it('lolos bila topic milik kategorinya', () => {
+      expect(validateConcepts([withTopic('psychology', 'judgment-heuristics')], [])).toEqual([]);
+    });
+
+    it.each([
+      ['topic kategori lain', withTopic('psychology', 'decision-under-risk')],
+      ['kategori tanpa topik', withTopic('foundations', 'apa-saja')],
+    ])('%s', (_, c) => {
+      expect(validateConcepts([c], []).join('\n')).toContain('tidak dikenal');
+    });
+  });
 });
 
 describe('validateProblems', () => {

@@ -1,13 +1,15 @@
 ---
 // Navigasi "Sebelumnya / Berikutnya" berdasarkan urutan jalur belajar.
-import { conceptHref, type PathContext } from '../lib/concepts';
+// Di langkah terakhir, "Berikutnya" menunjuk jalur tahap berikutnya (jalur yang membutuhkan jalur ini).
+import { conceptHref, pathAnchor, type PathContext } from '../lib/concepts';
 import { routes, withBase } from '../lib/url';
 
 interface Props {
   context: PathContext;
 }
 
-const { path, index, prev, next } = Astro.props.context;
+const { path, index, prev, next, nextPaths } = Astro.props.context;
+const nextPath = next ? undefined : nextPaths[0];
 const position = `Langkah ${index + 1} dari ${path.steps.length}`;
 ---
 
@@ -29,6 +31,14 @@ const position = `Langkah ${index + 1} dari ${path.steps.length}`;
         <a class="path-nav__link path-nav__link--next" href={conceptHref(next.id)} rel="next">
           <span class="path-nav__label">Berikutnya →</span>
           <span class="path-nav__title">{next.data.title}</span>
+        </a>
+      )
+    }
+    {
+      nextPath && (
+        <a class="path-nav__link path-nav__link--next" href={`${withBase(routes.learningPaths)}#${pathAnchor(nextPath.id)}`}>
+          <span class="path-nav__label">Jalur berikutnya →</span>
+          <span class="path-nav__title">{nextPath.title}</span>
         </a>
       )
     }

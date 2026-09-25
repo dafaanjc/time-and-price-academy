@@ -1,5 +1,6 @@
 // Validasi lintas-entri yang tidak bisa diekspresikan oleh skema Zod per-file.
 // Fungsi murni: menerima data, mengembalikan daftar pesan galat.
+import { categories } from '../data/categories';
 import type { LearningPath } from '../data/learning-paths';
 import {
   extractHeadings,
@@ -26,7 +27,7 @@ interface EntryLike {
 }
 
 export interface ConceptLike extends EntryLike {
-  data: EntryLike['data'] & { prerequisites: string[]; related: string[] };
+  data: EntryLike['data'] & { prerequisites: string[]; related: string[]; category?: string; topic?: string };
 }
 
 export interface ProblemLike extends EntryLike {
@@ -163,22 +164,55 @@ function checkCycles(concepts: ConceptLike[]): string[] {
   return errors;
 }
 
+/** `topic` harus salah satu `topics` milik kategori konsep itu (data/categories.ts). */
+function checkTopics(concepts: ConceptLike[]): string[] {
+  const errors: string[] = [];
+  for (const c of concepts) {
+    const { category, topic } = c.data;
+    if (!topic) continue;
+    const topics = categories.find((x) => x.id === category)?.topics ?? [];
+    if (!topics.some((t) => t.id === topic)) {
+      const known = topics.map((t) => t.id).join(', ') || 'kategori ini tidak punya topik';
+      errors.push(`${c.id}: topic "${topic}" tidak dikenal untuk kategori "${category}" (pakai: ${known})`);
+    }
+  }
+  return errors;
+}
+
+/**
+ * Jalur bertingkat: `requires` merujuk jalur yang muncul lebih awal (jadi tidak mungkin bersiklus), dan
+ * prasyarat setiap langkah harus sudah dipelajari, baik di langkah sebelumnya maupun di jalur yang
+ * dibutuhkan (secara berantai).
+ */
 function checkLearningPaths(paths: LearningPath[], concepts: ConceptLike[]): string[] {
   const byId = new Map(concepts.map((c) => [c.id, c]));
   const errors: string[] = [];
-  for (const path of paths) {
+  /** Konsep yang sudah tercakup setelah menyelesaikan jalur (termasuk jalur yang dibutuhkannya). */
+  const covered = new Map<string, Set<string>>();
+  for (const [pathIndex, path] of paths.entries()) {
+    if (covered.has(path.id)) errors.push(`Jalur "${path.id}": id jalur ganda`);
+    const inherited = new Set<string>();
+    for (const req of path.requires ?? []) {
+      const earlierIndex = paths.findIndex((p) => p.id === req);
+      if (earlierIndex === -1) errors.push(`Jalur "${path.id}": requires merujuk jalur yang tidak ada: "${req}"`);
+      else if (earlierIndex >= pathIndex) {
+        errors.push(`Jalur "${path.id}": jalur yang dibutuhkan "${req}" harus muncul lebih awal di learning-paths.ts`);
+      }
+      for (const id of covered.get(req) ?? []) inherited.add(id);
+    }
     path.steps.forEach((step, index) => {
       const concept = byId.get(step);
       if (!concept) {
         errors.push(`Jalur "${path.id}": langkah "${step}" bukan konsep yang ada`);
         return;
       }
-      const earlier = new Set(path.steps.slice(0, index));
+      const earlier = new Set([...inherited, ...path.steps.slice(0, index)]);
       const missing = concept.data.prerequisites.filter((p) => !earlier.has(p));
       if (missing.length > 0) {
         errors.push(`Jalur "${path.id}": "${step}" muncul sebelum prasyaratnya (${missing.join(', ')})`);
       }
     });
+    covered.set(path.id, new Set([...inherited, ...path.steps]));
   }
   return errors;
 }
@@ -195,6 +229,7 @@ export function validateConcepts(concepts: ConceptLike[], paths: LearningPath[])
     ...checkFileNames(concepts),
     ...checkReferences(concepts, ids),
     ...checkCycles(concepts),
+    ...checkTopics(concepts),
     ...checkSources(concepts),
     ...checkHeadingIds(concepts, reservedSectionIds),
     ...checkContentComponents(concepts),

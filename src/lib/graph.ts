@@ -8,6 +8,10 @@ export interface GraphInput {
   description?: string;
   href: string;
   prerequisites: string[];
+  /** Kelompok simpul (id kategori), dipakai sebagai kait `data-category`. */
+  group?: string;
+  /** Baris metadata singkat untuk tooltip, mis. "Psikologi · Heuristik Penilaian". */
+  meta?: string;
 }
 
 export interface GraphNode {
@@ -15,6 +19,8 @@ export interface GraphNode {
   title: string;
   description: string;
   href: string;
+  group?: string;
+  meta: string;
   /** Tingkat 0 = tanpa prasyarat. */
   layer: number;
   x: number;
@@ -183,6 +189,8 @@ export function layoutGraph(inputs: GraphInput[]): GraphLayout {
       title: n.title,
       description: n.description ?? '',
       href: n.href,
+      group: n.group,
+      meta: n.meta ?? '',
       layer,
       x: offset + i * (NODE_WIDTH + H_GAP),
       y: PADDING + layer * (NODE_HEIGHT + V_GAP),
