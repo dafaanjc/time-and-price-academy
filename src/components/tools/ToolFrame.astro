@@ -10,8 +10,9 @@ interface Props {
   /** Ringkasan hasil awal (juga diperbarui skrip). */
   summary: string;
   /**
-   * `instrument`: tampilan instrumen ukur untuk beranda (pelat bernomor, input mono, pembacaan besar).
-   * Default dipakai di dalam konten MDX.
+   * Tampilan selalu instrumen ukur (R9: satu gaya alat hitung di seluruh situs). Varian hanya mengatur
+   * penempatan: `default` = di dalam artikel MDX (lebar baca, jarak atas-bawah); `instrument` = berdiri
+   * sendiri di beranda (mengisi kolomnya).
    */
   variant?: 'default' | 'instrument';
   /** Label kecil di atas judul. */
@@ -25,7 +26,7 @@ const DEFAULT_NOTE =
 const { tool, title, description, summary, variant = 'default', label = 'Alat hitung', note = DEFAULT_NOTE } = Astro.props;
 ---
 
-<form class:list={['tool', { 'tool--instrument': variant === 'instrument' }]} data-tool={tool} novalidate>
+<form class:list={['tool', 'tool--instrument', { 'tool--embedded': variant === 'default' }]} data-tool={tool} novalidate>
   <header class="tool__header">
     <p class="tool__label">{label}</p>
     <h3 class="tool__title">{title}</h3>
@@ -350,7 +351,7 @@ const { tool, title, description, summary, variant = 'default', label = 'Alat hi
     color: var(--gain);
   }
 
-  /* ---------- Varian instrumen (beranda) ----------
+  /* ---------- Gaya instrumen (semua alat) ----------
      Pelat instrumen: bingkai garis tegas, label mono, input angka mono rata kanan seperti jendela
      pembacaan, hasil sebagai angka serif besar. Tanpa bayangan; sorotan hanya garis kuningan. */
   .tool--instrument {
@@ -454,5 +455,16 @@ const { tool, title, description, summary, variant = 'default', label = 'Alat hi
 
   .tool--instrument :global(.readout > .readout__primary) {
     border-left: var(--border-mark) solid var(--mark);
+  }
+
+  /* Label plot dan penanda simulasi menutup garis dengan warna bidang hasil (paper), bukan surface. */
+  .tool--instrument :global(.plot__tag) {
+    background: var(--paper);
+  }
+
+  /* Di dalam artikel: lebar baca dan jarak dari paragraf di sekitarnya. */
+  .tool--embedded {
+    max-width: var(--measure);
+    margin: var(--space-8) 0;
   }
 </style>

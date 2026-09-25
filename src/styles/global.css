@@ -383,6 +383,12 @@ svg {
   color: var(--ink-3);
 }
 
+/* Huruf yang maknanya berubah bila dikapitalkan (σ → Σ) tetap apa adanya di dalam label kapital.
+   `!important` disengaja: utilitas ini harus menang atas aturan label kapital komponen mana pun. */
+.keep-case {
+  text-transform: none !important;
+}
+
 /* Nomor indeks/penunjuk dalam label (mis. "01"): warna tanda ukur. */
 .label__index {
   color: var(--mark);
@@ -409,8 +415,7 @@ svg {
 }
 
 .badge--draft {
-  background: var(--caution-bg);
-  border-color: transparent;
+  border-color: var(--caution);
   color: var(--caution);
 }
 

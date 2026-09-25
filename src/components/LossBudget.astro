@@ -1,0 +1,130 @@
+---
+// Catatan tepi "Anggaran salah" (R9) di halaman masalah trader: sisa modal setelah 10 kali salah beruntun
+// untuk beberapa risiko per transaksi. Hitungan pasti (src/lib/hourglass.ts, sama dengan losingStreak
+// mode `fixed`), bukan data pasar; berlaku umum untuk semua masalah karena setiap masalah adalah soal
+// ukuran risiko. Garis tipis per baris = sisa modal (skala 0–100%); tautan ke instrumen di beranda.
+import HourglassGlyph from './figures/HourglassGlyph.astro';
+import { formatPercent, remainingAfterLosses } from '../lib/hourglass';
+import { routes, withBase } from '../lib/url';
+
+const LOSSES = 10;
+const rows = [1, 2, 5, 10].map((risk) => ({ risk, remaining: remainingAfterLosses(risk, LOSSES) }));
+const id = 'anggaran-salah';
+---
+
+<section class="loss-budget" aria-labelledby={id}>
+  <h2 id={id} class="label loss-budget__title">
+    <HourglassGlyph fill={0.4} />
+    <span>Anggaran salah</span>
+  </h2>
+  <p class="loss-budget__lead">Sisa modal setelah {LOSSES} kali salah beruntun, dengan risiko tetap per transaksi:</p>
+  <table class="loss-budget__table">
+    <thead>
+      <tr>
+        <th scope="col">Risiko</th>
+        <th scope="col">Sisa modal</th>
+      </tr>
+    </thead>
+    <tbody>
+      {
+        rows.map((r) => (
+          <tr>
+            <th scope="row">{formatPercent(r.risk)}</th>
+            <td>
+              <span class="loss-budget__cell">
+                <span class="loss-budget__value">{formatPercent(r.remaining)}</span>
+                <span class="loss-budget__bar" style={`--remaining: ${r.remaining.toFixed(1)}%`} aria-hidden="true" />
+              </span>
+            </td>
+          </tr>
+        ))
+      }
+    </tbody>
+  </table>
+  <p class="loss-budget__note">Hitungan pasti, bukan data pasar.</p>
+  <a class="loss-budget__link" href={`${withBase(routes.home)}#jam-pasir`}>Coba di jam pasir modal →</a>
+</section>
+
+<style>
+  .loss-budget {
+    padding-block: var(--space-3) var(--space-4);
+    border-block: var(--border-hair) solid var(--rule);
+  }
+
+  .loss-budget__title {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    margin: 0 0 var(--space-2);
+    color: var(--ink-2);
+  }
+
+  .loss-budget__lead,
+  .loss-budget__note {
+    margin: 0;
+    font-size: var(--text-sm);
+    color: var(--ink-2);
+  }
+
+  .loss-budget__note {
+    margin-top: var(--space-2);
+    font-size: var(--text-xs);
+    color: var(--ink-3);
+  }
+
+  .loss-budget__table {
+    width: 100%;
+    margin-top: var(--space-3);
+    border-collapse: collapse;
+    font-size: var(--text-sm);
+  }
+
+  .loss-budget__table th,
+  .loss-budget__table td {
+    padding: var(--space-1) 0;
+    text-align: left;
+    font-weight: 400;
+    border-bottom: var(--border-hair) solid var(--rule);
+  }
+
+  .loss-budget__table thead th {
+    font-family: var(--font-label);
+    font-size: var(--text-2xs);
+    letter-spacing: var(--tracking-mono);
+    text-transform: uppercase;
+    color: var(--ink-3);
+  }
+
+  .loss-budget__table tbody th {
+    width: 4.5rem;
+    color: var(--ink-2);
+  }
+
+  .loss-budget__cell {
+    display: grid;
+    grid-template-columns: 4rem minmax(0, 1fr);
+    align-items: center;
+    gap: var(--space-3);
+  }
+
+  .loss-budget__value {
+    font-weight: 600;
+  }
+
+  /* Skala 0–100%: garis tipis sepanjang sisa modal, sisanya garis putus-putus (yang hilang). */
+  .loss-budget__bar {
+    height: var(--tick-major);
+    background:
+      linear-gradient(var(--ink-2), var(--ink-2)) left center / var(--remaining) var(--stroke-trace) no-repeat,
+      linear-gradient(to right, var(--rule-strong) 50%, transparent 0) left center / 6px var(--stroke-hair) repeat-x;
+    border-right: var(--stroke-hair) solid var(--rule-strong);
+  }
+
+  .loss-budget__link {
+    display: inline-block;
+    margin-top: var(--space-3);
+    font-size: var(--text-sm);
+    font-weight: 600;
+    color: var(--ink);
+  }
+</style>

@@ -1,25 +1,37 @@
 ---
 // Halaman masalah trader: MASALAH → KEPUTUSAN → KONSEP → TEORI/BUKTI → PENERAPAN.
-// Urutan: header (kutipan, keputusan, atribusi) → notis draf → isi MDX (4 bagian wajib) →
-// konsep yang terlibat → baca dulu → sumber.
+// Urutan: header (kutipan, keputusan, atribusi) → daftar isi → notis draf → isi MDX (4 bagian wajib) →
+// konsep yang terlibat → baca dulu → sumber → catatan tepi "Anggaran salah".
+// Desktop (≥ 64rem, grid editorial): header & isi di kolom 1–7; daftar isi (sejajar header) dan
+// "Anggaran salah" (sticky, sejajar isi) di kolom 9–12. Mobile: satu kolom dalam urutan DOM di atas.
 import BaseLayout from './BaseLayout.astro';
 import Byline from '../components/Byline.astro';
 import ConceptLinkList from '../components/ConceptLinkList.astro';
+import LossBudget from '../components/LossBudget.astro';
 import PlaceholderNotice from '../components/PlaceholderNotice.astro';
 import SourceList from '../components/SourceList.astro';
+import TableOfContents from '../components/TableOfContents.astro';
 import { getProblemConcepts, getReadFirst, type Problem } from '../lib/problems';
 import { problemSectionIds } from '../lib/sections';
 import { absoluteUrl, problemOgImage, routes, withBase } from '../lib/url';
 
 interface Props {
   problem: Problem;
+  /** Heading level 2 dari isi MDX (id + judul), untuk daftar isi. */
+  headings: { id: string; title: string }[];
 }
 
-const { problem } = Astro.props;
+const { problem, headings } = Astro.props;
 const { title, decision, description, status, sources } = problem.data;
 const concepts = await getProblemConcepts(problem);
 const readFirst = await getReadFirst(problem);
 const shareUrl = absoluteUrl(Astro.url.pathname, Astro.site);
+const sections = [
+  ...headings,
+  { id: problemSectionIds.concepts, title: 'Konsep yang Terlibat' },
+  { id: problemSectionIds.readFirst, title: 'Baca Dulu' },
+  { id: problemSectionIds.sources, title: 'Sumber' },
+];
 ---
 
 <BaseLayout
@@ -40,41 +52,95 @@ const shareUrl = absoluteUrl(Astro.url.pathname, Astro.site);
       <Byline url={shareUrl} />
     </header>
 
-    {
-      status === 'draft' && (
-        <PlaceholderNotice>
-          Belum ditinjau dan belum bersumber. Angka dalam contoh adalah ilustrasi, bukan data pasar atau rekomendasi.
-        </PlaceholderNotice>
-      )
-    }
-
-    <div class="content">
-      <slot />
+    <div class="problem__toc">
+      <TableOfContents sections={sections} />
     </div>
 
-    <ConceptLinkList
-      id={problemSectionIds.concepts}
-      title="Konsep yang Terlibat"
-      concepts={concepts}
-      empty="Belum ada konsep yang dirujuk."
-    />
+    <div class="problem__body">
+      {
+        status === 'draft' && (
+          <PlaceholderNotice>
+            Belum ditinjau dan belum bersumber. Angka dalam contoh adalah ilustrasi, bukan data pasar atau rekomendasi.
+          </PlaceholderNotice>
+        )
+      }
 
-    <ConceptLinkList
-      id={problemSectionIds.readFirst}
-      title="Baca Dulu"
-      concepts={readFirst}
-      empty="Tidak ada prasyarat. Konsep di atas bisa langsung dipelajari."
-    />
+      <div class="content">
+        <slot />
+      </div>
 
-    <SourceList sources={sources} />
+      <ConceptLinkList
+        id={problemSectionIds.concepts}
+        title="Konsep yang Terlibat"
+        concepts={concepts}
+        empty="Belum ada konsep yang dirujuk."
+      />
+
+      <ConceptLinkList
+        id={problemSectionIds.readFirst}
+        title="Baca Dulu"
+        concepts={readFirst}
+        empty="Tidak ada prasyarat. Konsep di atas bisa langsung dipelajari."
+      />
+
+      <SourceList sources={sources} />
+    </div>
+
+    <aside class="problem__aside" aria-label="Catatan tepi">
+      <LossBudget />
+    </aside>
   </article>
 </BaseLayout>
 
 <style>
-  .problem {
+  .problem,
+  .problem__body {
     display: flex;
     flex-direction: column;
     gap: var(--space-8);
+  }
+
+  .problem__toc :global(.toc) {
+    margin: 0;
+  }
+
+  @media (min-width: 64rem) {
+    .problem {
+      display: grid;
+      grid-template-columns: repeat(var(--grid-columns), minmax(0, 1fr));
+      gap: var(--space-8) var(--grid-gap);
+      align-items: start;
+    }
+
+    .problem__header,
+    .problem__body {
+      grid-column: 1 / span 7;
+    }
+
+    .problem__toc,
+    .problem__aside {
+      grid-column: 9 / -1;
+    }
+
+    .problem__header,
+    .problem__toc {
+      grid-row: 1;
+    }
+
+    .problem__body,
+    .problem__aside {
+      grid-row: 2;
+    }
+
+    /* Daftar isi di kolom sempit: satu kolom, tanpa garis bawah (dipisah ruang dari header). */
+    .problem__toc :global(ol) {
+      columns: 1;
+    }
+
+    .problem__aside {
+      position: sticky;
+      top: calc(var(--header-height) + var(--space-8));
+    }
   }
 
   .problem__header {

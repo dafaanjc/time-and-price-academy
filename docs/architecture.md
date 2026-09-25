@@ -164,7 +164,9 @@ Detail skema dan cara menambah konsep ada di [`content-model.md`](./content-mode
 | `ConceptIndex` | Indeks semua kategori untuk `/konsep/`; tiap kategori memakai `ConceptRows` |
 | `ConceptRows` | Baris konsep bernomor (judul, istilah asli, tingkat, deskripsi); juga dipakai halaman kategori |
 | `ProblemList` | Daftar masalah trader sebagai baris editorial: kutipan, keputusan, konsep (di `/masalah/` dan tautan balik halaman konsep) |
-| `ProblemLayout` | Halaman masalah: kutipan → keputusan → atribusi → isi (4 bagian wajib) → konsep yang terlibat → baca dulu → sumber |
+| `ProblemLayout` | Halaman masalah: kutipan → keputusan → atribusi → daftar isi → isi (4 bagian wajib) → konsep yang terlibat → baca dulu → sumber. Desktop: grid editorial, isi di kolom 1–7, daftar isi + `LossBudget` (sticky) di kolom 9–12 |
+| `LossBudget` | Catatan tepi "Anggaran salah": sisa modal setelah 10 kali salah beruntun pada risiko 1/2/5/10% (hitungan pasti dari `src/lib/hourglass.ts`), tautan ke instrumen jam pasir di beranda (`#jam-pasir`) |
+| `figures/HourglassGlyph` | Glyph jam pasir kecil (motif "anggaran": waktu baca, anggaran salah). Tanda teknis, bukan emblem; `aria-hidden` |
 | `Sidebar` | `ConceptNav` di kiri (≥ 64rem), sticky; hanya bila `BaseLayout sidebar` |
 | `MobileNav` | Navigasi mobile dengan `<dialog>` native (fokus terkunci, Esc/backdrop menutup) |
 | `SiteFooter` | Atribusi "By Muhamad Daffa - Time & Price Academy" dan disclaimer |
@@ -180,7 +182,7 @@ Detail skema dan cara menambah konsep ada di [`content-model.md`](./content-mode
 | `CategoryIndex` | Indeks kategori sebagai daftar editorial: nomor "01 / 05", motif, judul, deskripsi, konsep |
 | `figures/TimePriceFigure` | FIG. 01, gambar teknik isometrik Waktu × Harga (SVG inline; geometri dari `src/lib/iso.ts`); `bare` = tanpa figure/caption, dipakai sebagai fallback RiskField |
 | `figures/CategoryMotif` | Motif SVG teknis per kategori (`motif` di `categories.ts`: axes, band, oscillation, kink, tree) |
-| `tools/ToolFrame` | Kerangka alat hitung: label, judul, input, hasil, ringkasan `aria-live`, catatan "bukan rekomendasi" |
+| `tools/ToolFrame` | Kerangka alat hitung: label, judul, input, hasil, ringkasan `aria-live`, catatan "bukan rekomendasi". Sejak R9 selalu bergaya instrumen; `variant` hanya mengatur penempatan (`default` = di artikel, lebar baca; `instrument` = beranda) |
 | `tools/UkuranPosisi` | Risiko per transaksi → ukuran posisi; rugi di stop loss setelah lot dibulatkan; risiko sebenarnya dan stop maksimum untuk "lot yang biasa dipakai"; meter risiko (`riskGauge`) di semua varian; `variant="instrument"` untuk beranda |
 | `tools/SimulasiMargin` | Margin level dan jarak (poin) ke margin call / stop out |
 | `tools/TabelKalahBeruntun` | Sisa modal saat kalah beruntun: risiko tetap vs digandakan |
@@ -189,17 +191,17 @@ Detail skema dan cara menambah konsep ada di [`content-model.md`](./content-mode
 | `tools/SimulasiEkuitas` | Nilai harapan → 200 kurva ekuitas (median, pita 5–95%, nilai harapan) → histogram drawdown maksimum dengan ambang |
 | `ConceptLayout` | Urutan halaman konsep: header → pita draf → [isi MDX + daftar isi] → masalah terkait → konsep terkait → prasyarat → sumber → navigasi jalur. Di ≥ 80rem daftar isi menjadi kolom kanan sticky |
 | `ConceptHeader` | Pembuka padat: meta satu baris, judul + istilah asli, deskripsi, byline |
-| `ConceptMeta` | Satu baris: kategori · tingkat · waktu baca · lencana Draf |
+| `ConceptMeta` | Satu baris: kategori · tingkat · waktu baca (dengan `HourglassGlyph`) · lencana Draf (garis, tanpa isian) |
 | `Byline` | Atribusi "By Muhamad Daffa - Time & Price Academy" + `CopyLinkButton` |
 | `CopyLinkButton` | Menyalin URL canonical (atau `location.href`) dan mengumumkan hasilnya lewat `role="status"` |
-| `PlaceholderNotice` | Pita tipis "DRAF" untuk konsep/masalah berstatus `draft` |
+| `PlaceholderNotice` | Satu baris "DRAF" di antara dua garis rambut untuk konsep/masalah berstatus `draft` (bukan panel berwarna) |
 | `TableOfContents` | "Di halaman ini", dari heading `##` MDX atau override `sections`. Kolom kanan sticky (≥ 80rem), dua kolom (tablet), sebaris membungkus (mobile) |
 | `mdx/Contoh` | Kotak contoh di isi konsep: `<Contoh jenis="kehidupan|keuangan|trading">` (trading bergaris peringatan) |
 | `mdx/Definisi` | Kotak definisi utama di "Gagasan Utama" |
 | `ConceptLinkList` | Daftar tautan konsep (dipakai untuk Konsep Terkait dan Prasyarat) |
 | `SourceList` | Bagian "Sumber": urutan per jenis dan keadaan kosong |
 | `SourceCard` | Satu sumber: label jenis, judul (tautan URL/DOI, tab baru), penulis · tahun, publisher/DOI/ISBN, catatan |
-| `KnowledgeGraph` | Graf prasyarat sebagai SVG; setiap simpul tautan ke konsep |
+| `KnowledgeGraph` | Graf prasyarat sebagai SVG; setiap simpul tautan ke konsep, penanda bentuk per kategori + legenda |
 | `PathNav` | "Sebelumnya / Berikutnya" dan posisi langkah, berdasarkan jalur belajar pertama yang memuat konsep; di langkah terakhir menunjuk "Jalur berikutnya" (jalur yang `requires` jalur ini) |
 
 ID bagian yang dirender layout (`konsep-terkait`, `prasyarat`, `sumber`) didefinisikan sekali di
@@ -263,13 +265,19 @@ SVG statis saat build, tanpa library dan tanpa JavaScript klien.
    dipilih agar graf terbaca di mobile tanpa diperkecil.
 4. **Garis.** Hanya relasi prasyarat (konsep terkait tampil di halaman konsep):
    - antar tingkat berurutan: kurva S dari bawah prasyarat ke atas konsep;
-   - melompati tingkat: garis siku di **jalur (lane) khusus di kanan semua simpul**. Garis turun dari
+   - melompati tingkat: garis siku di **jalur (lane) khusus di luar semua simpul, di sisi kiri atau kanan
+     (mana yang lebih dekat ke kedua simpul, R9)**. Garis turun dari
      bawah simpul asal, belok di celah antar-tingkat (yang tidak berisi simpul), turun di jalurnya, lalu
      masuk ke atas simpul tujuan. Setiap garis mendapat jalur sendiri (garis terpendek paling dekat), dan
      belokan keluar/masuk dipisah agar dua garis di satu celah tidak tampak menyatu. Tidak ada garis yang
      menembus simpul lain; ini diuji secara geometris.
-5. **Judul.** Maksimal dua baris × 22 karakter. Sisanya dipotong dengan elipsis.
-6. **Aksesibilitas.** SVG punya `<title>` dan `<desc>`. Setiap simpul adalah `<a>` dengan
+5. **Judul.** Maksimal dua baris × 18 karakter. Sisanya dipotong dengan elipsis. Ukuran simpul (172px)
+   dan jarak dipadatkan di R9 agar peta nyata (5 simpul per tingkat + jalur, ±1030px) muat di bingkai
+   desktop ≥ 80rem tanpa digeser; di layar lebih sempit area peta digeser mendatar.
+6. **Kategori.** Penanda simpul berbentuk per kategori (`marker` di `src/data/categories.ts`: lingkaran,
+   persegi, belah ketupat, segitiga, silang; `markerPath()` di `graph.ts`), monokrom di kedua tema.
+   Legenda di bawah peta hanya memuat kategori yang punya simpul.
+7. **Aksesibilitas.** SVG punya `<title>` dan `<desc>`. Setiap simpul adalah `<a>` dengan
    `aria-label` judul lengkap, bisa difokuskan dengan Tab dan punya cincin fokus. Halaman `/peta/`
    menyertakan tabel prasyarat sebagai alternatif teks.
 

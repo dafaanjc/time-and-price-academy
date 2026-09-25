@@ -1,0 +1,45 @@
+---
+// Glyph jam pasir kecil (R9): motif situs untuk "anggaran" — waktu (menit baca) dan modal (anggaran salah).
+// Digambar ulang sebagai tanda teknis sederhana (dua segitiga + pelat), BUKAN emblem: emblem resmi hanya
+// tampil lewat BrandEmblem. Mengikuti warna teks (currentColor); pasir memakai --mark. Dekoratif: teks
+// di sebelahnya selalu membawa maknanya, jadi aria-hidden.
+interface Props {
+  /** Isi pasir di tabung bawah, 0–1 (default: sebagian kecil sudah jatuh). */
+  fill?: number;
+}
+
+const { fill = 0.35 } = Astro.props;
+const f = Math.min(1, Math.max(0, fill));
+// Tabung bawah: puncak (6, 8), alas y = 14.5. Pasir = kerucut di alas setinggi f × 6,5, tetap di dalam kaca.
+const h = 6.5 * f;
+const w = (3.5 * h) / 6.5;
+---
+
+<svg class="glyph-hourglass" viewBox="0 0 12 16" width="12" height="16" aria-hidden="true" focusable="false">
+  <path class="glyph-hourglass__frame" d="M1 1.5 H11 M1 14.5 H11"></path>
+  <path class="glyph-hourglass__glass" d="M2.5 1.5 L6 8 L2.5 14.5 M9.5 1.5 L6 8 L9.5 14.5"></path>
+  {f > 0 && <path class="glyph-hourglass__sand" d={`M${6 - w} 14.5 L${6 + w} 14.5 L6 ${14.5 - h} Z`}></path>}
+</svg>
+
+<style>
+  .glyph-hourglass {
+    display: inline-block;
+    flex: none;
+    width: 0.75em;
+    height: 1em;
+    vertical-align: -0.15em;
+    overflow: visible;
+  }
+
+  .glyph-hourglass__frame,
+  .glyph-hourglass__glass {
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.2;
+    stroke-linecap: square;
+  }
+
+  .glyph-hourglass__sand {
+    fill: var(--mark);
+  }
+</style>

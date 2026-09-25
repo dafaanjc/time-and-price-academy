@@ -170,7 +170,9 @@ per-vertex opacity. No lights, shadows, glow, bloom, neon or spinning.
 Single source of truth: `src/data/categories.ts` (`foundations`, `risk-management`, `psychology`,
 `behavioral-finance`, `decision-theory`). Array order = display order = index number, rendered by
 `categoryIndexLabel()` as `01 / 05` (the total follows the array length). Each entry has a `motif`
-(`axes`, `band`, `oscillation`, `kink`, `tree`) drawn by `components/figures/CategoryMotif.astro`.
+(`axes`, `band`, `oscillation`, `kink`, `tree`) drawn by `components/figures/CategoryMotif.astro`, and a
+`marker` shape (`circle`, `square`, `diamond`, `triangle`, `cross`; unique per category, tested) used on the
+knowledge map.
 Optional `topics` = sub-categories (concept frontmatter `topic`, validated per category; the category page
 groups by topic). Learning paths are tiered via `requires` in `src/data/learning-paths.ts`
 (Fondasi → Heuristik dan Bias → Keputusan di Bawah Risiko); curriculum map in `docs/content-model.md`.
@@ -197,8 +199,15 @@ Labels are rendered in markup, never via CSS `content`, so they stay accessible.
 - **R9 "Jam Pasir Modal" — hero (done):** plate tokens + `.plate`, `HomeHero` rebuilt around
   `figures/CapitalHourglass` + emblem (`BrandEmblem variant="plate"`), emblem removed from
   `HomePhilosophy`, `siteConfig.heroLine`, Risk Field unmounted.
-- **R9 follow-ups (not started):** problem pages use `col-aside` (stakes note / small hourglass readout);
-  one calculator style everywhere (instrument variant on problem/concept pages); DRAF notice as a hairline
-  line instead of a beige panel; knowledge-map edges kept inside the frame + node coding; hourglass glyph
-  as a small site-wide motif.
+- **R9 follow-ups (done):**
+  - Problem pages on the editorial grid: header + body in columns 1–7; "Di halaman ini" and a sticky
+    `LossBudget` ("Anggaran salah": remaining capital after 10 losses at 1/2/5/10 %, links to `#jam-pasir`)
+    in columns 9–12.
+  - One calculator style: `ToolFrame` is always the instrument style; `variant` only sets placement.
+  - DRAF notice = one line between hairlines (`PlaceholderNotice`); the draft badge is outlined, not filled.
+  - Knowledge map fits the desktop frame (compact nodes, skip-lanes on the nearer side) and codes
+    categories by **marker shape** (`marker` in `categories.ts`, `markerPath()` in `lib/graph.ts`) + legend.
+  - `figures/HourglassGlyph`: the small hourglass motif for "budget" (reading time, loss budget). It is a
+    technical mark, never a stand-in for the emblem; use it only where time or capital is being spent.
+  - `.keep-case` keeps characters whose meaning changes in capitals (σ → Σ) inside uppercase labels.
 - **Next phases:** only after the user explicitly says `PROCEED`.

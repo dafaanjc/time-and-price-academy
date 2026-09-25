@@ -20,6 +20,13 @@ export const categoryMotifs = ['axes', 'band', 'oscillation', 'kink', 'tree'] as
 export type CategoryMotif = (typeof categoryMotifs)[number];
 
 /**
+ * Penanda simpul di peta pengetahuan (R9): bentuk monokrom, bukan warna, agar kategori terbaca di kedua
+ * tema dan tanpa bergantung pada warna. Digambar oleh `markerPath()` di src/lib/graph.ts.
+ */
+export const categoryMarkers = ['circle', 'square', 'diamond', 'triangle', 'cross'] as const;
+export type CategoryMarker = (typeof categoryMarkers)[number];
+
+/**
  * Sub-kategori (topik) di dalam satu kategori. Konsep memilihnya lewat frontmatter `topic`
  * (divalidasi terhadap kategori konsep di lib/validate.ts). Urutan array = urutan tampil di halaman
  * kategori. Kategori tanpa `topics` menampilkan konsepnya sebagai satu daftar.
@@ -34,6 +41,7 @@ export interface Category {
   title: string;
   description: string;
   motif: CategoryMotif;
+  marker: CategoryMarker;
   topics?: readonly CategoryTopic[];
 }
 
@@ -43,6 +51,7 @@ export const categories: Category[] = [
     id: 'foundations',
     title: 'Fondasi',
     motif: 'axes',
+    marker: 'circle',
     description:
       'Konsep dasar untuk membaca risiko: probabilitas, distribusi, nilai harapan, dan variabilitas.',
   },
@@ -50,12 +59,14 @@ export const categories: Category[] = [
     id: 'risk-management',
     title: 'Manajemen Risiko',
     motif: 'band',
+    marker: 'square',
     description: 'Cara mengukur, membatasi, dan mengelola risiko dalam keputusan keuangan.',
   },
   {
     id: 'psychology',
     title: 'Psikologi',
     motif: 'oscillation',
+    marker: 'diamond',
     description: 'Bagaimana emosi dan kondisi mental memengaruhi cara kita menghadapi risiko.',
     topics: [
       { id: 'bounded-rationality', title: 'Rasionalitas Terbatas' },
@@ -67,6 +78,7 @@ export const categories: Category[] = [
     id: 'behavioral-finance',
     title: 'Keuangan Perilaku',
     motif: 'kink',
+    marker: 'triangle',
     description: 'Pola perilaku dan bias yang muncul ketika manusia mengambil keputusan keuangan.',
     topics: [
       { id: 'decision-under-risk', title: 'Keputusan di Bawah Risiko' },
@@ -77,6 +89,7 @@ export const categories: Category[] = [
     id: 'decision-theory',
     title: 'Teori Keputusan',
     motif: 'tree',
+    marker: 'cross',
     description: 'Kerangka untuk memilih tindakan terbaik ketika hasilnya tidak pasti.',
   },
 ];
