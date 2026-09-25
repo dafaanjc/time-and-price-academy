@@ -238,6 +238,11 @@ Labels are rendered in markup, never via CSS `content`, so they stay accessible.
     the root node.
 - **R9.1 — hero refinement (done):** `figures/HeroStage` (+ `lib/outcome-field.ts`) replaces the hero
   plate; the hourglass moves to section `00 Anggaran salah`; emblem frame-crop rule; scroll-linked stage.
+  Hotfix: the hero component is now `HomeLanding.astro` (classes `landing__*`). Astro derives the scoped-CSS
+  id from the file path, so stale `HomeHero` CSS from `main` (e.g. a dev server not restarted after switching
+  branches) matched the new markup and collapsed the stage into one grid column. `HeroStage` picks its wide
+  or compact composition with a container query on its own width (`@container stage (min-width: 34rem)`),
+  never the viewport, so a narrow stage can't produce overlapping caption text.
 - **R9 follow-ups (done):**
   - Problem pages on the editorial grid: header + body in columns 1–7; "Di halaman ini" and a sticky
     `LossBudget` ("Anggaran salah": remaining capital after 10 losses at 1/2/5/10 %, links to `#jam-pasir`)

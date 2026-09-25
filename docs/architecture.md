@@ -78,7 +78,7 @@ Semua identitas ada di `src/config/site.ts` dan diekspor sebagai `siteConfig`:
 | `attribution` | By Muhamad Daffa - Time & Price Academy | `Byline` (setiap konsep), `SiteFooter` (setiap halaman) |
 | `lang` / `locale` | `id` / `id_ID` | `<html lang>`, `og:locale` |
 | `taglineParts` / `tagline` | Pahami Risiko. Pahami Keputusan. | `<title>` beranda, gambar OG |
-| `heroLine` | Trading bukan cuma soal entry. | judul hero beranda (`HomeHero`) |
+| `heroLine` | Trading bukan cuma soal entry. | judul hero beranda (`HomeLanding`) |
 | `description` | (diturunkan dari `product` dan `masterBrand`) | meta description default |
 
 Namanya sengaja `siteConfig`, bukan `site`, agar tidak tertukar dengan `Astro.site` (URL dari `SITE_URL`).
@@ -175,7 +175,7 @@ Detail skema dan cara menambah konsep ada di [`content-model.md`](./content-mode
 | `SiteFooter` | Atribusi "By Muhamad Daffa - Time & Price Academy" dan disclaimer |
 | `LearningPath` | Rute jalur belajar (R10): rel ukur vertikal, nomor langkah mono besar, baris editorial (bukan kartu), tick kuningan saat ditunjuk (`/jalur-belajar/`) |
 | `SectionHeading` | Judul bagian bernomor bergaya dokumen cetak ("01 MASALAH TRADER ─ Semua →") |
-| `HomeHero` | Hero beranda (R9.1): baris merek (induk + produk), judul `siteConfig.heroLine`, pertanyaan inti, dua tautan + `figures/HeroStage` |
+| `HomeLanding` | Hero beranda (R9.1; dulu `HomeHero`): baris merek (induk + produk), judul `siteConfig.heroLine`, pertanyaan inti, dua tautan + `figures/HeroStage`. Nama file & kelas `landing__*` sengaja baru: Astro menurunkan ID cakupan CSS dari path file, jadi CSS `HomeHero` lama (mis. dev server yang belum dimuat ulang setelah pindah branch) tidak bisa lagi mengenai markup ini |
 | `figures/HeroStage` | Panggung gelap hero: kisi → medan hasil prosedural (`src/lib/outcome-field.ts`) → emblem monumental; dua komposisi (lebar/ringkas); satu interaksi gulir (horizon 1T → 2T, sebaran ∝ √t, paralaks emblem ≤ `--parallax-shift`) |
 | `figures/CapitalHourglass` | (Bagian `00 Anggaran salah` di bawah hero, token netral tema.) Instrumen jam pasir modal: pasir = modal, tiap keputusan salah menjatuhkan risiko % dari modal berjalan; skala dikalibrasi dari luas tabung, pembanding 1%, kontrol risiko 1/2/5/10% + "Salah sekali lagi". Geometri & hitungan murni di `src/lib/hourglass.ts` (diuji); tanpa JS keadaan awal tetap tergambar + teks setara |
 | `figures/RiskField` | (Tidak dipasang sejak R9; disimpan untuk kemungkinan dipakai di Distribusi.) FIG. 01 Medan Risiko: relief kepadatan 3D (three.js, dimuat malas lewat `import()`); kualitas high/medium/low dari `src/lib/risk-field/quality.ts`, geometri murni di `geometry.ts`, adegan di `scene.ts`; fallback & isi HTML awal = `TimePriceFigure bare` |

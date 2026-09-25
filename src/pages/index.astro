@@ -6,7 +6,7 @@
 // → 04 INDEKS KATEGORI. Pintu masuk utama adalah masalah dalam bahasa trader; teori lewat rantai & indeks.
 import BaseLayout from '../layouts/BaseLayout.astro';
 import CategoryIndex from '../components/CategoryIndex.astro';
-import HomeHero from '../components/HomeHero.astro';
+import HomeLanding from '../components/HomeLanding.astro';
 import HomePhilosophy from '../components/HomePhilosophy.astro';
 import HomeProblems from '../components/HomeProblems.astro';
 import LearningSystem from '../components/LearningSystem.astro';
@@ -20,7 +20,7 @@ const problems = await getProblems();
 ---
 
 <BaseLayout>
-  <HomeHero />
+  <HomeLanding />
 
   <section class="home-section budget" aria-labelledby="anggaran-title">
     <SectionHeading id="anggaran-title" number="00" title="Anggaran salah" />
