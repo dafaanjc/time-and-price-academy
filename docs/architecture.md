@@ -107,10 +107,14 @@ Aturan pakai:
 
 - **Header:** tidak memakai emblem, karena detailnya hilang di 24–32px. Header memakai wordmark
   tipografis dari `siteConfig`. Ini penulisan nama, bukan logo baru.
-- **Emblem maksimal satu kali per halaman:** di footer setiap halaman kecuali beranda (96px, `alt=""`
-  karena atribusi sudah tertulis di sebelahnya). Sejak R9.3 beranda tidak menampilkan emblem: hero berupa
-  medan risiko abstrak.
-- **Latar dilebur tanpa kotak** (`BrandEmblem.astro`, varian `footer`, `<picture>` per tema):
+- **Emblem maksimal satu kali per halaman:** di beranda sebagai Objek 00 di panggung hero
+  (`figures/HeroStage`, varian `plate`, skala monumental ±86% lebar panggung; potongan bingkai hanya pada
+  jubah bawah & bahu kiri, kepala dan jam pasir selalu utuh), atau di
+  footer halaman lain (96px, `alt=""` karena atribusi sudah tertulis di sebelahnya).
+- **Latar dilebur tanpa kotak** (`BrandEmblem.astro`):
+  - varian `plate` (kedua tema): selalu `black logo.png` (satu-satunya sumber yang tajam di ukuran besar)
+    di atas `--plate` + `mix-blend-mode: screen`. Pelat selalu gelap, jadi aset tidak diwarnai ulang;
+  - varian `footer`, `<picture>` per tema:
     - tema gelap: `black logo.png` + `mix-blend-mode: screen`. Hitam murni menjadi transparan tanpa filter;
     - tema terang: `logos.jpeg` + `filter: brightness(1.16)` + `mix-blend-mode: multiply`. Kecerahan
     menaikkan latar terendah (221) menjadi putih, lalu `multiply` membuat putih transparan di atas kertas.
@@ -122,7 +126,7 @@ Aturan pakai:
 - **Dilarang:** memotong jam pasir menjadi ikon, mewarnai ulang, masker bentuk, watermark, latar
   bagian, atau memakai emblem sebagai dekorasi berulang.
 - `scripts/check-branding.mjs` memeriksa: wordmark ada di header, header tanpa gambar, emblem ≤ 1 per
-  halaman, dan `favicon.svg` (ikon buatan lama) tidak kembali.
+  halaman, beranda punya emblem di pelat hero (`emblem--plate`), dan `favicon.svg` (ikon buatan lama) tidak kembali.
 
 ## Sistem konten
 
@@ -155,7 +159,7 @@ Detail skema dan cara menambah konsep ada di [`content-model.md`](./content-mode
 | `BaseLayout` | Struktur halaman, `lang="id"`, skip link. Prop `sidebar`: indeks konsep di kiri (hanya halaman konsep/kategori); tanpa itu kontainer di tengah (`--container`) |
 | `SeoHead` | `<title>`, description, canonical, OpenGraph, Twitter card |
 | `SiteHeader` | Wordmark tipografis "TIME & PRICE ACADEMY │ Risk Lab" (dua baris di layar < 30rem) dan tombol menu mobile |
-| `BrandEmblem` | Artwork emblem resmi (varian `footer`), dilebur ke latar dengan blend mode |
+| `BrandEmblem` | Artwork emblem resmi (varian `plate` / `footer`), dilebur ke latar dengan blend mode |
 | `PrimaryNav` | Navigasi utama dari `src/lib/nav.ts` (Konsep / Jalur Belajar / Peta): baris di header desktop, kolom di menu mobile |
 | `ConceptNav` | Indeks konsep bergaya daftar isi bernomor; kategori kosong digabung jadi satu baris "Segera hadir" |
 | `ConceptIndex` | Indeks semua kategori untuk `/konsep/`; tiap kategori memakai `ConceptRows` |
@@ -171,10 +175,10 @@ Detail skema dan cara menambah konsep ada di [`content-model.md`](./content-mode
 | `SiteFooter` | Atribusi "By Muhamad Daffa - Time & Price Academy" dan disclaimer |
 | `LearningPath` | Rute jalur belajar (R10): rel ukur vertikal, nomor langkah mono besar, baris editorial (bukan kartu), tick kuningan saat ditunjuk (`/jalur-belajar/`) |
 | `SectionHeading` | Judul bagian bernomor bergaya dokumen cetak ("01 MASALAH TRADER ─ Semua →") |
-| `HomeLanding` | Hero beranda (dulu `HomeHero`): baris merek (induk + produk), judul `siteConfig.heroLine`, pertanyaan inti, dua tautan + `figures/HeroStage` (medan risiko abstrak). Nama file & kelas `landing__*` sengaja baru: Astro menurunkan ID cakupan CSS dari path file, jadi CSS `HomeHero` lama (mis. dev server yang belum dimuat ulang setelah pindah branch) tidak bisa lagi mengenai markup ini |
-| `figures/HeroStage` | Panggung gelap hero (R9.3): kisi teknis samar + `figures/RiskField` (tanpa figcaption sendiri); memetakan `--field-*` ke tinta pelat (grafit, kuningan satu-satunya aksen) dan menulis keterangan FIG. 00. Tanpa figur, tanpa jam pasir |
+| `HomeLanding` | Hero beranda (R9.1; dulu `HomeHero`): baris merek (induk + produk), judul `siteConfig.heroLine`, pertanyaan inti, dua tautan + `figures/HeroStage`. Nama file & kelas `landing__*` sengaja baru: Astro menurunkan ID cakupan CSS dari path file, jadi CSS `HomeHero` lama (mis. dev server yang belum dimuat ulang setelah pindah branch) tidak bisa lagi mengenai markup ini |
+| `figures/HeroStage` | Panggung gelap hero: kisi → medan hasil prosedural (`src/lib/outcome-field.ts`) → emblem monumental; dua komposisi (lebar/ringkas); satu interaksi gulir (horizon 1T → 2T, sebaran ∝ √t, paralaks emblem ≤ `--parallax-shift`); R9.2: paralaks kursor per lapisan (`--parallax-pointer`, `--tilt-max`) dan siklus jejak ambien (`traceAt`, `--motion-ambient`: denyut di "sekarang" → satu jalur ditempuh → pendaratan di kurva kepadatan), hanya saat terlihat, mati di bawah gerak dikurangi |
 | `figures/CapitalHourglass` | (Bagian `00 Anggaran salah` di bawah hero, token netral tema.) Instrumen jam pasir modal: pasir = modal, tiap keputusan salah menjatuhkan risiko % dari modal berjalan; skala dikalibrasi dari luas tabung, pembanding 1%, kontrol risiko 1/2/5/10% + "Salah sekali lagi". Geometri & hitungan murni di `src/lib/hourglass.ts` (diuji); tanpa JS keadaan awal tetap tergambar + teks setara |
-| `figures/RiskField` | (Dipasang lagi di panggung hero sejak R9.3; prop `caption`; token warna dibaca dari elemennya sendiri.) Medan Risiko: relief kepadatan 3D (three.js, dimuat malas lewat `import()`); kualitas high/medium/low dari `src/lib/risk-field/quality.ts`, geometri murni di `geometry.ts`, adegan di `scene.ts`; fallback & isi HTML awal = `TimePriceFigure bare` |
+| `figures/RiskField` | (Tidak dipasang sejak R9; disimpan untuk kemungkinan dipakai di Distribusi.) FIG. 01 Medan Risiko: relief kepadatan 3D (three.js, dimuat malas lewat `import()`); kualitas high/medium/low dari `src/lib/risk-field/quality.ts`, geometri murni di `geometry.ts`, adegan di `scene.ts`; fallback & isi HTML awal = `TimePriceFigure bare` |
 | `HomePhilosophy` | Pernyataan Waktu × Harga + garis ukur "satu jalur → sebaran", tiga prinsip sebagai catatan tepi |
 | `HomeProblems` | Masalah trader di beranda: pengantar menempel (kiri) + entri bernomor di sumbu tegak (kanan) |
 | `LearningSystem` | Rantai konsep Risiko → … → Varians (`src/data/concept-chain.ts`) sebagai diagram bertick dengan `figures/ChainGlyph` |
