@@ -4,10 +4,10 @@
 // tidak digambar ulang, tidak diwarnai ulang, tidak diberi efek (bevel/3D/logam). Potongan hanya potongan
 // bingkai di panggung hero (jubah bawah & bahu kiri); kepala dan jam pasir selalu utuh. Latar gambar dilebur dengan blend mode:
 // - `plate` (panggung hero beranda): SELALU versi gelap (1024px, satu-satunya sumber yang tajam di ukuran besar)
-//   di atas pelat gelap, `screen` → latar hitam murni melebur ke warna pelat. Sama di kedua tema.
+//   di atas pelat gelap, `screen` → latar hitam murni melebur ke warna pelat.
 //   Ukuran & potongan bingkai diatur oleh wadahnya (figures/HeroStage); gambar sendiri tidak diubah.
-// - `footer`, tema gelap: versi gelap + `screen`;
-//   tema terang: versi terang (latar abu-abu ±227) + `brightness(1.16)` agar latar menjadi putih,
+// - `footer` (situs hanya bertema terang, lihat docs/redesign-brief.md): versi terang (latar abu-abu ±227)
+//   + `brightness(1.16)` agar latar menjadi putih,
 //   lalu `multiply` → putih menjadi transparan di atas warna kertas. Garis etsa tidak berubah.
 import { getImage } from 'astro:assets';
 import { siteConfig } from '../config/site';
@@ -36,7 +36,6 @@ const height = Math.round((displayWidth * source.height) / source.width);
 ---
 
 <picture class={`emblem emblem--${variant}`}>
-  {!isPlate && <source media="(prefers-color-scheme: dark)" srcset={dark.srcSet.attribute} sizes={sizes} />}
   <img
     src={light.src}
     srcset={light.srcSet.attribute}
@@ -60,7 +59,7 @@ const height = Math.round((displayWidth * source.height) / source.width);
     display: block;
     width: 100%;
     height: auto;
-    /* Tema terang: latar abu-abu versi terang → putih → melebur ke kertas. */
+    /* Versi terang: latar abu-abu → putih → melebur ke kertas. */
     filter: brightness(1.16);
     mix-blend-mode: multiply;
   }
@@ -69,7 +68,7 @@ const height = Math.round((displayWidth * source.height) / source.width);
     width: 100%;
   }
 
-  /* Pelat selalu gelap: versi gelap, latar hitam melebur lewat `screen` di kedua tema. */
+  /* Pelat selalu gelap: versi gelap, latar hitam melebur lewat `screen`. */
   .emblem--plate img {
     filter: none;
     mix-blend-mode: screen;
@@ -77,13 +76,5 @@ const height = Math.round((displayWidth * source.height) / source.width);
 
   .emblem--footer {
     width: 96px;
-  }
-
-  @media (prefers-color-scheme: dark) {
-    .emblem img {
-      /* Tema gelap: versi gelap berlatar hitam murni; `screen` membuat hitam transparan. */
-      filter: none;
-      mix-blend-mode: screen;
-    }
   }
 </style>

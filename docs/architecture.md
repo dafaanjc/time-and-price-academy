@@ -112,11 +112,10 @@ Aturan pakai:
   jubah bawah & bahu kiri, kepala dan jam pasir selalu utuh), atau di
   footer halaman lain (96px, `alt=""` karena atribusi sudah tertulis di sebelahnya).
 - **Latar dilebur tanpa kotak** (`BrandEmblem.astro`):
-  - varian `plate` (kedua tema): selalu `black logo.png` (satu-satunya sumber yang tajam di ukuran besar)
+  - varian `plate`: selalu `black logo.png` (satu-satunya sumber yang tajam di ukuran besar)
     di atas `--plate` + `mix-blend-mode: screen`. Pelat selalu gelap, jadi aset tidak diwarnai ulang;
-  - varian `footer`, `<picture>` per tema:
-    - tema gelap: `black logo.png` + `mix-blend-mode: screen`. Hitam murni menjadi transparan tanpa filter;
-    - tema terang: `logos.jpeg` + `filter: brightness(1.16)` + `mix-blend-mode: multiply`. Kecerahan
+  - varian `footer` (situs hanya bertema terang):
+    - `logos.jpeg` + `filter: brightness(1.16)` + `mix-blend-mode: multiply`. Kecerahan
     menaikkan latar terendah (221) menjadi putih, lalu `multiply` membuat putih transparan di atas kertas.
     Garis etsa hampir tidak berubah; hanya sorotan paling terang yang terpotong ke putih.
 - **Gambar OG:** versi terang dengan teknik yang sama (sharp `linear(1.16)` + composite `multiply`) di
@@ -232,15 +231,17 @@ Prinsip:
 - Hindari kondisional bersarang. Pakai helper kecil atau pecah menjadi komponen.
 - JavaScript klien hanya ada tiga skrip kecil: menu mobile, salin tautan, dan pencarian.
 - Lebar baca teks panjang dibatasi `--measure: 68ch` (kelas `.prose`).
-- Tema terang/gelap mengikuti `prefers-color-scheme` melalui token CSS di `:root`.
-- **Token desain** (`src/styles/global.css`, arah "Trading Desk Manual"): warna monokrom (`--paper`, `--surface`,
-  `--ink`, `--ink-2`, `--ink-3`, `--rule`, `--tint`; `--accent` = tinta), warna semantik data saja
-  (`--loss`, `--gain`, `--caution`), skala teks `--text-xs`…`--text-4xl` (rasio 1,25, dasar 17px), jarak
-  `--space-1`…`--space-24` (dasar 4px), bentuk `--radius-0`/`--radius-1` (0/2px, tanpa bayangan), dan gerak
-  `--motion-fast`/`--motion-base` (0 bila `prefers-reduced-motion`). Komponen tidak menulis ukuran font
-  atau radius secara manual.
-- **Font:** Source Sans 3 (teks) dan Source Serif 4 (judul) disajikan sendiri dari `src/assets/fonts/web/`
-  (lihat README di sana); dua di antaranya di-preload di `SeoHead`.
+- Satu tema: terang (`color-scheme: light`); varian gelap dihapus di redesign "Kabinet Risiko"
+  (`docs/redesign-brief.md`).
+- **Token desain** (`src/styles/global.css`, arah "Kabinet Risiko"): palet kertas/tinta/kuningan
+  (`--paper`, `--paper-deep`, `--ink`, `--ink-soft`, `--rule`, `--brass`, `--brass-ink`, `--plate`, `--loss`;
+  nama lama `--ink-2/-3`, `--surface`, `--tint`, `--mark`, `--accent` tetap sebagai alias), tekstur
+  `--paper-grain`, skala teks `--text-xs`…`--text-6xl` (modular 1,333, fluid dengan `clamp()`), jarak
+  `--space-1`…`--space-32` (dasar 4px), bentuk `--radius-0`/`--radius-1` (0/2px, tanpa bayangan), dan gerak
+  `--motion-*` (0 bila `prefers-reduced-motion`). Komponen tidak menulis ukuran font atau radius secara manual.
+- **Font:** Bodoni Moda (display), Newsreader (teks, UI, label katalog), IBM Plex Mono (angka hasil & input),
+  self-hosted lewat paket `@fontsource/*` (subset latin) yang diimpor di `global.css`; dua di-preload di
+  `SeoHead` (lihat `src/assets/fonts/README.md`).
 
 ## Pencarian
 

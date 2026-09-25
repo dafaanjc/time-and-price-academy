@@ -1,6 +1,6 @@
 # Font
 
-## TTF — gambar OpenGraph
+## TTF — gambar OpenGraph (sementara)
 
 Dipakai oleh `src/lib/og-image.ts` saat build untuk merender `/og/*.png`. Font disertakan di repo
 agar hasil gambar identik di mesin lokal dan di GitHub Actions (tidak bergantung pada font sistem).
@@ -13,18 +13,17 @@ agar hasil gambar identik di mesin lokal dan di GitHub Actions (tidak bergantung
 Sumber: Google Fonts, melalui paket npm `@expo-google-fonts/source-serif-4` dan
 `@expo-google-fonts/source-sans-3` (v0.4.1).
 
-## WOFF2 — situs (`web/`)
+## Situs — paket @fontsource
 
-Dimuat lewat `@font-face` di `src/styles/global.css` (subset latin). Dua file di-preload di
-`SeoHead.astro`: Sans 400 dan Serif 600.
+Font situs tidak lagi disimpan di folder ini. Dipasang lewat npm (subset latin, SIL OFL 1.1) dan diimpor
+di awal `src/styles/global.css`; Vite menyalin file WOFF2 ke build (self-hosted, tanpa CDN).
+Dua file di-preload di `SeoHead.astro`: Newsreader 400 dan Bodoni Moda 500.
 
-| File | Dipakai untuk |
-|---|---|
-| `source-sans-3-latin-400-normal.woff2` | Teks isi, antarmuka |
-| `source-sans-3-latin-400-italic.woff2` | Teks miring |
-| `source-sans-3-latin-600-normal.woff2` | Tebal, label |
-| `source-serif-4-latin-600-normal.woff2` | Judul |
-| `source-serif-4-latin-400-italic.woff2` | Istilah asli, kutipan |
+| Paket | Bobot | Dipakai untuk |
+|---|---|---|
+| `@fontsource/bodoni-moda` | 500, 400 italic | Judul & display (`--font-display`) |
+| `@fontsource/newsreader` | 400, 400 italic, 600 | Teks baca, antarmuka, label katalog (`--font-text`) |
+| `@fontsource/ibm-plex-mono` | 400 | Angka hasil hitungan & input (`--font-num`) |
 
-Sumber: paket npm `@fontsource/source-sans-3` dan `@fontsource/source-serif-4` (v5.3.0), SIL OFL 1.1
-(teks lisensi sama dengan file `OFL-*.txt` di folder ini).
+Arah visual: `docs/redesign-brief.md`. TTF Source Serif/Sans di atas tetap dipakai untuk gambar OG
+sampai Tahap 2 brief memperbarui OG image.

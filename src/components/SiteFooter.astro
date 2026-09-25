@@ -20,6 +20,7 @@ const showEmblem = Astro.url.pathname !== withBase(routes.home);
 
 <style>
   .site-footer {
+    position: relative;
     display: flex;
     align-items: center;
     gap: var(--space-6);
@@ -30,13 +31,25 @@ const showEmblem = Astro.url.pathname !== withBase(routes.home);
     color: var(--ink-3);
   }
 
+  /* Garis kedua: garis ganda tipis ala kolofon buku. */
+  .site-footer::before {
+    content: "";
+    position: absolute;
+    inset-inline: 0;
+    top: var(--frame-gap);
+    border-top: var(--border-hair) solid var(--rule);
+  }
+
   .site-footer p {
     margin: 0;
     max-width: var(--measure);
   }
 
+  /* Kolofon: atribusi dalam italic small caps, keterangan dalam teks biasa. */
   .site-footer__attribution {
-    font-weight: 600;
+    font-style: italic;
+    font-variant-caps: small-caps;
+    letter-spacing: 0.02em;
     color: var(--ink-2);
   }
 

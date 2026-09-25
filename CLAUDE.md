@@ -15,6 +15,23 @@ Hard rules that already exist in the codebase:
   the hourglass are always fully visible.
 - Do not edit content MDX (`src/content/**`) as part of design work.
 
+## Redesign "Kabinet Risiko" (active — `docs/redesign-brief.md`)
+The brief is the source of truth for the visual redesign and **overrides the "Visual Design System" section
+below wherever they conflict**; work one stage (Tahap) at a time. Stage 1 (foundation) is done.
+- Substance never changes: no edits to MDX, copy, argument order, data or formulas. Only layout, type, colour,
+  illustration, motion, visual components and the logo.
+- One theme only: light (`color-scheme: light`, no dark variants). Palette: `--paper`, `--paper-deep`, `--ink`,
+  `--ink-soft`, `--rule`, `--brass` (non-text) / `--brass-ink` (text), `--plate`, `--loss` (rare); old token
+  names stay as aliases. Paper grain via `--paper-grain` (inline SVG noise, ≤ 0.05).
+- Type: Bodoni Moda (display), Newsreader (text/UI, prose 1.6 in `.prose` 68ch), IBM Plex Mono (calculation
+  results and inputs only), all via `@fontsource` (latin). Labels are italic serif small caps (`.label`), not
+  mono caps. Modular scale 1.333, fluid `clamp()`.
+- 1px `--rule` lines, radius ≤ 2px, no grey drop shadows; depth from hatching, layers and parallax. One ornament
+  per area (double frame, brass spiral, registration mark).
+- At large sizes the logo is always a dark engraved plate framed on light paper (`src/assets/brand/`).
+- Motion: one hero moment (CSS scroll-driven with static fallback); otherwise only responses to user actions.
+- Mobile first (test 360 / 768 / 1280), visible focus, AA contrast, reduced motion honoured, no 3D library.
+
 ## Visual Design System
 
 **Direction: "Modern Digital Museum."** A calm gallery for ideas about time and price. Each page
