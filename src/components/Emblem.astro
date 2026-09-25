@@ -1,0 +1,149 @@
+---
+// Emblem merek sebagai pelat ukiran gelap berbingkai ganda di atas kertas (docs/redesign-brief.md → Tahap 2):
+// pelat → bingkai ganda → cincin prasasti (merek induk di busur atas, produk di busur bawah, dari siteConfig)
+// → artwork emblem resmi di tengah. Artwork tidak digambar ulang/diwarnai ulang: versi gelap 1024px dilebur ke
+// pelat dengan `screen`, lalu dipudarkan melingkar di dalam cincin (hanya jubah bawah yang hilang; kepala dan
+// jam pasir selalu utuh). Geometri: src/lib/emblem.ts (sama dengan gambar OG).
+// Maksimal SATU emblem per halaman, tidak di header (header memakai Monogram).
+import { getImage } from 'astro:assets';
+import { siteConfig } from '../config/site';
+import emblemPlate from '../assets/brand/logo-plate.png';
+import {
+  artBox,
+  emblemGeometry,
+  emblemInscription,
+  EMBLEM_VIEWBOX,
+  inscriptionArc,
+  separatorPath,
+} from '../lib/emblem';
+
+interface Props {
+  /** `hero`: pelat besar (lebar mengikuti wadah); `footer`: tanda kecil 11rem di footer. */
+  variant: 'hero' | 'footer';
+  /** Atribut `sizes` gambar untuk varian hero bila wadahnya bukan setengah layar. */
+  sizes?: string;
+}
+
+const { variant, sizes } = Astro.props;
+const isHero = variant === 'hero';
+const g = emblemGeometry(variant);
+const art = artBox(g);
+const pct = (n: number) => `${(n / EMBLEM_VIEWBOX) * 100}%`;
+const artFraction = art.size / EMBLEM_VIEWBOX;
+
+// Lebar tampil artwork = ±65% lebar pelat.
+const image = await getImage({
+  src: emblemPlate,
+  widths: isHero ? [480, 720, 1024] : [128, 256],
+  format: 'webp',
+});
+const imageSizes = isHero ? (sizes ?? `(min-width: 64rem) ${Math.round(artFraction * 45)}vw, ${Math.round(artFraction * 100)}vw`) : `${Math.round(artFraction * 176)}px`;
+const style = [
+  `--art-x: ${pct(art.x)}`,
+  `--art-size: ${pct(art.size)}`,
+  `--fade-start: ${g.art.fadeStart}%`,
+  `--fade-end: ${g.art.fadeEnd}%`,
+].join('; ');
+const id = `emblem-${variant}`;
+const v = EMBLEM_VIEWBOX;
+const c = v / 2;
+---
+
+<div class={`emblem-plate emblem-plate--${variant}`} style={style}>
+  <img
+    class="emblem-plate__art"
+    src={image.src}
+    srcset={image.srcSet.attribute}
+    sizes={imageSizes}
+    width={emblemPlate.width}
+    height={emblemPlate.height}
+    alt={isHero ? siteConfig.emblemAlt : ''}
+    loading={isHero ? 'eager' : 'lazy'}
+    decoding="async"
+  />
+  <svg class="emblem-plate__ring" viewBox={`0 0 ${v} ${v}`} aria-hidden="true" focusable="false">
+    <defs>
+      <path id={`${id}-top`} d={inscriptionArc(g.baseline.top, 'top')}></path>
+      <path id={`${id}-bottom`} d={inscriptionArc(g.baseline.bottom, 'bottom')}></path>
+    </defs>
+    <rect class="emblem-plate__frame" x={g.frame.outer} y={g.frame.outer} width={v - 2 * g.frame.outer} height={v - 2 * g.frame.outer}></rect>
+    <rect class="emblem-plate__frame emblem-plate__frame--inner" x={g.frame.inner} y={g.frame.inner} width={v - 2 * g.frame.inner} height={v - 2 * g.frame.inner}></rect>
+    <circle class="emblem-plate__circle" cx={c} cy={c} r={g.ring.outer}></circle>
+    <circle class="emblem-plate__circle" cx={c} cy={c} r={g.ring.inner}></circle>
+    <path class="emblem-plate__separator" d={`${separatorPath(g, 0)} ${separatorPath(g, 180)}`}></path>
+    <text class="emblem-plate__text" font-size={g.fontSize} letter-spacing={g.letterSpacing}>
+      <textPath href={`#${id}-top`} startOffset="50%" text-anchor="middle">{emblemInscription.top}</textPath>
+    </text>
+    <text class="emblem-plate__text" font-size={g.fontSize} letter-spacing={g.letterSpacing}>
+      <textPath href={`#${id}-bottom`} startOffset="50%" text-anchor="middle">{emblemInscription.bottom}</textPath>
+    </text>
+  </svg>
+</div>
+
+<style>
+  .emblem-plate {
+    position: relative;
+    flex: none;
+    aspect-ratio: 1;
+    background: var(--plate);
+    /* Blend `screen` artwork hanya dengan pelat, bukan dengan kertas di belakangnya. */
+    isolation: isolate;
+  }
+
+  .emblem-plate--hero {
+    width: 100%;
+  }
+
+  .emblem-plate--footer {
+    width: 11rem;
+  }
+
+  .emblem-plate__art {
+    position: absolute;
+    top: var(--art-x);
+    left: var(--art-x);
+    width: var(--art-size);
+    height: var(--art-size);
+    mix-blend-mode: screen;
+    /* Pudar melingkar di dalam cincin; persen = jarak ke sudut terjauh (sama dengan gambar OG). */
+    mask-image: radial-gradient(circle farthest-corner at 50% 50%, #000 var(--fade-start), transparent var(--fade-end));
+  }
+
+  .emblem-plate__ring {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+  }
+
+  /* Garis 1px di ukuran apa pun. */
+  .emblem-plate__frame,
+  .emblem-plate__circle {
+    fill: none;
+    stroke-width: 1px;
+    vector-effect: non-scaling-stroke;
+  }
+
+  .emblem-plate__frame {
+    stroke: var(--plate-rule-strong);
+  }
+
+  .emblem-plate__frame--inner {
+    stroke: var(--plate-rule);
+  }
+
+  .emblem-plate__circle {
+    stroke: var(--plate-mark);
+  }
+
+  .emblem-plate__separator {
+    fill: var(--plate-mark);
+  }
+
+  .emblem-plate__text {
+    fill: var(--plate-ink-2);
+    font-family: var(--font-display);
+    font-weight: var(--weight-display);
+  }
+</style>

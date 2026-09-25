@@ -1,42 +1,44 @@
 // Template gambar OpenGraph (1200×630 PNG), dirender saat build dengan sharp.
+// Arah "Kabinet Risiko" (docs/redesign-brief.md): kertas terang, teks Bodoni Moda / Newsreader, dan emblem
+// sebagai pelat ukiran gelap berbingkai ganda di kanan (geometri sama dengan Emblem.astro, src/lib/emblem.ts).
 // Teks dirender dari font TTF di src/assets/fonts agar hasilnya identik di semua mesin.
 import { resolve } from 'node:path';
 import sharp, { type OverlayOptions } from 'sharp';
 import { siteConfig } from '../config/site';
-import { EMBLEM_LIGHT_ASPECT, emblemFiles, LIGHT_EMBLEM_BRIGHTNESS } from './brand-assets';
+import { emblemFiles } from './brand-assets';
+import { palette } from './brand-palette';
+import {
+  artBox,
+  artFadeRadii,
+  emblemGeometry,
+  emblemInscription,
+  EMBLEM_VIEWBOX,
+  glyphAngles,
+  separatorPath,
+} from './emblem';
 
 export const OG_WIDTH = 1200;
 export const OG_HEIGHT = 630;
 
-// Salinan token tema terang dari src/styles/global.css (:root). Gambar OG selalu bertema terang.
-// Monokrom: aksen = tinta (arah visual mengikuti emblem etsa merek induk (siteConfig.masterBrand)).
-const theme = {
-  paper: '#f6f3ec',
-  ink: '#16191d',
-  inkSoft: '#454c54',
-  inkFaint: '#666d74',
-  line: '#d6cfc2',
-  accent: '#16191d',
-};
-
 // Build selalu dijalankan dari root proyek (npm scripts), jadi path relatif ke cwd.
+// Spesifikasi Pango "Keluarga, Gaya": koma memisahkan nama keluarga dari gaya (nama keluarga TTF di tabel name).
 const fontsDir = resolve('src/assets/fonts');
 const fonts = {
-  serif: { file: resolve(fontsDir, 'SourceSerif4-SemiBold.ttf'), family: 'Source Serif 4 SemiBold' },
-  serifItalic: { file: resolve(fontsDir, 'SourceSerif4-Italic.ttf'), family: 'Source Serif 4 Italic' },
-  sans: { file: resolve(fontsDir, 'SourceSans3-Regular.ttf'), family: 'Source Sans 3' },
-  sansBold: { file: resolve(fontsDir, 'SourceSans3-SemiBold.ttf'), family: 'Source Sans 3 SemiBold' },
+  display: { file: resolve(fontsDir, 'BodoniModa-Medium.ttf'), spec: 'Bodoni Moda Medium,', svgFamily: 'Bodoni Moda Medium' },
+  text: { file: resolve(fontsDir, 'Newsreader-Regular.ttf'), spec: 'Newsreader,' },
+  italic: { file: resolve(fontsDir, 'Newsreader-Italic.ttf'), spec: 'Newsreader, Italic' },
+  strong: { file: resolve(fontsDir, 'Newsreader-SemiBold.ttf'), spec: 'Newsreader SemiBold,' },
 };
-type Font = (typeof fonts)[keyof typeof fonts];
+type Font = { file: string; spec: string };
 
-const PAD_X = 88;
+const PAD_X = 80;
 const HEADER_Y = 64;
 const RULE_Y = 530;
-const RULE_WIDTH = OG_WIDTH - PAD_X * 2;
-// Emblem resmi di kanan (versi terang, dilebur ke kertas); teks mendapat sisa lebar di kiri.
-const EMBLEM_HEIGHT = 360;
-const EMBLEM_WIDTH = Math.round(EMBLEM_HEIGHT * EMBLEM_LIGHT_ASPECT);
-const TEXT_WIDTH = RULE_WIDTH - EMBLEM_WIDTH - 40;
+// Pelat emblem di kanan, sejajar header; teks mendapat sisa lebar di kiri.
+const PLATE_SIZE = 430;
+const PLATE_X = OG_WIDTH - PAD_X - PLATE_SIZE;
+const PLATE_Y = RULE_Y - 36 - PLATE_SIZE;
+const TEXT_WIDTH = PLATE_X - PAD_X - 56;
 
 export interface OgImageContent {
   /** Label kecil di atas judul, mis. nama kategori. */
@@ -70,7 +72,7 @@ async function renderText(
   const { data, info } = await sharp({
     text: {
       text: `<span foreground="${color}"${spacing}>${escapeMarkup(text)}</span>`,
-      font: `${font.family} ${size}`,
+      font: `${font.spec} ${size}`,
       fontfile: font.file,
       width: options.width,
       align: options.align ?? 'left',
@@ -84,7 +86,41 @@ async function renderText(
   return { data, width: info.width, height: info.height };
 }
 
-const TITLE_SIZES = [84, 76, 68, 60, 52];
+const TITLE_SIZES = [80, 72, 64, 58, 52];
+// Jarak baris bawaan Bodoni Moda ±1,52× ukuran huruf (terlalu longgar untuk judul) dan vips hanya bisa
+// menambah jarak, jadi judul dibungkus per kata lalu baris-barisnya disusun sendiri dengan jarak 1,05×.
+const TITLE_LEADING = 1.05;
+
+/** Bungkus per kata agar tiap baris ≤ `width`; baris eksplisit (\n) dipertahankan. */
+async function wrapLines(text: string, font: Font, size: number, width: number): Promise<string[]> {
+  const lines: string[] = [];
+  for (const paragraph of text.split('\n')) {
+    let line = '';
+    for (const word of paragraph.split(' ')) {
+      const candidate = line ? `${line} ${word}` : word;
+      if (line && (await renderText(candidate, font, size, palette.ink)).width > width) {
+        lines.push(line);
+        line = word;
+      } else {
+        line = candidate;
+      }
+    }
+    lines.push(line);
+  }
+  return lines;
+}
+
+async function stackLines(lines: string[], font: Font, size: number, color: string): Promise<TextImage> {
+  const images = await Promise.all(lines.map((line) => renderText(line, font, size, color)));
+  const pitch = Math.round(size * TITLE_LEADING);
+  const width = Math.max(...images.map((img) => img.width));
+  const height = pitch * (images.length - 1) + (images.at(-1)?.height ?? 0);
+  const data = await sharp({ create: { width, height, channels: 4, background: { r: 0, g: 0, b: 0, alpha: 0 } } })
+    .composite(images.map((img, i) => ({ input: img.data, left: 0, top: i * pitch })))
+    .png()
+    .toBuffer();
+  return { data, width, height };
+}
 
 /**
  * Judul sebesar mungkin yang (1) muat dalam `maxHeight` dan (2) tidak lebih dari
@@ -95,10 +131,9 @@ async function fitTitle(title: string, maxHeight: number): Promise<TextImage> {
   const maxLines = Math.max(2, title.split('\n').length);
   let image: TextImage | undefined;
   for (const size of TITLE_SIZES) {
-    image = await renderText(title, fonts.serif, size, theme.ink, { width: TEXT_WIDTH });
-    const lineHeight = (await renderText('Ag', fonts.serif, size, theme.ink)).height;
-    const lines = Math.round(image.height / lineHeight);
-    if (image.height <= maxHeight && lines <= maxLines) return image;
+    const lines = await wrapLines(title, fonts.display, size, TEXT_WIDTH);
+    image = await stackLines(lines, fonts.display, size, palette.ink);
+    if (image.height <= maxHeight && lines.length <= maxLines) return image;
   }
   return image as TextImage;
 }
@@ -107,52 +142,131 @@ async function fitTitle(title: string, maxHeight: number): Promise<TextImage> {
 async function fitDescription(description: string, maxHeight: number): Promise<TextImage> {
   const words = description.split(' ');
   let text = description;
-  let image = await renderText(text, fonts.sans, 32, theme.inkSoft, { width: TEXT_WIDTH });
+  let image = await renderText(text, fonts.text, 30, palette.inkSoft, { width: TEXT_WIDTH });
   while (image.height > maxHeight && words.length > 1) {
     words.pop();
     text = `${words.join(' ').replace(/[,;:.]$/, '')}…`;
-    image = await renderText(text, fonts.sans, 32, theme.inkSoft, { width: TEXT_WIDTH });
+    image = await renderText(text, fonts.text, 30, palette.inkSoft, { width: TEXT_WIDTH });
   }
   return image;
 }
 
-function frameSvg(): Buffer {
+function paperSvg(): Buffer {
   return Buffer.from(
     `<svg xmlns="http://www.w3.org/2000/svg" width="${OG_WIDTH}" height="${OG_HEIGHT}">
-      <rect width="100%" height="100%" fill="${theme.paper}"/>
-      <rect width="14" height="100%" fill="${theme.accent}"/>
-      <rect x="${PAD_X}" y="${RULE_Y}" width="${RULE_WIDTH}" height="2" fill="${theme.line}"/>
+      <rect width="100%" height="100%" fill="${palette.paper}"/>
+      <rect x="${PAD_X}" y="${RULE_Y}" width="${OG_WIDTH - PAD_X * 2}" height="1" fill="${palette.rule}"/>
     </svg>`,
   );
 }
 
-export async function renderOgImage(content: OgImageContent): Promise<Buffer> {
-  // Sama dengan CSS BrandEmblem: kecerahan dinaikkan agar latar menjadi putih, lalu `multiply`.
-  const emblem = await sharp(emblemFiles.light)
-    .linear(LIGHT_EMBLEM_BRIGHTNESS, 0)
-    .resize({ height: EMBLEM_HEIGHT })
+/**
+ * Pelat emblem (varian `og`): pelat → bingkai ganda → cincin → artwork (dipudarkan melingkar, `screen`)
+ * → prasasti. librsvg tidak mendukung <textPath>, jadi tiap huruf diletakkan sendiri (sudut dari glyphAngles,
+ * lebar huruf diukur dengan Pango). Pengukuran Pango juga mendaftarkan font TTF ke fontconfig, sehingga
+ * librsvg dapat memakai keluarga yang sama untuk <text>.
+ */
+async function renderEmblemPlate(size: number): Promise<Buffer> {
+  const g = emblemGeometry('og');
+  const v = EMBLEM_VIEWBOX;
+  const c = v / 2;
+  const k = size / v;
+  const hair = 1 / k; // 1px dalam satuan viewBox
+
+  const glyphs = async (text: string, radius: number, side: 'top' | 'bottom') => {
+    const chars = [...text];
+    const widths = await Promise.all(
+      chars.map(async (ch) =>
+        ch === ' ' ? g.fontSize * 0.3 : (await renderText(ch, fonts.display, g.fontSize, palette.plateInk2)).width,
+      ),
+    );
+    const angles = glyphAngles(widths, radius, g.letterSpacing, side);
+    return chars
+      .map((ch, i) => {
+        const angle = angles[i] ?? 0;
+        if (ch === ' ') return '';
+        const a = (angle * Math.PI) / 180;
+        const x = c + radius * Math.cos(a);
+        const y = c + radius * Math.sin(a);
+        // Atas: kaki huruf di garis dasar, kepala menghadap keluar. Bawah: kepala menghadap ke pusat.
+        const rotate = side === 'top' ? angle + 90 : angle - 90;
+        return `<text x="${x.toFixed(2)}" y="${y.toFixed(2)}" transform="rotate(${rotate.toFixed(3)} ${x.toFixed(2)} ${y.toFixed(2)})">${escapeMarkup(ch)}</text>`;
+      })
+      .join('');
+  };
+
+  const [topGlyphs, bottomGlyphs] = [
+    await glyphs(emblemInscription.top, g.baseline.top, 'top'),
+    await glyphs(emblemInscription.bottom, g.baseline.bottom, 'bottom'),
+  ];
+
+  const frame = (inset: number, color: string) =>
+    `<rect x="${inset}" y="${inset}" width="${v - 2 * inset}" height="${v - 2 * inset}" fill="none" stroke="${color}" stroke-width="${hair}"/>`;
+  const plate = Buffer.from(
+    `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 ${v} ${v}">
+      <rect width="${v}" height="${v}" fill="${palette.plate}"/>
+      ${frame(g.frame.outer, palette.plateRuleStrong)}
+      ${frame(g.frame.inner, palette.plateRule)}
+      <circle cx="${c}" cy="${c}" r="${g.ring.outer}" fill="none" stroke="${palette.plateMark}" stroke-width="${hair}"/>
+      <circle cx="${c}" cy="${c}" r="${g.ring.inner}" fill="none" stroke="${palette.plateMark}" stroke-width="${hair}"/>
+      <path d="${separatorPath(g, 0)} ${separatorPath(g, 180)}" fill="${palette.plateMark}"/>
+    </svg>`,
+  );
+  const inscription = Buffer.from(
+    `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 ${v} ${v}">
+      <g font-family="${fonts.display.svgFamily}" font-size="${g.fontSize}" letter-spacing="0" text-anchor="middle" fill="${palette.plateInk2}">
+        ${topGlyphs}${bottomGlyphs}
+      </g>
+    </svg>`,
+  );
+
+  // Artwork: versi gelap, dipudarkan melingkar (sama dengan mask CSS Emblem.astro), lalu `screen` ke pelat.
+  const box = artBox(g);
+  const artPx = Math.round(box.size * k);
+  const fade = artFadeRadii(g);
+  const mask = Buffer.from(
+    `<svg xmlns="http://www.w3.org/2000/svg" width="${artPx}" height="${artPx}" viewBox="0 0 ${box.size} ${box.size}">
+      <defs><radialGradient id="f" gradientUnits="userSpaceOnUse" cx="${box.size / 2}" cy="${box.size / 2}" r="${fade.end}">
+        <stop offset="${fade.start / fade.end}" stop-color="#fff" stop-opacity="1"/>
+        <stop offset="1" stop-color="#fff" stop-opacity="0"/>
+      </radialGradient></defs>
+      <rect width="${box.size}" height="${box.size}" fill="url(#f)"/>
+    </svg>`,
+  );
+  const art = await sharp(emblemFiles.plate)
+    .resize(artPx, artPx)
+    .ensureAlpha()
+    .composite([{ input: mask, blend: 'dest-in' }])
     .png()
     .toBuffer();
-  const eyebrow = await renderText(
-    `${siteConfig.product} · ${siteConfig.masterBrand}`.toUpperCase(),
-    fonts.sansBold,
-    22,
-    theme.inkFaint,
-    { letterSpacing: 2048 },
-  );
-  const attribution = await renderText(siteConfig.attribution, fonts.sansBold, 24, theme.inkSoft);
-  const url = await renderText(content.url, fonts.sans, 22, theme.inkFaint);
+
+  return sharp(plate)
+    .composite([
+      { input: art, left: Math.round(box.x * k), top: Math.round(box.y * k), blend: 'screen' },
+      { input: inscription, left: 0, top: 0 },
+    ])
+    .png()
+    .toBuffer();
+}
+
+// Pelat sama untuk semua gambar OG: dirender sekali per build.
+let platePromise: Promise<Buffer> | undefined;
+const emblemPlate = () => (platePromise ??= renderEmblemPlate(PLATE_SIZE));
+
+export async function renderOgImage(content: OgImageContent): Promise<Buffer> {
+  const plate = await emblemPlate();
+  const eyebrow = await renderText(`${siteConfig.product} · ${siteConfig.masterBrand}`, fonts.italic, 26, palette.ink3);
+  const attribution = await renderText(siteConfig.attribution, fonts.strong, 24, palette.inkSoft);
+  const url = await renderText(content.url, fonts.text, 22, palette.ink3);
 
   // Blok tengah: kicker, judul, subjudul, deskripsi, dipusatkan vertikal di antara header dan garis.
   // Elemen pendukung dirender dulu; judul mendapat sisa ruang sehingga blok tidak pernah meluber.
   const GAP = 18;
-  const areaTop = HEADER_Y + eyebrow.height + 32;
+  const areaTop = HEADER_Y + eyebrow.height + 28;
   const areaHeight = RULE_Y - 24 - areaTop;
-  const kicker = content.kicker
-    ? await renderText(content.kicker.toUpperCase(), fonts.sansBold, 24, theme.accent, { letterSpacing: 1536 })
-    : undefined;
+  const kicker = content.kicker ? await renderText(content.kicker, fonts.italic, 28, palette.brassInk) : undefined;
   const subtitle = content.subtitle
-    ? await renderText(content.subtitle, fonts.serifItalic, 34, theme.inkFaint, { width: TEXT_WIDTH })
+    ? await renderText(content.subtitle, fonts.italic, 34, palette.ink3, { width: TEXT_WIDTH })
     : undefined;
   const description = content.description ? await fitDescription(content.description, 84) : undefined;
   const supporting = [kicker, subtitle, description].filter((x): x is TextImage => x !== undefined);
@@ -164,12 +278,7 @@ export async function renderOgImage(content: OgImageContent): Promise<Buffer> {
   let y = Math.max(areaTop, Math.round(areaTop + (areaHeight - blockHeight) / 2));
 
   const layers: OverlayOptions[] = [
-    {
-      input: emblem,
-      left: OG_WIDTH - PAD_X - EMBLEM_WIDTH,
-      top: Math.round((HEADER_Y + RULE_Y - EMBLEM_HEIGHT) / 2),
-      blend: 'multiply',
-    },
+    { input: plate, left: PLATE_X, top: PLATE_Y },
     { input: eyebrow.data, left: PAD_X, top: HEADER_Y },
   ];
   for (const img of block) {
@@ -180,5 +289,5 @@ export async function renderOgImage(content: OgImageContent): Promise<Buffer> {
   layers.push({ input: attribution.data, left: PAD_X, top: footerY });
   layers.push({ input: url.data, left: OG_WIDTH - PAD_X - url.width, top: footerY + attribution.height - url.height });
 
-  return sharp(frameSvg()).composite(layers).png().toBuffer();
+  return sharp(paperSvg()).composite(layers).png().toBuffer();
 }

@@ -11,6 +11,7 @@ export const routes = {
   search: '/cari/',
   searchIndex: '/search-index.json',
   favicon: '/favicon-32.png',
+  faviconSvg: '/favicon.svg',
   appleTouchIcon: '/apple-touch-icon.png',
   ogDefault: '/og/default.png',
 } as const;

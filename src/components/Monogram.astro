@@ -1,0 +1,39 @@
+---
+// Monogram jam pasir (≤ 32px): tanda merek di header, pengganti emblem di ukuran kecil.
+// Path dari src/lib/monogram.ts (sama dengan favicon). Tinta = warna teks, pasir = kuningan. Dekoratif:
+// nama merek selalu tertulis di sebelahnya, jadi aria-hidden.
+import { MONOGRAM_VIEWBOX, monogramPaths } from '../lib/monogram';
+
+const v = MONOGRAM_VIEWBOX;
+---
+
+<svg class="monogram" viewBox={`0 0 ${v} ${v}`} width={v} height={v} aria-hidden="true" focusable="false">
+  <path class="monogram__plates" d={monogramPaths.plates}></path>
+  <path class="monogram__line" d={monogramPaths.posts}></path>
+  <path class="monogram__line" d={monogramPaths.glass}></path>
+  <path class="monogram__sand" d={monogramPaths.sand}></path>
+</svg>
+
+<style>
+  .monogram {
+    display: block;
+    flex: none;
+    width: 1.75rem;
+    height: 1.75rem;
+  }
+
+  .monogram__plates {
+    fill: currentColor;
+  }
+
+  .monogram__line {
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.6;
+    stroke-linecap: round;
+  }
+
+  .monogram__sand {
+    fill: var(--brass);
+  }
+</style>

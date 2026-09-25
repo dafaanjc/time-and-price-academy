@@ -1,14 +1,14 @@
 ---
 import { siteConfig } from '../config/site';
-import BrandEmblem from './BrandEmblem.astro';
+import Emblem from './Emblem.astro';
 import { routes, withBase } from '../lib/url';
 
-// Emblem maksimal satu kali per halaman: beranda sudah menampilkannya sebagai objek pameran di bagian filosofi (HomePhilosophy).
+// Emblem maksimal satu kali per halaman: beranda sudah menampilkannya di panggung hero (figures/HeroStage).
 const showEmblem = Astro.url.pathname !== withBase(routes.home);
 ---
 
 <footer class="site-footer">
-  {showEmblem && <BrandEmblem variant="footer" />}
+  {showEmblem && <Emblem variant="footer" />}
   <div class="site-footer__text">
     <p class="site-footer__attribution">{siteConfig.attribution}</p>
     <p class="site-footer__meta">
@@ -22,8 +22,9 @@ const showEmblem = Astro.url.pathname !== withBase(routes.home);
   .site-footer {
     position: relative;
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
-    gap: var(--space-6);
+    gap: var(--space-6) var(--space-8);
     margin-top: var(--space-16);
     padding: var(--space-8) 0 var(--space-12);
     border-top: var(--border-hair) solid var(--rule);
@@ -38,6 +39,11 @@ const showEmblem = Astro.url.pathname !== withBase(routes.home);
     inset-inline: 0;
     top: var(--frame-gap);
     border-top: var(--border-hair) solid var(--rule);
+  }
+
+  /* Layar sempit: pelat di atas, teks di bawah. */
+  .site-footer__text {
+    flex: 1 1 16rem;
   }
 
   .site-footer p {

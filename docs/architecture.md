@@ -94,38 +94,47 @@ Namanya sengaja `siteConfig`, bukan `site`, agar tidak tertukar dengan `Astro.si
 Nilai diambil langsung dari `src/config/site.ts` (Node menjalankan TypeScript secara native), sehingga
 tidak ada salinan kedua yang bisa berbeda.
 
-### Aset merek (emblem)
+### Aset merek (emblem, monogram, spiral)
 
-Aset resmi ada di `src/assets/Logo/` dan **tidak diubah**:
+Sistem logo mengikuti `docs/redesign-brief.md` → Tahap 2. Aset raster resmi ada di `src/assets/brand/`
+dan **tidak diubah**:
 
 | File | Isi | Latar |
 |---|---|---|
-| `black logo.png` | 1024×1024, figur klasik + jam pasir, gaya etsa | Hitam murni (0–1) |
-| `logos.jpeg` | 433×453, versi terang (resolusi rendah) | Abu-abu ±221–231 |
+| `logo-plate.png` | 1024×1024, figur klasik + jam pasir + spiral emas, gaya etsa (putih di atas hitam) | Hitam murni (0–1) |
+| `logo-light-433.jpeg` | 433×453, versi terang resolusi rendah. **Tidak dipakai** (buram di ukuran besar) | Abu-abu ±221–231 |
 
-Aturan pakai:
+Bila tersedia versi terang resolusi tinggi, simpan sebagai `src/assets/brand/logo-paper.png`.
 
-- **Header:** tidak memakai emblem, karena detailnya hilang di 24–32px. Header memakai wordmark
-  tipografis dari `siteConfig`. Ini penulisan nama, bukan logo baru.
-- **Emblem maksimal satu kali per halaman:** di beranda sebagai Objek 00 di panggung hero
-  (`figures/HeroStage`, varian `plate`, skala monumental ±86% lebar panggung; potongan bingkai hanya pada
-  jubah bawah & bahu kiri, kepala dan jam pasir selalu utuh), atau di
-  footer halaman lain (96px, `alt=""` karena atribusi sudah tertulis di sebelahnya).
-- **Latar dilebur tanpa kotak** (`BrandEmblem.astro`):
-  - varian `plate`: selalu `black logo.png` (satu-satunya sumber yang tajam di ukuran besar)
-    di atas `--plate` + `mix-blend-mode: screen`. Pelat selalu gelap, jadi aset tidak diwarnai ulang;
-  - varian `footer` (situs hanya bertema terang):
-    - `logos.jpeg` + `filter: brightness(1.16)` + `mix-blend-mode: multiply`. Kecerahan
-    menaikkan latar terendah (221) menjadi putih, lalu `multiply` membuat putih transparan di atas kertas.
-    Garis etsa hampir tidak berubah; hanya sorotan paling terang yang terpotong ke putih.
-- **Gambar OG:** versi terang dengan teknik yang sama (sharp `linear(1.16)` + composite `multiply`) di
-  sisi kanan. Faktor 1,16 didefinisikan sekali di `src/lib/brand-assets.ts`.
-- **Favicon (sementara):** `favicon-32.png` dan `apple-touch-icon.png` (180px) dibuat saat build dari
-  `black logo.png`, hanya diperkecil. Di 32px emblem tidak terbaca; ganti bila ada ikon kecil resmi.
-- **Dilarang:** memotong jam pasir menjadi ikon, mewarnai ulang, masker bentuk, watermark, latar
-  bagian, atau memakai emblem sebagai dekorasi berulang.
-- `scripts/check-branding.mjs` memeriksa: wordmark ada di header, header tanpa gambar, emblem ≤ 1 per
-  halaman, beranda punya emblem di pelat hero (`emblem--plate`), dan `favicon.svg` (ikon buatan lama) tidak kembali.
+Komponen dan aturan pakai:
+
+- **`Emblem.astro` (pelat ukiran):** di ukuran besar logo selalu tampil sebagai pelat gelap (`--plate`)
+  berbingkai ganda di atas kertas terang: pelat → bingkai ganda (1px) → cincin prasasti kuningan
+  (`siteConfig.masterBrand` di busur atas, `siteConfig.product` di busur bawah, `<textPath>`, `aria-hidden`)
+  → artwork `logo-plate.png` di tengah, dilebur ke pelat dengan `mix-blend-mode: screen` dan dipudarkan
+  melingkar di dalam cincin (hanya jubah bawah yang hilang; kepala dan jam pasir selalu utuh). Varian:
+  `hero` (lebar mengikuti wadah; dipasang di hero pada Tahap 3), `footer` (11rem, `alt=""` karena atribusi
+  tertulis di sebelahnya), dan `og` (gambar OG, dirender sharp). Geometri satu sumber di `src/lib/emblem.ts`
+  (diuji di `tests/brand-geometry.test.ts`).
+- **Emblem maksimal satu kali per halaman:** beranda: artwork di panggung hero (`BrandEmblem`, lapisan
+  `figures/HeroStage` sampai hero dibangun ulang di Tahap 3; potongan bingkai hanya jubah bawah & bahu kiri);
+  halaman lain: pelat `Emblem variant="footer"`.
+- **Header:** `Monogram` (jam pasir bertiang, SVG, ≤ 32px) + wordmark tipografis Bodoni Moda dari
+  `siteConfig`. Tidak ada gambar logo di header. Path monogram satu sumber di `src/lib/monogram.ts`.
+- **Favicon:** `/favicon.svg`, `/favicon-32.png`, dan `/apple-touch-icon.png` (180px) dibuat saat build dari
+  monogram yang sama (`src/lib/favicon.ts`): pelat gelap, tinta pelat, pasir kuningan.
+- **Spiral emas:** `figures/GoldenSpiral` menggambar ulang spiral di balik figur sebagai vektor murni
+  (persegi panjang emas, seperempat lingkaran per persegi, garis `--brass`, `pathLength="1"` untuk efek
+  digambar). Geometri di `src/lib/golden-spiral.ts` (diuji). Motif, bukan logo; satu ornamen per area.
+- **Gambar OG:** pelat emblem varian `og` di kanan (dirender sekali per build), teks Bodoni Moda / Newsreader
+  di kiri, warna dari `src/lib/brand-palette.ts` (salinan token, dicek terhadap `global.css` oleh
+  `tests/brand-palette.test.ts`).
+- **Dilarang:** mewarnai ulang artwork, efek bevel/3D/logam, watermark, atau memakai emblem sebagai
+  dekorasi berulang. Monogram dan spiral boleh dipakai sebagai tanda/motif, bukan pengganti emblem di
+  ukuran besar.
+- `scripts/check-branding.mjs` memeriksa: monogram + wordmark ada di header, header tanpa `<img>`, emblem
+  ≤ 1 per halaman, beranda punya emblem di panggung hero, halaman lain punya pelat emblem di footer, dan
+  `dist/favicon.svg` adalah monogram (bukan file lepas di `public/`).
 
 ## Sistem konten
 
@@ -158,7 +167,10 @@ Detail skema dan cara menambah konsep ada di [`content-model.md`](./content-mode
 | `BaseLayout` | Struktur halaman, `lang="id"`, skip link. Prop `sidebar`: indeks konsep di kiri (hanya halaman konsep/kategori); tanpa itu kontainer di tengah (`--container`) |
 | `SeoHead` | `<title>`, description, canonical, OpenGraph, Twitter card |
 | `SiteHeader` | Wordmark tipografis "TIME & PRICE ACADEMY │ Risk Lab" (dua baris di layar < 30rem) dan tombol menu mobile |
-| `BrandEmblem` | Artwork emblem resmi (varian `plate` / `footer`), dilebur ke latar dengan blend mode |
+| `Emblem` | Pelat ukiran merek: pelat gelap, bingkai ganda, cincin prasasti dari `siteConfig`, artwork resmi (varian `hero` / `footer`) |
+| `BrandEmblem` | Artwork emblem resmi tanpa pelat, lapisan di `figures/HeroStage` (sampai Tahap 3) |
+| `Monogram` | Monogram jam pasir (≤ 32px) di header; sama dengan favicon |
+| `figures/GoldenSpiral` | Spiral emas vektor (motif kuningan), geometri di `src/lib/golden-spiral.ts` |
 | `PrimaryNav` | Navigasi utama dari `src/lib/nav.ts` (Konsep / Jalur Belajar / Peta): baris di header desktop, kolom di menu mobile |
 | `ConceptNav` | Indeks konsep bergaya daftar isi bernomor; kategori kosong digabung jadi satu baris "Segera hadir" |
 | `ConceptIndex` | Indeks semua kategori untuk `/konsep/`; tiap kategori memakai `ConceptRows` |
@@ -320,9 +332,9 @@ Karena situs berada di sub-path, **semua tautan internal wajib lewat `src/lib/ur
 ### Pratinjau tautan (OpenGraph)
 
 - `/og/default.png` (beranda dan halaman umum) dan `/og/konsep/<slug>.png` (satu per konsep) dirender
-  saat build oleh `src/lib/og-image.ts`: 1200×630 PNG, font Source Serif 4 / Source Sans 3 dari
-  `src/assets/fonts` (OFL), warna dari token tema terang.
-- Isi: logo + "RISK LAB · TIME & PRICE ACADEMY", kategori, judul, istilah asli, deskripsi,
+  saat build oleh `src/lib/og-image.ts`: 1200×630 PNG, font Bodoni Moda / Newsreader (TTF) dari
+  `src/assets/fonts` (OFL), warna dari `src/lib/brand-palette.ts`.
+- Isi: pelat emblem + baris merek (produk · merek induk), kategori, judul, istilah asli, deskripsi,
   atribusi `siteConfig.attribution`, dan alamat situs. Judul diperkecil dan deskripsi dipangkas otomatis
   agar tidak meluber.
 - `SeoHead` menulis `og:image` (+ type/width/height/alt) dan `twitter:card=summary_large_image`.

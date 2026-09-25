@@ -38,6 +38,7 @@ const isArticle = type === 'article';
 <title>{fullTitle}</title>
 <meta name="description" content={description} />
 <meta name="author" content={siteConfig.author} />
+<link rel="icon" type="image/svg+xml" href={withBase(routes.faviconSvg)} />
 <link rel="icon" type="image/png" sizes="32x32" href={withBase(routes.favicon)} />
 <link rel="apple-touch-icon" sizes="180x180" href={withBase(routes.appleTouchIcon)} />
 <link rel="preload" href={textRegular} as="font" type="font/woff2" crossorigin />

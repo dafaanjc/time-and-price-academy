@@ -1,9 +1,10 @@
 ---
-// Wordmark tipografis "MEREK INDUK │ Produk" dari siteConfig. Ini penulisan nama, bukan logo:
-// artwork emblem terlalu detail untuk ukuran header dan hanya tampil di hero/footer.
+// Monogram jam pasir + wordmark tipografis "Merek induk │ Produk" (Bodoni Moda) dari siteConfig.
+// Bukan gambar logo penuh: artwork emblem terlalu detail untuk header dan hanya tampil sebagai pelat (Emblem).
 // Desktop: wordmark · navigasi utama · cari. Mobile: wordmark · cari · menu.
 import { siteConfig } from '../config/site';
 import MobileNav from './MobileNav.astro';
+import Monogram from './Monogram.astro';
 import PrimaryNav from './PrimaryNav.astro';
 import { routes, withBase } from '../lib/url';
 
@@ -13,9 +14,12 @@ const onSearch = Astro.url.pathname === searchHref;
 
 <header class="site-header">
   <a class="wordmark" href={withBase(routes.home)} aria-label={`${siteConfig.name} — Beranda`}>
-    <span class="wordmark__master">{siteConfig.masterBrand}</span>
-    <span class="wordmark__divider" aria-hidden="true"></span>
-    <span class="wordmark__product">{siteConfig.product}</span>
+    <Monogram />
+    <span class="wordmark__text">
+      <span class="wordmark__master">{siteConfig.masterBrand}</span>
+      <span class="wordmark__divider" aria-hidden="true"></span>
+      <span class="wordmark__product">{siteConfig.product}</span>
+    </span>
   </a>
 
   <nav class="site-header__nav" aria-label="Navigasi utama">
@@ -58,6 +62,13 @@ const onSearch = Astro.url.pathname === searchHref;
     margin-right: auto;
     color: var(--ink);
     text-decoration: none;
+  }
+
+  .wordmark__text {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    min-width: 0;
   }
 
   /* Merek induk: italic small caps ala katalog; produk: Bodoni Moda. */
@@ -133,6 +144,10 @@ const onSearch = Astro.url.pathname === searchHref;
     }
 
     .wordmark {
+      gap: var(--space-2);
+    }
+
+    .wordmark__text {
       flex-direction: column;
       align-items: flex-start;
       gap: var(--space-1);

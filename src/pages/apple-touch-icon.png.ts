@@ -1,9 +1,6 @@
 import type { APIRoute } from 'astro';
-import sharp from 'sharp';
-import { emblemFiles } from '../lib/brand-assets';
+import { faviconPng } from '../lib/favicon';
 
-// Ikon layar beranda iOS (180×180): emblem resmi versi gelap, hanya diperkecil.
-export const GET: APIRoute = async () => {
-  const png = await sharp(emblemFiles.dark).resize(180, 180).png().toBuffer();
-  return new Response(new Uint8Array(png), { headers: { 'Content-Type': 'image/png' } });
-};
+// Ikon layar beranda iOS (180×180): monogram jam pasir di atas pelat gelap.
+export const GET: APIRoute = async () =>
+  new Response(await faviconPng(180), { headers: { 'Content-Type': 'image/png' } });

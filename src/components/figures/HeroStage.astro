@@ -5,7 +5,7 @@
 //   1. kisi koordinat samar (CSS);
 //   2. medan hasil prosedural (SVG, src/lib/outcome-field.ts): dari jam pasir di tangan figur ("sekarang"),
 //      masa depan bercabang ke kanan, selubung ±2σ, garis E[P] kuningan (satu-satunya), kurva kepadatan di T;
-//   3. emblem resmi (BrandEmblem `plate`, versi hitam, rata, tidak diwarnai ulang) dalam skala monumental.
+//   3. emblem resmi (BrandEmblem, versi hitam, rata, tidak diwarnai ulang) dalam skala monumental.
 //      Potongan bingkai: tepi panggung hanya memotong jubah bawah dan bahu kiri; kepala dan jam pasir selalu utuh.
 // Dua komposisi, dipilih dari lebar panggung sendiri (container query, ≥ 34rem = lebar): lebar (1000×720, figur kiri &
 // medan kanan) dan ringkas (600×760, figur atas dipotong
@@ -121,7 +121,7 @@ const origin = (x: number, y: number, box: { w: number; h: number }) => `${pct(x
     <!-- Lapisan 3: emblem resmi. Hanya dipindah & diperbesar; potongan oleh tepi panggung. -->
     <div class="stage__art">
       <div class="stage__art-inner">
-        <BrandEmblem variant="plate" />
+        <BrandEmblem />
       </div>
     </div>
 

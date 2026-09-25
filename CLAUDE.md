@@ -10,14 +10,16 @@ Hard rules that already exist in the codebase:
   `scripts/check-branding.mjs` fails the build otherwise.
 - Internal links via `withBase()` / `routes` (`src/lib/url.ts`).
 - Brand emblem at most once per page (home: Objek 00 on the hero stage, `figures/HeroStage`, black version;
-  other pages: footer), never in the header, never redrawn, recoloured, stretched, bevelled/3D/metallic.
-  The only allowed crop is the hero stage's **frame crop** (lower drapery and far-left shoulder); the head and
-  the hourglass are always fully visible.
+  other pages: `Emblem variant="footer"` plate), never in the header (header = `Monogram` + wordmark), artwork
+  never redrawn, recoloured, stretched, bevelled/3D/metallic. Allowed crops: the hero stage's **frame crop**
+  and the `Emblem` plate's circular fade (lower drapery only); the head and the hourglass are always fully
+  visible. Official art: `src/assets/brand/logo-plate.png`. Emblem/monogram/spiral geometry lives in
+  `src/lib/emblem.ts`, `monogram.ts`, `golden-spiral.ts` (tested).
 - Do not edit content MDX (`src/content/**`) as part of design work.
 
 ## Redesign "Kabinet Risiko" (active — `docs/redesign-brief.md`)
 The brief is the source of truth for the visual redesign and **overrides the "Visual Design System" section
-below wherever they conflict**; work one stage (Tahap) at a time. Stage 1 (foundation) is done.
+below wherever they conflict**; work one stage (Tahap) at a time. Done: Stage 1 (foundation), Stage 2 (logo system).
 - Substance never changes: no edits to MDX, copy, argument order, data or formulas. Only layout, type, colour,
   illustration, motion, visual components and the logo.
 - One theme only: light (`color-scheme: light`, no dark variants). Palette: `--paper`, `--paper-deep`, `--ink`,
@@ -28,7 +30,10 @@ below wherever they conflict**; work one stage (Tahap) at a time. Stage 1 (found
   mono caps. Modular scale 1.333, fluid `clamp()`.
 - 1px `--rule` lines, radius ≤ 2px, no grey drop shadows; depth from hatching, layers and parallax. One ornament
   per area (double frame, brass spiral, registration mark).
-- At large sizes the logo is always a dark engraved plate framed on light paper (`src/assets/brand/`).
+- At large sizes the logo is always a dark engraved plate framed on light paper (`Emblem.astro`: double frame,
+  inscription ring from `siteConfig`, art in the centre); ≤ 32px it is the hourglass `Monogram` (also the
+  favicon). The golden spiral is redrawn as a brass vector motif (`figures/GoldenSpiral`). OG images use the
+  `og` plate; raster colours come from `src/lib/brand-palette.ts` (tested against `global.css`).
 - Motion: one hero moment (CSS scroll-driven with static fallback); otherwise only responses to user actions.
 - Mobile first (test 360 / 768 / 1280), visible focus, AA contrast, reduced motion honoured, no 3D library.
 
@@ -104,7 +109,7 @@ axis, graph traces, tick marks, dashed guides, measurement annotations.
 - They should read as **technical drawings**: hairline strokes, labelled axes, annotation leaders,
   one brass pointer at most. No fills beyond `--surface` / `--mark-soft`.
 - **Inline or local SVG only.** No stock illustrations, no image assets from external websites,
-  no icon fonts, no raster art (except the official emblem in `src/assets/Logo/`). The single exception
+  no icon fonts, no raster art (except the official emblem in `src/assets/brand/`). The single exception
   is the **Risk Field** (three.js, procedural geometry; see "3D: Risk Field"), currently not mounted.
 - Every figure has a text equivalent (`<title>`/`aria-label` or an adjacent caption).
 - Not trading charts: no candlesticks, no volume bars, no indicator overlays unless a concept is

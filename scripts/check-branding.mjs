@@ -3,7 +3,8 @@
 //    Semua harus lewat `siteConfig` (src/config/site.ts).
 // 2. Setiap halaman hasil build wajib memuat author, og:site_name, lang, dan atribusi footer.
 //    Halaman konsep juga wajib memuat atribusi di byline dan article:author.
-//    Header memuat wordmark tipografis; emblem maksimal satu per halaman (beranda: di panggung hero, versi gelap).
+//    Header memuat monogram jam pasir + wordmark tipografis; emblem maksimal satu per halaman
+//    (beranda: artwork di panggung hero; halaman lain: pelat Emblem di footer).
 // 3. package.json harus mencantumkan author yang sama.
 import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
 import { join, relative, sep } from 'node:path';
@@ -60,18 +61,21 @@ for (const file of pages) {
   );
   expect(/<footer[\s\S]*?<\/footer>/.exec(html)?.[0].includes(escapeHtml(siteConfig.attribution)), 'atribusi footer hilang');
 
-  // Header: wordmark tipografis (induk + produk), bukan gambar.
+  // Header: monogram (SVG) + wordmark tipografis (induk + produk), bukan gambar logo.
   const header = /<header class="site-header[\s\S]*?<\/header>/.exec(html)?.[0] ?? '';
   expect(
     header.includes(escapeHtml(siteConfig.masterBrand)) && header.includes(escapeHtml(siteConfig.product)),
     'wordmark header (induk │ produk) hilang',
   );
   expect(!/<img\b/.test(header), 'header tidak boleh memuat gambar (emblem hanya di beranda/footer)');
+  expect(/<svg class="monogram\b/.test(header), 'monogram jam pasir hilang di header');
 
-  // Emblem resmi: maksimal satu per halaman; beranda wajib menampilkannya di panggung hero.
-  const emblems = (html.match(/<picture class="emblem\b/g) ?? []).length;
+  // Emblem resmi: maksimal satu per halaman (artwork panggung hero ATAU pelat Emblem); beranda wajib
+  // menampilkannya di panggung hero, halaman lain sebagai pelat di footer.
+  const emblems = (html.match(/<picture class="emblem\b|<div class="emblem-plate\b/g) ?? []).length;
   expect(emblems <= 1, `emblem muncul ${emblems}× (maksimal 1 per halaman)`);
   if (page === 'dist/index.html') expect(/class="emblem emblem--plate"/.test(html), 'emblem panggung hilang di hero beranda');
+  else expect(/<footer[\s\S]*?class="emblem-plate emblem-plate--footer/.test(html), 'pelat emblem footer hilang');
 
   // Halaman konsep = dist/konsep/<slug>/index.html (bukan indeks dist/konsep/index.html).
   if (/^dist\/konsep\/[^/]+\/index\.html$/.test(page)) {
@@ -95,10 +99,12 @@ for (const file of pages) {
 const pkg = JSON.parse(readFileSync(join(root, 'package.json'), 'utf8'));
 if (pkg.author !== siteConfig.author) errors.push(`package.json: author harus "${siteConfig.author}"`);
 
-// --- 4. Ikon buatan lama tidak boleh kembali (hanya aset resmi yang dipakai) ---
-if (existsSync(join(root, 'public', 'favicon.svg')) || existsSync(join(dist, 'favicon.svg'))) {
-  errors.push('favicon.svg (ikon buatan, bukan aset resmi) tidak boleh ada');
+// --- 4. Favicon = monogram jam pasir (src/lib/monogram.ts), dibuat saat build, bukan file lepas di public/ ---
+if (existsSync(join(root, 'public', 'favicon.svg'))) {
+  errors.push('public/favicon.svg tidak boleh ada: favicon dibuat dari monogram (src/pages/favicon.svg.ts)');
 }
+const favicon = existsSync(join(dist, 'favicon.svg')) ? readFileSync(join(dist, 'favicon.svg'), 'utf8') : '';
+if (!favicon.includes('viewBox="0 0 32 32"')) errors.push('dist/favicon.svg (monogram jam pasir) hilang');
 
 if (errors.length > 0) {
   console.error(`Pemeriksaan merek gagal (${errors.length}):\n- ${errors.join('\n- ')}`);
