@@ -1,0 +1,194 @@
+---
+// Filosofi beranda: satu pernyataan editorial besar (Waktu × Harga), garis ukur "satu jalur → sebaran",
+// emblem merek induk sebagai objek pameran (satu-satunya emblem di beranda), lalu tiga prinsip sebagai
+// catatan bernomor. Menggantikan bagian transisi lama; rantai konsep pindah ke LearningSystem.
+import { siteConfig } from '../config/site';
+import BrandEmblem from './BrandEmblem.astro';
+
+const principles = [
+  {
+    title: 'Dapat ditelusuri',
+    body: 'Setiap klaim harus bisa dilacak ke sumbernya. Halaman tanpa sumber terverifikasi ditandai sebagai draf.',
+  },
+  {
+    title: 'Bertahap',
+    body: 'Konsep disusun berdasarkan prasyarat. Setiap halaman menunjukkan apa yang perlu dipahami lebih dulu.',
+  },
+  {
+    title: 'Edukasi, bukan sinyal',
+    body: `${siteConfig.product} menjelaskan cara berpikir tentang risiko. Tidak ada rekomendasi beli, jual, atau sinyal trading.`,
+  },
+];
+
+// Garis ukur: satu jalur (masa lalu) sampai "sekarang", lalu kipas lima kemungkinan (masa depan).
+const fan = [-36, -18, 0, 18, 36].map((dy) => `M240 40 C 300 40, 340 ${40 + dy * 0.6}, 472 ${40 + dy}`);
+const pad = (n: number) => String(n).padStart(2, '0');
+---
+
+<section class="philosophy" aria-labelledby="filosofi-title" data-reveal>
+  <div class="philosophy__statement">
+    <p class="label"><span class="label__index">Filosofi</span><span class="label__sep" aria-hidden="true">·</span>Waktu × Harga</p>
+    <h2 id="filosofi-title" class="philosophy__title">
+      <span>Masa lalu satu jalur,</span>{' '}
+      <em>masa depan sebaran kemungkinan.</em>
+    </h2>
+
+    <svg class="philosophy__rule" viewBox="0 0 480 100" aria-hidden="true" focusable="false">
+      <path class="svg-axis" d="M0 76 H480"></path>
+      <path class="svg-tick" d="M0 76 v-4 M60 76 v-4 M120 76 v-4 M180 76 v-4 M300 76 v-4 M360 76 v-4 M420 76 v-4 M480 76 v-6"></path>
+      <path class="svg-guide" d="M240 0 V76"></path>
+      <path class="svg-trace philosophy__past" d="M0 52 L28 46 L52 50 L80 38 L104 44 L132 34 L160 42 L188 36 L214 44 L240 40"></path>
+      {fan.map((d, i) => <path class:list={['svg-trace', 'svg-trace--alt', { 'philosophy__future--mid': i === 2 }]} d={d} />)}
+      <circle class="philosophy__now" cx="240" cy="40" r="3.5"></circle>
+      <g class="svg-label">
+        <text x="0" y="96">Masa lalu</text>
+        <text x="240" y="96" text-anchor="middle">Sekarang</text>
+        <text x="480" y="96" text-anchor="end">Masa depan</text>
+      </g>
+    </svg>
+
+    <p class="philosophy__lead">
+      {siteConfig.masterBrand} membaca pasar lewat dua sumbu: waktu dan harga. {siteConfig.product} adalah ruangnya
+      untuk risiko, tempat ketidakpastian diukur lebih dulu sebelum keputusan diambil.
+    </p>
+  </div>
+
+  <div class="philosophy__object">
+    <BrandEmblem variant="exhibit" />
+    <p class="label philosophy__object-caption">
+      <span class="label__index">Objek 00</span><span class="label__sep" aria-hidden="true">·</span>{`Emblem ${siteConfig.masterBrand}`}
+    </p>
+  </div>
+
+  <ol class="principles" aria-label="Prinsip">
+    {
+      principles.map((p, i) => (
+        <li>
+          <p class="label">
+            <span class="label__index">{pad(i + 1)}</span>
+            <span class="label__sep" aria-hidden="true">·</span>Prinsip
+          </p>
+          <h3>{p.title}</h3>
+          <p class="principles__body">{p.body}</p>
+        </li>
+      ))
+    }
+  </ol>
+</section>
+
+<style>
+  .philosophy {
+    display: grid;
+    gap: var(--space-12) var(--grid-gap);
+    padding-top: var(--space-16);
+  }
+
+  .philosophy__title {
+    display: flex;
+    flex-direction: column;
+    margin: var(--space-4) 0 var(--space-8);
+    font-size: clamp(var(--text-2xl), 6vw, var(--text-4xl));
+    line-height: var(--leading-tight);
+    letter-spacing: var(--tracking-display);
+  }
+
+  /* Kalimat kedua miring: suara yang berbeda untuk masa depan, bukan warna berbeda. */
+  .philosophy__title em {
+    font-style: italic;
+    font-weight: 400;
+    color: var(--ink-2);
+  }
+
+  .philosophy__rule {
+    display: block;
+    width: 100%;
+    max-width: 36rem;
+    height: auto;
+    overflow: visible;
+  }
+
+  .philosophy__past {
+    stroke-width: var(--stroke-trace-bold);
+  }
+
+  /* Satu kemungkinan tengah = nilai harapan: satu-satunya garis kuningan. */
+  .philosophy__future--mid {
+    stroke: var(--mark);
+    stroke-dasharray: none;
+  }
+
+  .philosophy__now {
+    fill: var(--paper);
+    stroke: var(--trace);
+    stroke-width: var(--stroke-trace);
+  }
+
+  .philosophy__lead {
+    max-width: var(--measure-narrow);
+    margin: var(--space-8) 0 0;
+    font-size: var(--text-lg);
+    color: var(--ink-2);
+  }
+
+  .philosophy__object {
+    justify-self: center;
+    display: grid;
+    justify-items: center;
+    gap: var(--space-3);
+  }
+
+  .philosophy__object-caption {
+    text-align: center;
+  }
+
+  .principles {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr));
+    gap: var(--space-8) var(--grid-gap);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .principles li {
+    padding-top: var(--space-3);
+    border-top: var(--border-hair) solid var(--rule-strong);
+  }
+
+  .principles h3 {
+    margin: var(--space-3) 0 var(--space-2);
+    font-size: var(--text-lg);
+  }
+
+  .principles__body {
+    margin: 0;
+    font-size: var(--text-sm);
+    color: var(--ink-2);
+  }
+
+  @media (min-width: 64rem) {
+    .philosophy {
+      grid-template-columns: repeat(var(--grid-columns), minmax(0, 1fr));
+      align-items: center;
+      padding-top: var(--space-24);
+    }
+
+    .philosophy__statement {
+      grid-column: 1 / span 7;
+    }
+
+    .philosophy__object {
+      grid-column: 9 / -1;
+    }
+
+    .philosophy__title {
+      font-size: clamp(var(--text-3xl), 3.8vw, var(--text-5xl));
+      line-height: var(--leading-display);
+    }
+
+    .principles {
+      grid-column: 1 / -1;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+</style>

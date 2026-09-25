@@ -9,7 +9,7 @@ Hard rules that already exist in the codebase:
 - Brand, product, author and tagline strings only via `siteConfig` (`src/config/site.ts`);
   `scripts/check-branding.mjs` fails the build otherwise.
 - Internal links via `withBase()` / `routes` (`src/lib/url.ts`).
-- Brand emblem at most once per page (home: exhibit object in `RiskLabTransition`; other pages: footer),
+- Brand emblem at most once per page (home: exhibit object in `HomePhilosophy`; other pages: footer),
   never in the header, never recoloured.
 - Do not edit content MDX (`src/content/**`) as part of design work.
 
@@ -82,7 +82,8 @@ axis, graph traces, tick marks, dashed guides, measurement annotations.
 - They should read as **technical drawings**: hairline strokes, labelled axes, annotation leaders,
   one brass pointer at most. No fills beyond `--surface` / `--mark-soft`.
 - **Inline or local SVG only.** No stock illustrations, no image assets from external websites,
-  no icon fonts, no raster art (except the official emblem in `src/assets/Logo/`).
+  no icon fonts, no raster art (except the official emblem in `src/assets/Logo/`). The single exception
+  is the homepage **Risk Field** (three.js, procedural geometry; see "3D: Risk Field").
 - Every figure has a text equivalent (`<title>`/`aria-label` or an adjacent caption).
 - Not trading charts: no candlesticks, no volume bars, no indicator overlays unless a concept is
   literally about them.
@@ -106,13 +107,42 @@ axis, graph traces, tick marks, dashed guides, measurement annotations.
   script in `BaseLayout` sets `.js-reveal` on `<html>` + IntersectionObserver; styles in `global.css`.
   Progressive enhancement: without JS or with reduced motion, content is simply visible. Never put it on
   the hero or anything above the fold, never stagger children, never re-animate on scroll back.
+- **Risk Field camera (the one sanctioned continuous motion):** a very slow drift
+  (`--field-drift-period`, about ±3°) plus small pointer/scroll parallax, only in the hero figure and only
+  while it is on screen. Never a rotation/spin, never anywhere else.
 - Otherwise no decorative entrance animations, parallax, looping motion or scroll-jacking.
 - All durations collapse to 0 under `prefers-reduced-motion` (handled in the tokens).
 
 ### Content concept order (respect it in navigation, paths and visuals)
-**Risk → Uncertainty → Probability → Distribution → Expected Value.**
+**Risk → Uncertainty → Probability → Distribution → Expected Value → Variance.**
 Visuals should build along this chain (e.g. a band of outcomes → a probability → a curve → a
-weighted mean marker), not present the ideas as unrelated cards.
+weighted mean marker → a ±σ spread), not present the ideas as unrelated cards. The chain lives in
+`src/data/concept-chain.ts` (label, question, glyph); `LearningSystem` + `figures/ChainGlyph` draw it.
+
+### 3D: Risk Field (homepage hero only)
+FIG. 01 is a **wireframe probability terrain**: the time × price plane is the floor, density is height.
+The past is one dark path on the floor ending at "now"; the future is a ridge that widens and flattens
+(σ ∝ √t), with branching paths draped on it, three upright probability curves (the one at horizon T
+filled with `--field-fill`), and **one** brass trajectory: the expected-value path along the ridge
+with an `E[P]` marker. Transparent canvas over the warm gallery wall, thin graphite lines, depth through
+per-vertex opacity. No lights, shadows, glow, bloom, neon or spinning.
+- Code: `src/lib/risk-field/geometry.ts` (pure maths in `[t, p, d]`, tested), `quality.ts` (tier
+  choice, tested), `scene.ts` (three.js; the only module that imports `three`), and
+  `components/figures/RiskField.astro` (markup, fallback, boot script). Axis labels are HTML projected
+  from 3D points, never WebGL text.
+- Colours only from `--field-*` tokens (aliases of the palette), read at runtime with
+  `getComputedStyle`, so both themes work; re-read on `prefers-color-scheme` change.
+- **Progressive quality** (`pickQuality`): `high` = full detail, 60 fps, drift + pointer + scroll
+  parallax; `medium` (touch, < 768px, ≤ 4 cores or ≤ 4 GB) = sparser mesh, 30 fps, half drift, no pointer;
+  `low` (no WebGL, `prefers-reduced-motion`, Save-Data, very weak device) = the technical SVG
+  (`TimePriceFigure bare`), and three.js is never downloaded. Context loss, or switching to reduced
+  motion at runtime, falls back to `low`.
+- **Performance:** the SVG is the server-rendered content (no layout shift, works without JS).
+  `three` is loaded via dynamic `import()` only when the stage is near the viewport and the browser is
+  idle. Rendering pauses when the stage is off screen or the tab is hidden, and stops once motion settles.
+  Geometry is procedural and small; never download models, textures or HDRs.
+- Keep the one-brass-pointer rule, time → right, and the concept reading (past path → spread → curve →
+  E[P]) consistent with the SVG fallback.
 
 ### Reusable category treatment
 Single source of truth: `src/data/categories.ts` (`foundations`, `risk-management`, `psychology`,
@@ -121,7 +151,7 @@ Single source of truth: `src/data/categories.ts` (`foundations`, `risk-managemen
 (`axes`, `band`, `oscillation`, `kink`, `tree`) drawn by `components/figures/CategoryMotif.astro`.
 Containers carry `data-category="<id>"` (hook for `--category-accent` and any per-category tweak in
 `global.css`). To add a category: one entry in `categories.ts` (plus a new motif value and its branch
-in `CategoryMotif` if none of the existing ones fits). `CategoryGrid` picks it up automatically.
+in `CategoryMotif` if none of the existing ones fits). `CategoryIndex` (the editorial list on the homepage) picks it up automatically.
 Labels are rendered in markup, never via CSS `content`, so they stay accessible.
 
 ### Planned components (architecture only, built in later phases)
@@ -135,4 +165,8 @@ Labels are rendered in markup, never via CSS `content`, so they stay accessible.
 - **Phase 2 (done):** homepage: `HomeHero` + `figures/TimePriceFigure` (FIG. 01, isometric
   Time × Price; geometry in `src/lib/iso.ts`, tested), `RiskLabTransition` (emblem as exhibit object +
   concept chain on a time axis, `src/data/concept-chain.ts`), `CategoryGrid` + `figures/CategoryMotif`.
+- **Homepage redesign with 3D (done):** `HomeHero` + `figures/RiskField` (three.js, fallback
+  `TimePriceFigure`), `HomePhilosophy` (statement + emblem + principles), `HomeProblems`,
+  `LearningSystem` + `figures/ChainGlyph`, instrument variant of `UkuranPosisi`/`ToolFrame` (with risk
+  gauge), `CategoryIndex`. Replaced `RiskLabTransition`, `CategoryGrid`, `LearningPathStrip`.
 - **Next phases:** only after the user explicitly says `PROCEED`.

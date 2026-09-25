@@ -1,0 +1,147 @@
+---
+// Glyph teknis untuk satu langkah rantai konsep (src/data/concept-chain.ts). Dekoratif (aria-hidden):
+// nama konsep dan pertanyaannya selalu tertulis di sebelahnya. Glyph bertumpuk mengikuti rantai:
+//   path   → Risiko: satu jalur yang menyentuh batas rugi
+//   band   → Ketidakpastian: setelah "sekarang", jalur menjadi pita yang melebar
+//   slice  → Probabilitas: irisan pita di satu waktu; titik lebih besar = lebih mungkin
+//   curve  → Distribusi: irisan menjadi kurva kepadatan
+//   mean   → Nilai Harapan: kurva miring + penanda rata-rata (satu-satunya kuningan di rantai)
+//   spread → Varians: rentang ±σ di sekitar rata-rata
+// Kanvas 120×80; sumbu bawah = waktu/hasil, sumbu kiri = harga/kepadatan. Warna dari kelas .svg-*.
+import type { ChainGlyph } from '../../data/concept-chain';
+
+interface Props {
+  glyph: ChainGlyph;
+}
+
+const { glyph } = Astro.props;
+
+const BASE = 70;
+const range = (a: number, b: number, n: number) => Array.from({ length: n + 1 }, (_, i) => a + ((b - a) * i) / n);
+const line = (pts: [number, number][]) => pts.map(([x, y], i) => `${i ? 'L' : 'M'}${x.toFixed(1)} ${y.toFixed(1)}`).join(' ');
+const gauss = (x: number, m: number, s: number) => Math.exp(-0.5 * ((x - m) / s) ** 2);
+
+const history: [number, number][] = [
+  [8, 38], [18, 33], [28, 41], [38, 35], [48, 43], [58, 40],
+];
+const pathRisk: [number, number][] = [
+  [8, 36], [20, 32], [30, 40], [42, 34], [54, 45], [64, 40], [76, 56], [86, 49], [98, 43], [112, 47],
+];
+
+// Distribusi simetris dan miring (campuran dua Gauss) — rata-rata miring dihitung, bukan ditebak.
+const xs = range(12, 112, 60);
+const sym = (x: number) => gauss(x, 62, 14);
+const skew = (x: number) => 0.85 * gauss(x, 50, 10) + 0.4 * gauss(x, 76, 16);
+const skewMax = Math.max(...xs.map(skew));
+const curvePath = (f: (x: number) => number, max = 1) => line(xs.map((x) => [x, BASE - 50 * (f(x) / max)]));
+const skewMean = xs.reduce((s, x) => s + x * skew(x), 0) / xs.reduce((s, x) => s + skew(x), 0);
+const skewAtMean = BASE - 50 * (skew(skewMean) / skewMax);
+const sigma = 14;
+const sigmaY = BASE - 50 * gauss(62 + sigma, 62, 14);
+
+const slice = [
+  { y: 22, r: 1.6 },
+  { y: 31, r: 2.4 },
+  { y: 40, r: 3.4 },
+  { y: 49, r: 2.4 },
+  { y: 58, r: 1.6 },
+];
+---
+
+<svg class="glyph" viewBox="0 0 120 80" aria-hidden="true" focusable="false">
+  <path class="svg-axis" d={`M4 6 V${BASE} H118`}></path>
+  <path class="svg-tick" d={range(4, 116, 7).slice(1).map((x) => `M${x.toFixed(1)} ${BASE} v3`).join(' ')}></path>
+
+  {
+    glyph === 'path' && (
+      <>
+        <path class="svg-guide" d="M4 56 H118" />
+        <path class="svg-trace" d={line(pathRisk)} />
+        <circle class="glyph__point" cx="76" cy="56" r="2.6" />
+      </>
+    )
+  }
+
+  {
+    (glyph === 'band' || glyph === 'slice') && (
+      <>
+        <path class="svg-guide" d="M58 6 V70" />
+        <path class="svg-trace" d={line(history)} />
+        <path class:list={['svg-trace', 'svg-trace--alt', { 'glyph__faint': glyph === 'slice' }]} d="M58 40 C 80 38, 96 26, 114 14" />
+        <path class:list={['svg-trace', 'svg-trace--alt', { 'glyph__faint': glyph === 'slice' }]} d="M58 40 C 80 42, 96 54, 114 66" />
+        <circle class="glyph__point" cx="58" cy="40" r="2.6" />
+      </>
+    )
+  }
+
+  {
+    glyph === 'slice' && (
+      <>
+        <path class="svg-axis" d="M100 16 V64" />
+        {slice.map((d) => (
+          <circle class="glyph__dot" cx="100" cy={d.y} r={d.r} />
+        ))}
+      </>
+    )
+  }
+
+  {
+    (glyph === 'curve' || glyph === 'spread') && <path class="svg-trace" d={curvePath(sym)} />
+  }
+
+  {
+    glyph === 'mean' && (
+      <>
+        <path class="glyph__fill" d={`${curvePath(skew, skewMax)} L112 ${BASE} L12 ${BASE} Z`} />
+        <path class="svg-trace" d={curvePath(skew, skewMax)} />
+        <path class="glyph__mean" d={`M${skewMean.toFixed(1)} ${BASE} V${(skewAtMean - 6).toFixed(1)}`} />
+        <circle class="svg-mark" cx={skewMean.toFixed(1)} cy={BASE} r="2.8" />
+      </>
+    )
+  }
+
+  {
+    glyph === 'spread' && (
+      <>
+        <path class="svg-guide" d={`M62 ${BASE} V14`} />
+        <path class="svg-axis" d={`M${62 - sigma} ${sigmaY.toFixed(1)} H${62 + sigma} M${62 - sigma} ${(sigmaY - 4).toFixed(1)} v8 M${62 + sigma} ${(sigmaY - 4).toFixed(1)} v8`} />
+        <path class="svg-guide" d={`M${62 - 2 * sigma} ${BASE} V58 M${62 + 2 * sigma} ${BASE} V58`} />
+      </>
+    )
+  }
+</svg>
+
+<style>
+  .glyph {
+    display: block;
+    width: 100%;
+    height: auto;
+    overflow: visible;
+  }
+
+  .glyph__point {
+    fill: var(--paper);
+    stroke: var(--trace);
+    stroke-width: var(--stroke-trace);
+  }
+
+  .glyph__dot {
+    fill: var(--trace);
+    stroke: none;
+  }
+
+  .glyph__faint {
+    stroke: var(--rule-strong);
+  }
+
+  .glyph__fill {
+    fill: var(--mark-soft);
+    stroke: none;
+  }
+
+  .glyph__mean {
+    fill: none;
+    stroke: var(--mark);
+    stroke-width: var(--stroke-trace);
+  }
+</style>

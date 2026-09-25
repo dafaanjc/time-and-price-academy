@@ -91,6 +91,19 @@
   --dash-guide: 3 3; /* stroke-dasharray garis bantu */
   --dash-trace: 6 4; /* stroke-dasharray jejak pembanding */
 
+  /* Risk Field — figur 3D hero (three.js). Dibaca src/lib/risk-field lewat getComputedStyle, jadi
+     warna 3D mengikuti tema tanpa ditulis di kode. Semua alias token di atas: tidak ada warna baru. */
+  --field-grid: var(--rule); /* kisi dinding waktu × harga */
+  --field-line-faint: var(--rule-strong); /* relief: ekor distribusi (memudar) */
+  --field-line: var(--ink-2); /* relief: punggung distribusi, jalur bercabang, garis bantu */
+  --field-axis: var(--axis);
+  --field-trace: var(--trace); /* jalur masa lalu & kurva probabilitas */
+  --field-highlight: var(--mark); /* SATU lintasan kuningan: nilai harapan */
+  --field-fill: var(--mark-soft); /* isian lembut di bawah kurva di horizon T */
+  --field-drift-period: 48s; /* satu siklus drift kamera: sangat pelan, bukan putaran */
+  --field-aspect: 6 / 5; /* rasio panggung figur (desktop) */
+  --field-aspect-compact: 1 / 1; /* rasio panggung di layar sempit */
+
   /* Tipografi — serif untuk bacaan & judul, sans untuk UI, mono untuk metadata/angka ukur */
   --font-sans: "Source Sans 3", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
   --font-serif: "Source Serif 4", "Iowan Old Style", "Palatino Linotype", Georgia, serif;
@@ -114,6 +127,8 @@
   --tracking-label: 0.08em; /* label sans kapital */
   --tracking-mono: 0.1em; /* label mono kapital */
   --tracking-display: -0.022em;
+  --tracking-caps-display: 0.015em; /* judul serif kapital (hero): huruf pahatan dinding museum */
+  --leading-caps-display: 1.08;
 
   /* Jarak (dasar 4px) */
   --space-1: 0.25rem;

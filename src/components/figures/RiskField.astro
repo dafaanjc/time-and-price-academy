@@ -1,0 +1,299 @@
+---
+// FIG. 01 — Medan Risiko (hero beranda): relief kepadatan probabilitas di atas dinding Waktu × Harga.
+// Kualitas progresif (src/lib/risk-field/quality.ts):
+//   low    → figur SVG teknis FIG. 01 (TimePriceFigure) — juga isi HTML awal, jadi tanpa JS/WebGL tetap utuh;
+//   medium → WebGL dengan geometri jarang, 30 fps, tanpa paralaks penunjuk;
+//   high   → WebGL penuh: drift kamera pelan + paralaks penunjuk & gulir.
+// three.js dimuat lewat import() dinamis hanya bila kualitas ≠ low DAN panggung terlihat, lalu saat
+// browser senggang. Render berhenti saat panggung keluar layar atau tab disembunyikan.
+// Label sumbu adalah HTML (bukan teks WebGL) yang diposisikan dari proyeksi titik 3D.
+import TimePriceFigure from './TimePriceFigure.astro';
+
+interface Props {
+  number?: string;
+}
+
+const { number = '01' } = Astro.props;
+
+const labels = [
+  { anchor: 'price', text: 'Harga', align: 'above' },
+  { anchor: 'time', text: 'Waktu', align: 'right' },
+  { anchor: 'now', text: 'Sekarang', align: 'below' },
+  { anchor: 'horizon', text: 'T', align: 'below' },
+  { anchor: 'density', text: 'Kepadatan', align: 'right' },
+  { anchor: 'ev', text: 'E[P]', align: 'right', mark: true },
+] as const;
+---
+
+<figure class="risk-field" data-risk-field data-quality="low" data-state="fallback">
+  <div class="risk-field__stage">
+    <div class="risk-field__fallback" data-fallback>
+      <TimePriceFigure number={number} bare />
+    </div>
+    <canvas
+      class="risk-field__canvas"
+      data-canvas
+      role="img"
+      aria-hidden="true"
+      aria-label="Medan risiko tiga dimensi. Sumbu mendatar waktu, sumbu tegak harga. Jalur harga masa lalu berakhir di titik sekarang; setelahnya relief kepadatan probabilitas melebar menuju horizon T, dengan jalur-jalur bercabang di permukaannya. Garis kuningan di punggung relief adalah nilai harapan E[P]."
+    ></canvas>
+    <div class="risk-field__labels" aria-hidden="true">
+      {
+        labels.map((l) => (
+          <span class="risk-field__anchor" data-anchor={l.anchor}>
+            <span class:list={['risk-field__label', `risk-field__label--${l.align}`, { 'risk-field__label--mark': 'mark' in l }]}>
+              {l.text}
+            </span>
+          </span>
+        ))
+      }
+    </div>
+  </div>
+
+  <figcaption class="risk-field__caption">
+    <span class="label"><span class="label__index">Fig. {number}</span><span class="label__sep">·</span>Medan Risiko · Waktu × Harga</span>
+    <span class="risk-field__caption-text">
+      Masa lalu hanya satu jalur; masa depan adalah sebaran kemungkinan. Relief menunjukkan kepadatan
+      probabilitas harga yang melebar seiring waktu. Garis kuningan adalah nilai harapan.
+    </span>
+  </figcaption>
+</figure>
+
+<script>
+  import { pickQuality, qualitySettings } from '../../lib/risk-field/quality';
+  import type { AnchorKey, FieldPalette, RiskFieldController } from '../../lib/risk-field/scene';
+
+  const token = (name: string) => getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+
+  const readPalette = (): FieldPalette => ({
+    grid: token('--field-grid'),
+    lineFaint: token('--field-line-faint'),
+    line: token('--field-line'),
+    axis: token('--field-axis'),
+    trace: token('--field-trace'),
+    highlight: token('--field-highlight'),
+    fill: token('--field-fill'),
+  });
+
+  /** "48s" / "480ms" → milidetik. */
+  const durationMs = (value: string): number => {
+    const n = Number.parseFloat(value);
+    if (!Number.isFinite(n)) return 0;
+    return value.endsWith('ms') ? n : n * 1000;
+  };
+
+  /** Tunggu browser senggang agar muat three.js tidak bersaing dengan render pertama. */
+  const whenIdle = () =>
+    new Promise<void>((resolve) => {
+      if ('requestIdleCallback' in window) window.requestIdleCallback(() => resolve(), { timeout: 1500 });
+      else setTimeout(resolve, 200);
+    });
+
+  function boot(root: HTMLElement): void {
+    const stage = root.querySelector<HTMLElement>('.risk-field__stage')!;
+    const canvas = root.querySelector<HTMLCanvasElement>('[data-canvas]')!;
+    const fallback = root.querySelector<HTMLElement>('[data-fallback]')!;
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const darkScheme = window.matchMedia('(prefers-color-scheme: dark)');
+    const nav = navigator as Navigator & { deviceMemory?: number; connection?: { saveData?: boolean } };
+
+    const quality = pickQuality({
+      webgl: 'WebGLRenderingContext' in window,
+      reducedMotion: reduceMotion.matches,
+      saveData: nav.connection?.saveData === true,
+      coarsePointer: window.matchMedia('(pointer: coarse)').matches,
+      viewportWidth: window.innerWidth,
+      deviceMemory: nav.deviceMemory,
+      cores: nav.hardwareConcurrency,
+    });
+    root.dataset.quality = quality;
+    if (quality === 'low') return;
+
+    let controller: RiskFieldController | undefined;
+    let loading = false;
+    let visible = false;
+
+    const syncActive = () => controller?.setActive(visible && !document.hidden);
+
+    // Kembali ke SVG (konteks gagal/hilang, atau pengguna beralih ke gerak dikurangi).
+    function fallBack(): void {
+      controller?.dispose();
+      controller = undefined;
+      observer.disconnect();
+      root.dataset.quality = 'low';
+      root.dataset.state = 'fallback';
+      fallback.removeAttribute('aria-hidden');
+      canvas.setAttribute('aria-hidden', 'true');
+    }
+
+    async function load(): Promise<void> {
+      loading = true;
+      await whenIdle();
+      try {
+        const { mountRiskField } = await import('../../lib/risk-field/scene');
+        if (root.dataset.quality === 'low') return;
+        const labels: Partial<Record<AnchorKey, HTMLElement>> = {};
+        root.querySelectorAll<HTMLElement>('[data-anchor]').forEach((el) => {
+          labels[el.dataset.anchor as AnchorKey] = el;
+        });
+        controller = mountRiskField({
+          canvas,
+          labels,
+          settings: qualitySettings[quality as 'high' | 'medium'],
+          palette: readPalette(),
+          driftPeriodMs: durationMs(token('--field-drift-period')) || 48_000,
+          revealMs: durationMs(token('--motion-slow')) * 3,
+          motion: !reduceMotion.matches,
+          onFirstFrame: () => {
+            root.dataset.state = 'live';
+            fallback.setAttribute('aria-hidden', 'true');
+            canvas.removeAttribute('aria-hidden');
+          },
+          onContextLost: fallBack,
+        });
+        syncActive();
+      } catch {
+        fallBack();
+      }
+    }
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        visible = entry?.isIntersecting ?? false;
+        if (visible && !loading) void load();
+        syncActive();
+      },
+      { rootMargin: '120px 0px' },
+    );
+    observer.observe(stage);
+
+    document.addEventListener('visibilitychange', syncActive);
+    darkScheme.addEventListener('change', () => controller?.setPalette(readPalette()));
+    reduceMotion.addEventListener('change', () => {
+      if (reduceMotion.matches) fallBack();
+    });
+  }
+
+  document.querySelectorAll<HTMLElement>('[data-risk-field]').forEach(boot);
+</script>
+
+<style>
+  .risk-field {
+    margin: 0;
+  }
+
+  /* Panggung: SVG fallback dan kanvas WebGL menumpuk di sel yang sama; rasio tetap → tanpa geser tata letak. */
+  .risk-field__stage {
+    position: relative;
+    display: grid;
+    aspect-ratio: var(--field-aspect-compact);
+  }
+
+  .risk-field__stage > * {
+    grid-area: 1 / 1;
+    min-width: 0;
+    min-height: 0;
+  }
+
+  .risk-field__fallback {
+    display: grid;
+    place-items: center;
+    transition:
+      opacity var(--motion-slow) var(--ease),
+      visibility 0s linear;
+  }
+
+  .risk-field__fallback :global(svg) {
+    height: 100%;
+    max-height: 100%;
+  }
+
+  .risk-field__canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    transition: opacity var(--motion-slow) var(--ease);
+  }
+
+  .risk-field__labels {
+    position: relative;
+    overflow: hidden;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity var(--motion-slow) var(--ease);
+  }
+
+  [data-quality='low'] .risk-field__canvas,
+  [data-quality='low'] .risk-field__labels {
+    display: none;
+  }
+
+  [data-state='live'] .risk-field__canvas,
+  [data-state='live'] .risk-field__labels {
+    opacity: 1;
+  }
+
+  [data-state='live'] .risk-field__fallback {
+    opacity: 0;
+    visibility: hidden;
+    transition:
+      opacity var(--motion-slow) var(--ease),
+      visibility 0s linear var(--motion-slow);
+  }
+
+  /* Label sumbu: jangkar di (0, 0), digeser JS ke proyeksi titik 3D; teks disejajarkan relatif jangkar. */
+  .risk-field__anchor {
+    position: absolute;
+    top: 0;
+    left: 0;
+    will-change: transform;
+  }
+
+  .risk-field__label {
+    position: absolute;
+    font-family: var(--font-label);
+    font-size: var(--text-2xs);
+    letter-spacing: var(--tracking-mono);
+    text-transform: uppercase;
+    line-height: 1;
+    white-space: nowrap;
+    color: var(--ink-3);
+  }
+
+  .risk-field__label--above {
+    transform: translate(-50%, -100%);
+  }
+
+  .risk-field__label--below {
+    transform: translate(-50%, 0);
+  }
+
+  .risk-field__label--right {
+    transform: translate(0.5em, -50%);
+  }
+
+  .risk-field__label--mark {
+    color: var(--mark);
+  }
+
+  .risk-field__caption {
+    display: grid;
+    gap: var(--space-2);
+    max-width: var(--measure-narrow);
+    margin-top: var(--space-4);
+    padding-top: var(--space-3);
+    border-top: var(--border-hair) solid var(--rule-strong);
+  }
+
+  .risk-field__caption-text {
+    font-size: var(--text-sm);
+    color: var(--ink-2);
+  }
+
+  @media (min-width: 48rem) {
+    .risk-field__stage {
+      aspect-ratio: var(--field-aspect);
+    }
+  }
+</style>

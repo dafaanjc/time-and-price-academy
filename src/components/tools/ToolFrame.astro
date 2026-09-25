@@ -9,14 +9,21 @@ interface Props {
   description: string;
   /** Ringkasan hasil awal (juga diperbarui skrip). */
   summary: string;
+  /**
+   * `instrument`: tampilan instrumen ukur untuk beranda (pelat bernomor, input mono, pembacaan besar).
+   * Default dipakai di dalam konten MDX.
+   */
+  variant?: 'default' | 'instrument';
+  /** Label kecil di atas judul. */
+  label?: string;
 }
 
-const { tool, title, description, summary } = Astro.props;
+const { tool, title, description, summary, variant = 'default', label = 'Alat hitung' } = Astro.props;
 ---
 
-<form class="tool" data-tool={tool} novalidate>
+<form class:list={['tool', { 'tool--instrument': variant === 'instrument' }]} data-tool={tool} novalidate>
   <header class="tool__header">
-    <p class="tool__label">Alat hitung</p>
+    <p class="tool__label">{label}</p>
     <h3 class="tool__title">{title}</h3>
     <p class="tool__desc">{description}</p>
   </header>
@@ -155,5 +162,111 @@ const { tool, title, description, summary } = Astro.props;
 
   .tool :global(.is-gain) {
     color: var(--gain);
+  }
+
+  /* ---------- Varian instrumen (beranda) ----------
+     Pelat instrumen: bingkai garis tegas, label mono, input angka mono rata kanan seperti jendela
+     pembacaan, hasil sebagai angka serif besar. Tanpa bayangan; sorotan hanya garis kuningan. */
+  .tool--instrument {
+    max-width: none;
+    margin: 0;
+    padding: 0;
+    border: var(--border-hair) solid var(--rule-strong);
+    border-top: var(--border-hair) solid var(--rule-strong);
+  }
+
+  .tool--instrument .tool__header {
+    margin: 0;
+    padding: var(--space-4) var(--space-6);
+    border-bottom: var(--border-hair) solid var(--rule);
+  }
+
+  .tool--instrument .tool__label {
+    font-family: var(--font-label);
+    font-size: var(--text-label);
+    font-weight: 400;
+    letter-spacing: var(--tracking-mono);
+    color: var(--mark);
+  }
+
+  .tool--instrument .tool__title {
+    font-size: var(--text-xl);
+  }
+
+  .tool--instrument .tool__inputs {
+    padding: var(--space-6);
+    gap: var(--space-4) var(--space-4);
+  }
+
+  .tool--instrument .tool__results {
+    margin: 0;
+    padding: var(--space-6);
+    border-top: var(--border-hair) solid var(--rule-strong);
+    background: var(--paper);
+  }
+
+  .tool--instrument .tool__summary,
+  .tool--instrument .tool__note {
+    margin: 0;
+    padding: var(--space-3) var(--space-6) 0;
+  }
+
+  .tool--instrument .tool__note:last-of-type {
+    padding-bottom: var(--space-4);
+  }
+
+  .tool--instrument .tool__summary {
+    padding-top: var(--space-4);
+    border-top: var(--border-hair) solid var(--rule);
+  }
+
+  .tool--instrument :global(.field span) {
+    font-family: var(--font-label);
+    font-size: var(--text-label);
+    letter-spacing: var(--tracking-mono);
+    text-transform: uppercase;
+    color: var(--ink-3);
+  }
+
+  .tool--instrument :global(.field input) {
+    font-family: var(--font-mono);
+    font-size: var(--text-base);
+    text-align: right;
+    background: var(--surface);
+    border-color: var(--rule-strong);
+    border-radius: var(--radius-0);
+    transition: border-color var(--motion-fast) var(--ease);
+  }
+
+  .tool--instrument :global(.field input:hover) {
+    border-color: var(--ink-3);
+  }
+
+  .tool--instrument :global(.field input:focus-visible) {
+    outline: 2px solid var(--mark);
+    outline-offset: 1px;
+    border-color: var(--mark);
+  }
+
+  .tool--instrument :global(.readout dt) {
+    font-family: var(--font-label);
+    font-size: var(--text-label);
+    font-weight: 400;
+    letter-spacing: var(--tracking-mono);
+  }
+
+  .tool--instrument :global(.readout dd) {
+    font-family: var(--font-serif);
+    font-size: var(--text-2xl);
+    line-height: 1.1;
+  }
+
+  .tool--instrument :global(.readout > div) {
+    padding-left: var(--space-3);
+    border-left: var(--border-hair) solid var(--rule-strong);
+  }
+
+  .tool--instrument :global(.readout > .readout__primary) {
+    border-left: var(--border-mark) solid var(--mark);
   }
 </style>

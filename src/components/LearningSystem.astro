@@ -1,0 +1,232 @@
+---
+// Sistem belajar: rantai konsep inti sebagai diagram teknis di atas satu sumbu bertick.
+// Risiko → Ketidakpastian → Probabilitas → Distribusi → Nilai Harapan → Varians (src/data/concept-chain.ts).
+// Tiap langkah: glyph bertumpuk (figures/ChainGlyph) dalam bidang koordinat, nomor "01 / 06",
+// nama konsep (tautan), dan pertanyaan yang dijawabnya. Desktop: enam kolom mendatar dengan mata panah
+// di ujung sumbu; layar sempit: sumbu tegak di kiri.
+import { conceptChain } from '../data/concept-chain';
+import { conceptHref, getConceptsByIds } from '../lib/concepts';
+import { routes, withBase } from '../lib/url';
+import ChainGlyph from './figures/ChainGlyph.astro';
+import SectionHeading from './SectionHeading.astro';
+
+interface Props {
+  number: string;
+}
+
+const { number } = Astro.props;
+
+const concepts = await getConceptsByIds(conceptChain.map((s) => s.id));
+if (concepts.length !== conceptChain.length) {
+  const found = new Set(concepts.map((c) => c.id));
+  const missing = conceptChain.filter((s) => !found.has(s.id)).map((s) => s.id);
+  throw new Error(`concept-chain.ts: konsep tidak ditemukan: ${missing.join(', ')}`);
+}
+const pad = (n: number) => String(n).padStart(2, '0');
+const total = pad(conceptChain.length);
+---
+
+<section class="system" id="sistem" aria-labelledby="sistem-title" data-reveal>
+  <SectionHeading
+    id="sistem-title"
+    number={number}
+    title="Sistem Belajar"
+    more={{ href: withBase(routes.learningPaths), label: 'Jalur belajar' }}
+  />
+
+  <div class="system__intro">
+    <p class="system__statement">Enam konsep, satu rantai.</p>
+    <p class="system__lead">
+      Setiap langkah memakai langkah sebelumnya: dari satu jalur yang bisa rugi, ke sebaran kemungkinan, ke
+      angka yang bisa dihitung sebelum mengambil keputusan.
+    </p>
+  </div>
+
+  <ol class="system__chain" aria-label="Rantai konsep inti">
+    {
+      conceptChain.map((step, i) => (
+        <li class:list={['system__step', { 'system__step--mark': step.glyph === 'mean' }]}>
+          <div class="system__plate plot-field">
+            <ChainGlyph glyph={step.glyph} />
+          </div>
+          <div class="system__text">
+            <p class="label">
+              <span class="label__index">{pad(i + 1)}</span> / {total}
+            </p>
+            <h3 class="system__name">
+              <a href={conceptHref(step.id)}>{step.label}</a>
+            </h3>
+            <p class="system__question">{step.question}</p>
+          </div>
+        </li>
+      ))
+    }
+  </ol>
+
+  <p class="system__more">
+    <a href={withBase(routes.map)}>Lihat hubungan antar-konsep di peta pengetahuan →</a>
+  </p>
+</section>
+
+<style>
+  .system {
+    padding-top: var(--space-16);
+  }
+
+  .system__statement {
+    margin: 0;
+    font-family: var(--font-serif);
+    font-size: var(--text-2xl);
+    font-weight: 600;
+    line-height: var(--leading-tight);
+    letter-spacing: var(--tracking-display);
+  }
+
+  .system__lead {
+    max-width: var(--measure-narrow);
+    margin: var(--space-4) 0 0;
+    color: var(--ink-2);
+  }
+
+  /* Mobile: sumbu tegak di kiri, tick per langkah; glyph kecil di kiri teks. */
+  .system__chain {
+    position: relative;
+    display: grid;
+    gap: var(--space-6);
+    margin: var(--space-12) 0 0;
+    padding: 0 0 0 var(--space-6);
+    list-style: none;
+    border-left: var(--stroke-axis) solid var(--axis);
+  }
+
+  .system__step {
+    position: relative;
+    display: grid;
+    grid-template-columns: 7rem minmax(0, 1fr);
+    gap: var(--space-4);
+    align-items: center;
+  }
+
+  .system__step::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: calc(-1 * var(--space-6));
+    width: var(--tick-major);
+    height: var(--stroke-hair);
+    background: var(--axis);
+  }
+
+  .system__step--mark::before {
+    width: 7px;
+    height: 7px;
+    margin: -3px 0 0 -4px;
+    background: var(--mark);
+  }
+
+  .system__plate {
+    padding: var(--space-2);
+  }
+
+  .system__text .label {
+    color: var(--ink-3);
+  }
+
+  .system__name {
+    margin: var(--space-1) 0 0;
+    font-size: var(--text-lg);
+  }
+
+  .system__name a {
+    color: var(--ink);
+    text-decoration: none;
+  }
+
+  .system__name a:hover {
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-decoration-color: var(--mark);
+    text-underline-offset: 0.2em;
+  }
+
+  .system__question {
+    margin: var(--space-1) 0 0;
+    font-size: var(--text-sm);
+    color: var(--ink-2);
+  }
+
+  .system__more {
+    margin: var(--space-8) 0 0;
+    font-weight: 600;
+  }
+
+  @media (min-width: 40rem) {
+    .system__chain {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: var(--space-8) var(--grid-gap);
+      padding: var(--space-6) 0 0;
+      border-left: 0;
+      border-top: var(--stroke-axis) solid var(--axis);
+    }
+
+    .system__step {
+      grid-template-columns: minmax(0, 1fr);
+      align-items: start;
+      align-content: start; /* langkah pendek tidak meregang: teks sejajar di semua kolom */
+    }
+
+    .system__step::before {
+      top: calc(-1 * var(--space-6));
+      left: 0;
+      width: var(--stroke-hair);
+      height: var(--tick-major);
+    }
+
+    .system__step--mark::before {
+      width: 7px;
+      height: 7px;
+      margin: -3px 0 0 -3px;
+    }
+  }
+
+  /* Desktop: enam langkah di satu sumbu mendatar, dengan mata panah di ujung kanan. */
+  @media (min-width: 64rem) {
+    .system {
+      padding-top: var(--space-24);
+    }
+
+    .system__intro {
+      display: grid;
+      grid-template-columns: repeat(var(--grid-columns), minmax(0, 1fr));
+      gap: var(--grid-gap);
+      align-items: end;
+    }
+
+    .system__statement {
+      grid-column: 1 / span 5;
+      font-size: var(--text-3xl);
+    }
+
+    .system__lead {
+      grid-column: 7 / -1;
+      margin: 0;
+    }
+
+    .system__chain {
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+      margin-top: var(--space-16);
+    }
+
+    .system__chain::after {
+      content: '';
+      position: absolute;
+      top: -4px;
+      right: 0;
+      width: 7px;
+      height: 7px;
+      border-top: var(--stroke-axis) solid var(--axis);
+      border-right: var(--stroke-axis) solid var(--axis);
+      transform: rotate(45deg);
+    }
+  }
+</style>

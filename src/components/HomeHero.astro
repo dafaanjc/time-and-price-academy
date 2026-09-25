@@ -1,12 +1,13 @@
 ---
-// Hero beranda: teks di 6 kolom kiri, figur teknis Waktu × Harga di 6 kolom kanan (desktop).
+// Hero beranda: tagline sebagai judul kapital bergaya huruf pahatan museum (5 kolom kiri) dan
+// FIG. 01 Medan Risiko (7 kolom kanan): figur 3D three.js dengan fallback SVG teknis.
 // Di bawah tombol, baris spesifikasi bergaya label museum; angkanya dihitung dari data, bukan ditulis.
 import { siteConfig } from '../config/site';
 import { categories } from '../data/categories';
 import { getConcepts } from '../lib/concepts';
 import { getProblems } from '../lib/problems';
 import { routes, withBase } from '../lib/url';
-import TimePriceFigure from './figures/TimePriceFigure.astro';
+import RiskField from './figures/RiskField.astro';
 import { toolComponents } from './tools';
 
 const pad = (n: number) => String(n).padStart(2, '0');
@@ -32,7 +33,7 @@ const specs = [
     </p>
     <p class="hero__actions">
       <a class="button" href="#masalah">Mulai dari masalah</a>
-      <a class="hero__secondary" href={withBase(routes.learningPaths)}>Ikuti jalur belajar →</a>
+      <a class="hero__secondary" href="#sistem">Lihat sistem belajar →</a>
     </p>
     <dl class="hero__specs">
       {
@@ -47,7 +48,7 @@ const specs = [
   </div>
 
   <div class="hero__figure">
-    <TimePriceFigure number="01" />
+    <RiskField number="01" />
   </div>
 </section>
 
@@ -58,12 +59,15 @@ const specs = [
     padding-block: var(--space-4) var(--space-8);
   }
 
+  /* Judul kapital serif: tegas tapi tenang — tracking sedikit dibuka, baris rapat. */
   .hero__title {
     display: flex;
     flex-direction: column;
-    margin: var(--space-4) 0 var(--space-6);
-    font-size: clamp(var(--text-2xl), 7vw, var(--text-4xl));
-    line-height: var(--leading-display);
+    margin: var(--space-6) 0 var(--space-6);
+    font-size: clamp(var(--text-2xl), 8.5vw, var(--text-4xl));
+    line-height: var(--leading-caps-display);
+    letter-spacing: var(--tracking-caps-display);
+    text-transform: uppercase;
   }
 
   .hero__lead {
@@ -131,8 +135,7 @@ const specs = [
 
   .hero__figure {
     width: 100%;
-    max-width: 30rem;
-    justify-self: center;
+    min-width: 0;
   }
 
   @media (min-width: 30rem) {
@@ -146,21 +149,19 @@ const specs = [
       grid-template-columns: repeat(var(--grid-columns), minmax(0, 1fr));
       gap: var(--grid-gap);
       align-items: center;
-      padding-block: var(--space-8) var(--space-12);
+      padding-block: var(--space-8) var(--space-16);
     }
 
     .hero__text {
-      grid-column: 1 / span 6;
+      grid-column: 1 / span 5;
     }
 
     .hero__title {
-      font-size: clamp(var(--text-3xl), 3.9vw, var(--text-5xl));
+      font-size: clamp(var(--text-3xl), 3.6vw, var(--text-4xl));
     }
 
     .hero__figure {
-      grid-column: 7 / -1;
-      max-width: none;
-      padding-left: var(--space-8);
+      grid-column: 6 / -1;
     }
   }
 </style>

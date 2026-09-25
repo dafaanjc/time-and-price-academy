@@ -1,100 +1,57 @@
 ---
-// Beranda: HERO (figur Waktu × Harga) → TRANSISI RISK LAB (emblem + rantai konsep) → MASALAH TRADER →
-// HITUNG DULU → KATEGORI → JALUR BELAJAR (+ prinsip).
-// Pintu masuk utama adalah masalah dalam bahasa trader; teori tetap tersedia lewat indeks dan jalur.
+// Beranda "Modern Digital Museum", enam ruang berurutan:
+// HERO (tagline + FIG. 01 Medan Risiko 3D, fallback SVG) → FILOSOFI (Waktu × Harga + emblem pameran + prinsip)
+// → 01 MASALAH TRADER → 02 SISTEM BELAJAR (rantai Risiko → … → Varians) → 03 INSTRUMEN (ukuran posisi)
+// → 04 INDEKS KATEGORI. Pintu masuk utama adalah masalah dalam bahasa trader; teori lewat rantai & indeks.
 import BaseLayout from '../layouts/BaseLayout.astro';
-import CategoryGrid from '../components/CategoryGrid.astro';
+import CategoryIndex from '../components/CategoryIndex.astro';
 import HomeHero from '../components/HomeHero.astro';
-import LearningPathStrip from '../components/LearningPathStrip.astro';
-import ProblemList from '../components/ProblemList.astro';
-import RiskLabTransition from '../components/RiskLabTransition.astro';
+import HomePhilosophy from '../components/HomePhilosophy.astro';
+import HomeProblems from '../components/HomeProblems.astro';
+import LearningSystem from '../components/LearningSystem.astro';
 import SectionHeading from '../components/SectionHeading.astro';
 import UkuranPosisi from '../components/tools/UkuranPosisi.astro';
-import { siteConfig } from '../config/site';
-import { getLearningPaths } from '../lib/concepts';
 import { getProblems } from '../lib/problems';
 import { routes, withBase } from '../lib/url';
 
 const problems = await getProblems();
-const [mainPath] = await getLearningPaths();
-
-const principles = [
-  {
-    title: 'Dapat ditelusuri',
-    body: 'Setiap klaim harus bisa dilacak ke sumbernya. Halaman tanpa sumber terverifikasi ditandai sebagai draf.',
-  },
-  {
-    title: 'Bertahap',
-    body: 'Konsep disusun berdasarkan prasyarat. Setiap halaman menunjukkan apa yang perlu dipahami lebih dulu.',
-  },
-  {
-    title: 'Edukasi, bukan sinyal',
-    body: `${siteConfig.product} menjelaskan cara berpikir tentang risiko. Tidak ada rekomendasi beli, jual, atau sinyal trading.`,
-  },
-];
 ---
 
 <BaseLayout>
   <HomeHero />
-  <RiskLabTransition />
+  <HomePhilosophy />
+  <HomeProblems problems={problems} number="01" />
+  <LearningSystem number="02" />
 
-  <section class="home-section" data-reveal id="masalah" aria-labelledby="masalah-title">
-    <SectionHeading
-      id="masalah-title"
-      number="01"
-      title="Masalah Trader"
-      more={{ href: withBase(routes.problems), label: 'Semua masalah' }}
-    />
-    <ProblemList problems={problems} headingLevel={3} ruled={false} />
+  <section class="home-section" data-reveal aria-labelledby="instrumen-title">
+    <SectionHeading id="instrumen-title" number="03" title="Instrumen" />
+    <div class="instrument">
+      <div class="instrument__intro">
+        <p class="instrument__statement">Ukuran posisi adalah hasil, bukan titik awal.</p>
+        <p class="instrument__lead">
+          Tentukan dulu berapa yang rela hilang bila stop loss tersentuh. Lot mengikuti dari angka itu, bukan dari
+          kebiasaan atau keyakinan.
+        </p>
+        <p class="instrument__formula">
+          <span class="instrument__formula-label">Rumus</span>
+          <span>Lot = (Modal × Risiko %)</span>
+          <span>&emsp;&ensp;÷ (Stop × Nilai/poin)</span>
+        </p>
+      </div>
+      <div class="instrument__tool">
+        <UkuranPosisi variant="instrument" />
+      </div>
+    </div>
   </section>
 
-  <section class="home-section" data-reveal aria-labelledby="hitung-title">
-    <SectionHeading id="hitung-title" number="02" title="Hitung Dulu" />
-    <UkuranPosisi />
-  </section>
-
-  <section class="home-section" data-reveal aria-labelledby="konsep-title">
+  <section class="home-section" data-reveal aria-labelledby="kategori-title">
     <SectionHeading
-      id="konsep-title"
-      number="03"
-      title="Kategori"
+      id="kategori-title"
+      number="04"
+      title="Indeks Kategori"
       more={{ href: withBase(routes.concepts), label: 'Indeks konsep' }}
     />
-    <CategoryGrid />
-  </section>
-
-  {
-    mainPath && (
-      <section class="home-section" data-reveal aria-labelledby="jalur-title">
-        <SectionHeading
-          id="jalur-title"
-          number="04"
-          title="Jalur Belajar"
-          more={{ href: withBase(routes.learningPaths), label: 'Semua jalur' }}
-        />
-        <p class="section-lead">
-          <strong>{mainPath.title}.</strong> {mainPath.description}
-        </p>
-        <LearningPathStrip path={mainPath} />
-        <p class="section-more">
-          <a href={withBase(routes.map)}>Lihat hubungan antar-konsep di peta pengetahuan →</a>
-        </p>
-      </section>
-    )
-  }
-
-  <section class="home-section" data-reveal aria-labelledby="prinsip-title">
-    <SectionHeading id="prinsip-title" number="05" title="Prinsip" />
-    <ul class="principles">
-      {
-        principles.map((p) => (
-          <li>
-            <h3>{p.title}</h3>
-            <p>{p.body}</p>
-          </li>
-        ))
-      }
-    </ul>
+    <CategoryIndex />
   </section>
 </BaseLayout>
 
@@ -103,44 +60,67 @@ const principles = [
     padding-top: var(--space-16);
   }
 
+  .instrument {
+    display: grid;
+    gap: var(--space-8) var(--grid-gap);
+  }
+
+  .instrument__statement {
+    margin: 0;
+    font-family: var(--font-serif);
+    font-size: var(--text-2xl);
+    font-weight: 600;
+    line-height: var(--leading-tight);
+    letter-spacing: var(--tracking-display);
+    text-wrap: balance;
+  }
+
+  .instrument__lead {
+    max-width: var(--measure-narrow);
+    margin: var(--space-4) 0 0;
+    color: var(--ink-2);
+  }
+
+  /* Rumus sebagai keterangan instrumen: mono, garis kiri kuningan, tanpa kotak. */
+  .instrument__formula {
+    display: grid;
+    gap: var(--space-1);
+    margin: var(--space-8) 0 0;
+    padding-left: var(--space-4);
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    border-left: var(--border-mark) solid var(--mark);
+  }
+
+  .instrument__formula-label {
+    font-size: var(--text-2xs);
+    letter-spacing: var(--tracking-mono);
+    text-transform: uppercase;
+    color: var(--ink-3);
+  }
+
   @media (min-width: 64rem) {
     .home-section {
       padding-top: var(--space-24);
     }
-  }
 
-  .section-lead {
-    max-width: var(--measure);
-    margin: 0 0 var(--space-6);
-    color: var(--ink-2);
-  }
+    .instrument {
+      grid-template-columns: repeat(var(--grid-columns), minmax(0, 1fr));
+      align-items: start;
+    }
 
-  .section-lead strong {
-    color: var(--ink);
-  }
+    .instrument__intro {
+      grid-column: 1 / span 4;
+      position: sticky;
+      top: calc(var(--header-height) + var(--space-8));
+    }
 
-  .section-more {
-    margin: var(--space-6) 0 0;
-    font-weight: 600;
-  }
+    .instrument__statement {
+      font-size: var(--text-3xl);
+    }
 
-  .principles {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr));
-    gap: var(--space-8);
-    margin: 0;
-    padding: 0;
-    list-style: none;
-  }
-
-  .principles h3 {
-    margin: 0 0 var(--space-2);
-    font-size: var(--text-lg);
-  }
-
-  .principles p {
-    margin: 0;
-    font-size: var(--text-sm);
-    color: var(--ink-2);
+    .instrument__tool {
+      grid-column: 6 / -1;
+    }
   }
 </style>

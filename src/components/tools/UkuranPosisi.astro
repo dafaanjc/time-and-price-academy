@@ -1,16 +1,26 @@
 ---
 // Alat: risiko per transaksi → ukuran posisi (+ risiko sebenarnya dari "lot yang biasa dipakai").
 // Menjawab: "berapa yang sebenarnya gue risikokan?" dan "kenapa lot gue selalu kebesaran?".
+// Varian `instrument` (beranda) menambah meter risiko: skala 0–maks dengan penunjuk kuningan di batas
+// risiko dan jarum grafit di risiko lot yang biasa dipakai (merah redam bila melewati batas).
 import ToolFrame from './ToolFrame.astro';
 import { describePositionSize, describeUsualLots } from '../../lib/calc/describe';
-import { positionSize, riskForLots } from '../../lib/calc/position-size';
+import { positionSize, riskForLots, riskGauge } from '../../lib/calc/position-size';
 import { formatNumber, formatRupiah } from '../../lib/format';
+
+interface Props {
+  variant?: 'default' | 'instrument';
+}
+
+const { variant = 'default' } = Astro.props;
+const instrument = variant === 'instrument';
 
 const MIN_LOT = 0.01;
 const defaults = { capital: 50_000_000, riskPercent: 1, stopPoints: 100, valuePerPointPerLot: 10_000, usualLots: 1 };
 const result = positionSize({ ...defaults, lotStep: MIN_LOT });
 const usual = riskForLots({ ...defaults, lots: defaults.usualLots });
 const usualOverRisk = usual.riskPercent > defaults.riskPercent * 1.001;
+const gauge = riskGauge(defaults.riskPercent, usual.riskPercent);
 ---
 
 <ToolFrame
@@ -18,6 +28,8 @@ const usualOverRisk = usual.riskPercent > defaults.riskPercent * 1.001;
   title="Hitung ukuran posisi dari risiko"
   description="Isi modal, batas risiko, jarak stop loss, dan nilai per poin untuk 1 lot. Ukuran posisi adalah hasil, bukan titik awal."
   summary={describePositionSize(result, MIN_LOT)}
+  variant={variant}
+  label={instrument ? 'Instrumen 01 · Ukuran posisi' : undefined}
 >
   <Fragment slot="inputs">
     <label class="field"><span>Modal (Rp)</span><input name="capital" type="number" inputmode="decimal" min="0" step="any" value={defaults.capital} /></label>
@@ -29,15 +41,35 @@ const usualOverRisk = usual.riskPercent > defaults.riskPercent * 1.001;
   <Fragment slot="results">
     <dl class="readout">
       <div><dt>Risiko per transaksi</dt><dd data-out="riskAmount">{formatRupiah(result.riskAmount)}</dd></div>
-      <div><dt>Ukuran posisi maksimum</dt><dd data-out="lots">{formatNumber(result.lots)} lot</dd></div>
+      <div class="readout__primary"><dt>Ukuran posisi maksimum</dt><dd data-out="lots">{formatNumber(result.lots)} lot</dd></div>
     </dl>
+    {
+      instrument && (
+        <div class="gauge" data-gauge aria-hidden="true" style={`--limit-at: ${gauge.limitAt}%; --actual-at: ${gauge.actualAt}%`}>
+          <p class="gauge__title">Meter risiko · % modal</p>
+          <div class:list={['gauge__scale', { 'is-over': usualOverRisk }]} data-gauge-scale>
+            <span class="gauge__zone" />
+            <span class="gauge__limit">
+              <span class="gauge__tag" data-gauge-limit>Batas {formatNumber(defaults.riskPercent)}%</span>
+            </span>
+            <span class="gauge__needle">
+              <span class="gauge__tag" data-gauge-actual>Lot biasa {formatNumber(usual.riskPercent)}%</span>
+            </span>
+          </div>
+          <p class="gauge__ends">
+            <span>0%</span>
+            <span data-gauge-max>{gauge.max}%</span>
+          </p>
+        </div>
+      )
+    }
     <p class:list={["usual", { "is-loss": usualOverRisk }]} data-out="usual">{describeUsualLots(defaults.usualLots, usual.riskAmount, usual.riskPercent, defaults.riskPercent)}</p>
   </Fragment>
 </ToolFrame>
 
 <script>
   import { describePositionSize, describeUsualLots } from '../../lib/calc/describe';
-  import { positionSize, riskForLots } from '../../lib/calc/position-size';
+  import { positionSize, riskForLots, riskGauge } from '../../lib/calc/position-size';
   import { formatNumber, formatRupiah } from '../../lib/format';
 
   const MIN_LOT = 0.01;
@@ -46,6 +78,21 @@ const usualOverRisk = usual.riskPercent > defaults.riskPercent * 1.001;
     const value = (name: string) => (form.elements.namedItem(name) as HTMLInputElement).valueAsNumber;
     const out = (name: string) => form.querySelector<HTMLElement>(`[data-out="${name}"]`)!;
     const summary = form.querySelector<HTMLElement>('[data-summary]')!;
+    const gauge = form.querySelector<HTMLElement>('[data-gauge]');
+
+    const updateGauge = (limit: number, actual: number | undefined): void => {
+      if (!gauge) return;
+      const g = riskGauge(limit, actual ?? 0);
+      gauge.style.setProperty('--limit-at', `${g.limitAt}%`);
+      gauge.style.setProperty('--actual-at', `${g.actualAt}%`);
+      gauge.querySelector<HTMLElement>('[data-gauge-max]')!.textContent = `${g.max}%`;
+      gauge.querySelector<HTMLElement>('[data-gauge-limit]')!.textContent = `Batas ${formatNumber(limit)}%`;
+      const actualTag = gauge.querySelector<HTMLElement>('[data-gauge-actual]')!;
+      actualTag.textContent = actual === undefined ? '' : `Lot biasa ${formatNumber(Math.round(actual * 100) / 100)}%`;
+      const scale = gauge.querySelector<HTMLElement>('[data-gauge-scale]')!;
+      scale.classList.toggle('is-over', actual !== undefined && actual > limit * 1.001);
+      scale.classList.toggle('is-empty', actual === undefined);
+    };
 
     const update = (): void => {
       const input = {
@@ -60,8 +107,10 @@ const usualOverRisk = usual.riskPercent > defaults.riskPercent * 1.001;
         out('lots').textContent = '—';
         out('usual').textContent = '';
         summary.textContent = 'Isi semua kolom dengan angka lebih dari 0.';
+        gauge?.classList.add('is-invalid');
         return;
       }
+      gauge?.classList.remove('is-invalid');
       const result = positionSize({ ...input, lotStep: MIN_LOT });
       out('riskAmount').textContent = formatRupiah(result.riskAmount);
       out('lots').textContent = `${formatNumber(result.lots)} lot`;
@@ -71,6 +120,7 @@ const usualOverRisk = usual.riskPercent > defaults.riskPercent * 1.001;
       const usual = Number.isFinite(lots) && lots > 0 ? riskForLots({ ...input, lots }) : undefined;
       out('usual').textContent = usual ? describeUsualLots(lots, usual.riskAmount, usual.riskPercent, input.riskPercent) : '';
       out('usual').classList.toggle('is-loss', !!usual && usual.riskPercent > input.riskPercent * 1.001);
+      updateGauge(input.riskPercent, usual?.riskPercent);
     };
 
     form.addEventListener('input', update);
@@ -84,5 +134,105 @@ const usualOverRisk = usual.riskPercent > defaults.riskPercent * 1.001;
     margin: var(--space-4) 0 0;
     font-size: var(--text-sm);
     color: var(--ink-2);
+  }
+
+  /* ---------- Meter risiko (varian instrumen) ----------
+     Penggaris mendatar bertick. Penunjuk kuningan = batas yang Anda tetapkan; jarum grafit = risiko lot
+     yang biasa dipakai. Melewati batas: jarum & zona di atas batas memakai --loss (data, bukan dekorasi). */
+  .gauge {
+    margin-top: var(--space-6);
+  }
+
+  .gauge__title,
+  .gauge__ends,
+  .gauge__tag {
+    font-family: var(--font-label);
+    font-size: var(--text-2xs);
+    letter-spacing: var(--tracking-mono);
+    text-transform: uppercase;
+    color: var(--ink-3);
+  }
+
+  .gauge__title {
+    margin: 0 0 var(--space-6);
+  }
+
+  .gauge__scale {
+    position: relative;
+    height: var(--tick-major);
+    margin-top: var(--space-6);
+    background:
+      linear-gradient(var(--rule-strong), var(--rule-strong)) bottom / 100% var(--stroke-hair) no-repeat,
+      repeating-linear-gradient(to right, var(--rule-strong) 0 var(--stroke-hair), transparent var(--stroke-hair) 10%) bottom / 100% var(--tick-minor) no-repeat;
+  }
+
+  .gauge__zone {
+    position: absolute;
+    bottom: 0;
+    left: var(--limit-at);
+    right: 0;
+    height: var(--stroke-trace-bold);
+    background: var(--rule);
+  }
+
+  .gauge__scale.is-over .gauge__zone {
+    right: calc(100% - var(--actual-at));
+    background: var(--loss);
+  }
+
+  .gauge__limit,
+  .gauge__needle {
+    position: absolute;
+    bottom: 0;
+    width: var(--stroke-trace-bold);
+    transition: left var(--motion-base) var(--ease);
+  }
+
+  .gauge__limit {
+    left: var(--limit-at);
+    height: calc(var(--tick-major) * 2);
+    background: var(--mark);
+  }
+
+  .gauge__needle {
+    left: var(--actual-at);
+    height: calc(var(--tick-major) * 3.5);
+    background: var(--ink);
+  }
+
+  .gauge__scale.is-over .gauge__needle {
+    background: var(--loss);
+  }
+
+  .gauge__scale.is-empty .gauge__needle {
+    display: none;
+  }
+
+  .gauge__tag {
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    padding-bottom: var(--space-1);
+    white-space: nowrap;
+    transform: translateX(-50%);
+  }
+
+  .gauge__limit .gauge__tag {
+    left: auto;
+    right: 100%;
+    bottom: 0;
+    padding: 0 var(--space-2) 0 0;
+    transform: none;
+    color: var(--mark);
+  }
+
+  .gauge__ends {
+    display: flex;
+    justify-content: space-between;
+    margin: var(--space-1) 0 0;
+  }
+
+  .gauge.is-invalid {
+    opacity: 0.4;
   }
 </style>

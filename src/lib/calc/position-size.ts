@@ -40,3 +40,16 @@ export function riskForLots(input: Omit<PositionSizeInput, 'riskPercent' | 'lotS
   const riskAmount = input.lots * input.stopPoints * input.valuePerPointPerLot;
   return { riskAmount, riskPercent: input.capital > 0 ? (riskAmount / input.capital) * 100 : 0 };
 }
+
+const GAUGE_STEPS = [1, 2, 3, 5, 10, 20, 30, 50, 100];
+
+/**
+ * Skala meter risiko pada alat ukuran posisi: 0 sampai `max` (angka bulat dari GAUGE_STEPS, cukup untuk
+ * ±2,5× batas dan risiko aktual), dengan posisi batas dan risiko aktual dalam persen lebar skala (0–100).
+ */
+export function riskGauge(limitPercent: number, actualPercent: number): { max: number; limitAt: number; actualAt: number } {
+  const need = Math.max(limitPercent * 2.5, actualPercent * 1.1, 0);
+  const max = GAUGE_STEPS.find((s) => s >= need) ?? GAUGE_STEPS[GAUGE_STEPS.length - 1]!;
+  const at = (v: number) => Math.max(0, Math.min(100, (v / max) * 100));
+  return { max, limitAt: at(limitPercent), actualAt: at(actualPercent) };
+}

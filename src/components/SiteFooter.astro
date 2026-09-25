@@ -3,7 +3,7 @@ import { siteConfig } from '../config/site';
 import BrandEmblem from './BrandEmblem.astro';
 import { routes, withBase } from '../lib/url';
 
-// Emblem maksimal satu kali per halaman: beranda sudah menampilkannya di bagian transisi (RiskLabTransition).
+// Emblem maksimal satu kali per halaman: beranda sudah menampilkannya sebagai objek pameran di bagian filosofi (HomePhilosophy).
 const showEmblem = Astro.url.pathname !== withBase(routes.home);
 ---
 

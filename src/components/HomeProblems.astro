@@ -1,0 +1,227 @@
+---
+// Masalah trader di beranda: tata letak editorial asimetris. Kiri (desktop, menempel saat digulir):
+// pernyataan pembuka. Kanan: masalah sebagai entri bernomor di sepanjang sumbu tegak bertick —
+// kutipan dalam suara trader (serif), ringkasan, lalu keputusan & konsep sebagai keterangan mono.
+// Data dari koleksi `problems`; halaman /masalah/ tetap memakai ProblemList.
+import { conceptHref, getConcepts } from '../lib/concepts';
+import { problemHref, type Problem } from '../lib/problems';
+import { routes, withBase } from '../lib/url';
+import SectionHeading from './SectionHeading.astro';
+
+interface Props {
+  problems: Problem[];
+  number: string;
+}
+
+const { problems, number } = Astro.props;
+const titles = new Map((await getConcepts()).map((c) => [c.id, c.data.title]));
+const pad = (n: number) => String(n).padStart(2, '0');
+---
+
+<section class="problems" id="masalah" aria-labelledby="masalah-title" data-reveal>
+  <SectionHeading
+    id="masalah-title"
+    number={number}
+    title="Masalah Trader"
+    more={{ href: withBase(routes.problems), label: 'Semua masalah' }}
+  />
+
+  <div class="problems__layout">
+    <div class="problems__intro">
+      <p class="problems__statement">Mulai dari yang terasa, bukan dari teori.</p>
+      <p class="problems__lead">
+        Setiap masalah di bawah adalah keputusan yang sedang dipertaruhkan. Kami menunjukkan konsep mana yang
+        menjelaskannya dan cara menghitungnya.
+      </p>
+    </div>
+
+    <ol class="problems__list">
+      {
+        problems.map((problem, i) => (
+          <li class="problems__item">
+            <span class="problems__index label" aria-hidden="true">
+              {pad(i + 1)}
+            </span>
+            <div class="problems__body">
+              <h3 class="problems__quote">
+                <a href={problemHref(problem.id)}>“{problem.data.title}”</a>
+              </h3>
+              <p class="problems__desc">{problem.data.description}</p>
+              <dl class="problems__meta">
+                <div>
+                  <dt class="label">Keputusan</dt>
+                  <dd>{problem.data.decision}</dd>
+                </div>
+                <div>
+                  <dt class="label">Konsep</dt>
+                  <dd>
+                    {problem.data.concepts.map((id, j) => (
+                      <>
+                        {j > 0 && <span aria-hidden="true"> · </span>}
+                        <a href={conceptHref(id)}>{titles.get(id) ?? id}</a>
+                      </>
+                    ))}
+                  </dd>
+                </div>
+              </dl>
+            </div>
+          </li>
+        ))
+      }
+    </ol>
+  </div>
+</section>
+
+<style>
+  .problems {
+    padding-top: var(--space-16);
+  }
+
+  .problems__layout {
+    display: grid;
+    gap: var(--space-8) var(--grid-gap);
+  }
+
+  .problems__statement {
+    margin: 0;
+    font-family: var(--font-serif);
+    font-size: var(--text-2xl);
+    font-weight: 600;
+    line-height: var(--leading-tight);
+    letter-spacing: var(--tracking-display);
+    text-wrap: balance;
+  }
+
+  .problems__lead {
+    max-width: var(--measure-narrow);
+    margin: var(--space-4) 0 0;
+    color: var(--ink-2);
+  }
+
+  /* Daftar = sumbu tegak: garis kiri dengan tick di tiap entri; nomor entri dalam kuningan. */
+  .problems__list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    border-left: var(--stroke-axis) solid var(--axis);
+  }
+
+  .problems__item {
+    position: relative;
+    display: grid;
+    grid-template-columns: 3rem minmax(0, 1fr);
+    gap: var(--space-2);
+    padding: var(--space-6) 0 var(--space-6) var(--space-4);
+    border-bottom: var(--border-hair) solid var(--rule);
+  }
+
+  .problems__item:first-child {
+    padding-top: 0;
+  }
+
+  .problems__item::before {
+    content: '';
+    position: absolute;
+    top: var(--space-6);
+    left: 0;
+    width: var(--tick-major);
+    height: var(--stroke-hair);
+    margin-top: 0.8em;
+    background: var(--axis);
+  }
+
+  .problems__item:first-child::before {
+    top: 0;
+  }
+
+  .problems__index {
+    padding-top: 0.55em;
+    color: var(--mark);
+  }
+
+  .problems__quote {
+    margin: 0;
+    font-size: var(--text-xl);
+    line-height: 1.25;
+  }
+
+  .problems__quote a {
+    color: var(--ink);
+    text-decoration: none;
+  }
+
+  .problems__quote a:hover {
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-decoration-color: var(--mark);
+    text-underline-offset: 0.2em;
+  }
+
+  .problems__desc {
+    max-width: var(--measure);
+    margin: var(--space-2) 0 0;
+    font-size: var(--text-sm);
+    color: var(--ink-2);
+  }
+
+  .problems__meta {
+    display: grid;
+    gap: var(--space-2);
+    margin: var(--space-4) 0 0;
+    font-size: var(--text-sm);
+  }
+
+  .problems__meta div {
+    display: grid;
+    grid-template-columns: 7rem minmax(0, 1fr);
+    column-gap: var(--space-3);
+  }
+
+  .problems__meta dt {
+    padding-top: 0.2em;
+  }
+
+  .problems__meta dd {
+    margin: 0;
+    color: var(--ink-2);
+  }
+
+  .problems__meta a {
+    color: var(--ink-2);
+  }
+
+  .problems__meta a:hover {
+    color: var(--ink);
+  }
+
+  @media (max-width: 30rem) {
+    .problems__meta div {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+
+  @media (min-width: 64rem) {
+    .problems {
+      padding-top: var(--space-24);
+    }
+
+    .problems__layout {
+      grid-template-columns: repeat(var(--grid-columns), minmax(0, 1fr));
+    }
+
+    .problems__intro {
+      grid-column: 1 / span 4;
+      align-self: start;
+      position: sticky;
+      top: calc(var(--header-height) + var(--space-8));
+    }
+
+    .problems__list {
+      grid-column: 6 / -1;
+    }
+
+    .problems__statement {
+      font-size: var(--text-3xl);
+    }
+  }
+</style>

@@ -69,7 +69,7 @@ Semua identitas ada di `src/config/site.ts` dan diekspor sebagai `siteConfig`:
 
 | Field | Nilai | Dipakai oleh |
 |---|---|---|
-| `masterBrand` | Time & Price Academy | `SiteHeader` (wordmark), `SiteFooter`, label hero, `RiskLabTransition`, alt emblem |
+| `masterBrand` | Time & Price Academy | `SiteHeader` (wordmark), `SiteFooter`, label hero, `HomePhilosophy`, alt emblem |
 | `product` | Risk Lab | `SiteHeader`, `SiteFooter`, hero, deskripsi halaman |
 | `author` | Muhamad Daffa | `<meta name="author">`, `article:author` |
 | `name` | Risk Lab — Time & Price Academy | `<title>`, `og:site_name`, `og:title` default |
@@ -105,7 +105,7 @@ Aturan pakai:
 - **Header:** tidak memakai emblem, karena detailnya hilang di 24–32px. Header memakai wordmark
   tipografis dari `siteConfig`. Ini penulisan nama, bukan logo baru.
 - **Emblem maksimal satu kali per halaman:** sebagai objek pameran di bagian transisi beranda
-  (`RiskLabTransition`, varian `exhibit`, 300px desktop / 240px mobile) atau di
+  (`HomePhilosophy`, varian `exhibit`, 300px desktop / 240px mobile) atau di
   footer halaman lain (96px, `alt=""` karena atribusi sudah tertulis di sebelahnya).
 - **Latar dilebur tanpa kotak** (`BrandEmblem.astro`, `<picture>` per tema):
   - tema gelap: `black logo.png` + `mix-blend-mode: screen`. Hitam murni menjadi transparan tanpa filter;
@@ -161,14 +161,17 @@ Detail skema dan cara menambah konsep ada di [`content-model.md`](./content-mode
 | `SiteFooter` | Atribusi "By Muhamad Daffa - Time & Price Academy" dan disclaimer |
 | `LearningPath` | Langkah bernomor dengan deskripsi (`/jalur-belajar/`) |
 | `SectionHeading` | Judul bagian bernomor bergaya dokumen cetak ("01 MASALAH TRADER ─ Semua →") |
-| `HomeHero` | Hero beranda: label merek, tagline, tombol, baris spesifikasi (angka dari data) + `figures/TimePriceFigure` |
-| `RiskLabTransition` | Transisi merek induk → produk: emblem sebagai objek pameran + rantai konsep (`src/data/concept-chain.ts`) di atas sumbu waktu |
-| `CategoryGrid` | Pelat kategori ("01 / 05", motif, judul, deskripsi, konsep); pelat pertama utama, asimetris di desktop |
-| `figures/TimePriceFigure` | FIG. 01, gambar teknik isometrik Waktu × Harga (SVG inline; geometri dari `src/lib/iso.ts`) |
+| `HomeHero` | Hero beranda: label merek, tagline kapital, tombol, baris spesifikasi (angka dari data) + `figures/RiskField` |
+| `figures/RiskField` | FIG. 01 Medan Risiko: relief kepadatan 3D (three.js, dimuat malas lewat `import()`); kualitas high/medium/low dari `src/lib/risk-field/quality.ts`, geometri murni di `geometry.ts`, adegan di `scene.ts`; fallback & isi HTML awal = `TimePriceFigure bare` |
+| `HomePhilosophy` | Pernyataan Waktu × Harga + garis ukur "satu jalur → sebaran", emblem sebagai objek pameran, tiga prinsip |
+| `HomeProblems` | Masalah trader di beranda: pengantar menempel (kiri) + entri bernomor di sumbu tegak (kanan) |
+| `LearningSystem` | Rantai konsep Risiko → … → Varians (`src/data/concept-chain.ts`) sebagai diagram bertick dengan `figures/ChainGlyph` |
+| `figures/ChainGlyph` | Glyph teknis bertumpuk per langkah rantai (path, band, slice, curve, mean, spread) |
+| `CategoryIndex` | Indeks kategori sebagai daftar editorial: nomor "01 / 05", motif, judul, deskripsi, konsep |
+| `figures/TimePriceFigure` | FIG. 01, gambar teknik isometrik Waktu × Harga (SVG inline; geometri dari `src/lib/iso.ts`); `bare` = tanpa figure/caption, dipakai sebagai fallback RiskField |
 | `figures/CategoryMotif` | Motif SVG teknis per kategori (`motif` di `categories.ts`: axes, band, oscillation, kink, tree) |
-| `LearningPathStrip` | Jalur belajar ringkas satu alur untuk beranda |
 | `tools/ToolFrame` | Kerangka alat hitung: label, judul, input, hasil, ringkasan `aria-live`, catatan "bukan rekomendasi" |
-| `tools/UkuranPosisi` | Risiko per transaksi → ukuran posisi; risiko sebenarnya dari "lot yang biasa dipakai" |
+| `tools/UkuranPosisi` | Risiko per transaksi → ukuran posisi; risiko sebenarnya dari "lot yang biasa dipakai"; `variant="instrument"` (beranda) menambah meter risiko (`riskGauge`) |
 | `tools/SimulasiMargin` | Margin level dan jarak (poin) ke margin call / stop out |
 | `tools/TabelKalahBeruntun` | Sisa modal saat kalah beruntun: risiko tetap vs digandakan |
 | `tools/PenjelajahNilaiHarapan` | Nilai harapan (R), titik impas, 20 rangkaian simulasi 100 transaksi (SVG) |

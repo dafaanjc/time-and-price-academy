@@ -1,0 +1,208 @@
+---
+// Indeks kategori sebagai daftar editorial (bukan kisi kartu): satu baris per kategori seperti daftar isi
+// katalog pameran — nomor "01 / 05", motif teknis kecil, judul serif + deskripsi, lalu konsep di dalamnya.
+// Garis rambut antarbaris; sorotan saat hover/fokus hanya tick kuningan di kiri dan garis bawah judul.
+// Sumber: src/data/categories.ts (urutan = nomor). Kategori baru muncul otomatis.
+import { categories, categoryIndexLabel } from '../data/categories';
+import { categoryHref, conceptHref, getConceptsByCategory } from '../lib/concepts';
+import CategoryMotif from './figures/CategoryMotif.astro';
+
+interface Props {
+  /** Level heading judul kategori (mengikuti heading bagian di atasnya). */
+  headingLevel?: 2 | 3;
+}
+
+const { headingLevel = 3 } = Astro.props;
+const Heading = `h${headingLevel}` as 'h2' | 'h3';
+const grouped = await getConceptsByCategory();
+---
+
+<ol class="category-index">
+  {
+    categories.map((category) => {
+      const concepts = grouped.get(category.id) ?? [];
+      return (
+        <li class="entry" data-category={category.id}>
+          <p class="entry__index label">
+            <span class="label__index">{categoryIndexLabel(category.id)}</span>
+          </p>
+          <div class="entry__motif">
+            <CategoryMotif motif={category.motif} />
+          </div>
+          <div class="entry__body">
+            <Heading class="entry__title">
+              <a href={categoryHref(category.id)}>{category.title}</a>
+            </Heading>
+            <p class="entry__desc">{category.description}</p>
+          </div>
+          <div class="entry__concepts">
+            <p class="label">{concepts.length > 0 ? `${concepts.length} konsep` : 'Segera hadir'}</p>
+            {concepts.length > 0 && (
+              <ul aria-label={`Konsep dalam ${category.title}`}>
+                {concepts.map((concept) => (
+                  <li>
+                    <a href={conceptHref(concept.id)}>{concept.data.title}</a>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        </li>
+      );
+    })
+  }
+</ol>
+
+<style>
+  .category-index {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    border-top: var(--border-hair) solid var(--rule-strong);
+  }
+
+  /* Mobile: nomor + motif di satu baris, lalu judul, deskripsi, konsep. */
+  .entry {
+    position: relative;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 6rem;
+    grid-template-areas:
+      'index motif'
+      'body body'
+      'concepts concepts';
+    gap: var(--space-3) var(--grid-gap);
+    padding-block: var(--space-6);
+    border-bottom: var(--border-hair) solid var(--rule);
+  }
+
+  /* Tick kuningan di tepi kiri saat baris disorot (garis, bukan blok warna). */
+  .entry::before {
+    content: '';
+    position: absolute;
+    top: var(--space-6);
+    bottom: var(--space-6);
+    left: calc(-1 * var(--space-4));
+    width: var(--border-mark);
+    background: var(--mark);
+    transform: scaleY(0);
+    transform-origin: top;
+    transition: transform var(--motion-base) var(--ease);
+  }
+
+  .entry:hover::before,
+  .entry:focus-within::before {
+    transform: scaleY(1);
+  }
+
+  .entry__index {
+    grid-area: index;
+  }
+
+  .entry__motif {
+    grid-area: motif;
+  }
+
+  .entry__body {
+    grid-area: body;
+    min-width: 0;
+  }
+
+  .entry__concepts {
+    grid-area: concepts;
+    min-width: 0;
+  }
+
+  .entry__title {
+    margin: 0;
+    font-size: var(--text-xl);
+  }
+
+  /* Tautan judul direntangkan menutupi baris; tautan konsep berada di atasnya. */
+  .entry__title a {
+    color: var(--ink);
+    text-decoration: none;
+  }
+
+  .entry__title a::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+  }
+
+  .entry:hover .entry__title a,
+  .entry__title a:focus-visible {
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-decoration-color: var(--mark);
+    text-underline-offset: 0.2em;
+  }
+
+  .entry__desc {
+    max-width: var(--measure-narrow);
+    margin: var(--space-2) 0 0;
+    font-size: var(--text-sm);
+    color: var(--ink-2);
+  }
+
+  .entry__concepts ul {
+    margin: var(--space-2) 0 0;
+    padding: 0;
+    list-style: none;
+    font-size: var(--text-sm);
+  }
+
+  .entry__concepts li + li {
+    margin-top: var(--space-1);
+  }
+
+  .entry__concepts a {
+    position: relative;
+    z-index: 1;
+    color: var(--ink-2);
+  }
+
+  .entry__concepts a:hover {
+    color: var(--ink);
+  }
+
+  /* Desktop: kolom katalog — nomor (2) · motif (2) · judul & deskripsi (5) · konsep (3). */
+  @media (min-width: 64rem) {
+    .entry {
+      grid-template-columns: repeat(var(--grid-columns), minmax(0, 1fr));
+      grid-template-areas: none;
+      align-items: start;
+      padding-block: var(--space-8);
+    }
+
+    .entry::before {
+      top: var(--space-8);
+      bottom: var(--space-8);
+    }
+
+    .entry__index {
+      grid-area: auto;
+      grid-column: 1 / span 2;
+      padding-top: 0.45em;
+    }
+
+    .entry__motif {
+      grid-area: auto;
+      grid-column: 3 / span 2;
+    }
+
+    .entry__body {
+      grid-area: auto;
+      grid-column: 5 / span 5;
+    }
+
+    .entry__concepts {
+      grid-area: auto;
+      grid-column: 10 / -1;
+      padding-top: 0.3em;
+    }
+
+    .entry__title {
+      font-size: var(--text-2xl);
+    }
+  }
+</style>
