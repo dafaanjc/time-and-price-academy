@@ -12,6 +12,11 @@
 // garis, medan di bawah dengan garis bantu dari jam pasir ke "sekarang" dan satu jalur masa lalu).
 // Gerak (satu interaksi): saat menggulir melewati hero, horizon bertambah 1T → 2T dan sebaran melebar ∝ √t
 // (skala CSS pada grup SVG), emblem bergeser sangat sedikit (paralaks). Tanpa JS / gerak dikurangi: keadaan 1T diam.
+// R9.2 (kedalaman & gerak halus, hanya saat panggung terlihat, mati di bawah prefers-reduced-motion):
+//   - paralaks kursor per lapisan (kisi → emblem → medan) + kemiringan kecil medan (`--parallax-pointer`, `--tilt-max`);
+//   - siklus jejak (`traceAt`, `--motion-ambient`): denyut di "sekarang" (jam pasir) → satu jalur ditempuh sampai T →
+//     penanda pendaratan di kurva kepadatan → pudar; setiap siklus jalur lain. Tanpa blur/glow, hanya opasitas garis.
+//   Emblem sendiri tidak dianimasikan selain pergeseran (aturan merek: tidak digambar ulang/diwarnai ulang).
 import { siteConfig } from '../../config/site';
 import { outcomeField } from '../../lib/outcome-field';
 import BrandEmblem from '../BrandEmblem.astro';
@@ -42,7 +47,13 @@ const origin = (x: number, y: number, box: { w: number; h: number }) => `${pct(x
 <figure class="stage plate" data-stage aria-labelledby="stage-caption">
   <div class="stage__field">
     <!-- Lapisan 2: medan hasil. Dekoratif-informatif; artinya ada di keterangan. -->
-    <svg class="stage__svg stage__svg--wide" viewBox={`0 0 ${W.w} ${W.h}`} aria-hidden="true" focusable="false">
+    <svg
+      class="stage__svg stage__svg--wide"
+      viewBox={`0 0 ${W.w} ${W.h}`}
+      aria-hidden="true"
+      focusable="false"
+      data-field={JSON.stringify({ x0: W.x0, y0: W.y0, xT: W.xT, sigmaT: W.sigmaT, dw: 58 })}
+    >
       <path class="svg-axis" d={`M${W.x0} ${W.axis} H${W.w - 24}`}></path>
       <path class="svg-tick" d={[0, 1, 2, 3, 4, 5, 6].map((i) => `M${W.x0 + i * ((W.xT - W.x0) / 6)} ${W.axis} v6`).join(' ')}></path>
       <path class="svg-guide" d={`M${W.x0} 96 V${W.axis}`}></path>
@@ -51,12 +62,18 @@ const origin = (x: number, y: number, box: { w: number; h: number }) => `${pct(x
         {wide.paths.map((d) => <path class="stage__path" d={d} />)}
         <path class="stage__envelope" d={wide.upper}></path>
         <path class="stage__envelope" d={wide.lower}></path>
+        <path class="stage__trace" d="" data-trace></path>
       </g>
       <g class="stage__density" style={`transform-origin: ${origin(W.xT, W.y0, W)}`}>
         <path class="stage__density-curve" d={wide.density}></path>
       </g>
       <path class="stage__expected" d={wide.expected}></path>
       <circle class="stage__now" cx={W.x0} cy={W.y0} r="4.5"></circle>
+      <g class="stage__ambient">
+        <circle class="stage__pulse" cx={W.x0} cy={W.y0} r="4.5" data-pulse></circle>
+        <path class="stage__landing" d="" data-landing></path>
+        <circle class="stage__head" cx={W.x0} cy={W.y0} r="3" data-head></circle>
+      </g>
       <g class="stage__labels">
         <text x={W.x0} y={W.axis + 26} text-anchor="middle">Sekarang</text>
         <text x={W.xT} y={W.axis + 26} text-anchor="middle">T</text>
@@ -66,7 +83,13 @@ const origin = (x: number, y: number, box: { w: number; h: number }) => `${pct(x
       </g>
     </svg>
 
-    <svg class="stage__svg stage__svg--compact" viewBox={`0 0 ${C.w} ${C.h}`} aria-hidden="true" focusable="false">
+    <svg
+      class="stage__svg stage__svg--compact"
+      viewBox={`0 0 ${C.w} ${C.h}`}
+      aria-hidden="true"
+      focusable="false"
+      data-field={JSON.stringify({ x0: C.x0, y0: C.y0, xT: C.xT, sigmaT: C.sigmaT, dw: 40 })}
+    >
       <path class="stage__cut" d={`M0 ${C.cut} H${C.w}`}></path>
       <path class="svg-guide" d={`M${C.x0} 452 V${C.axis}`}></path>
       <path class="svg-axis" d={`M24 ${C.axis} H${C.w - 16}`}></path>
@@ -75,12 +98,18 @@ const origin = (x: number, y: number, box: { w: number; h: number }) => `${pct(x
         {compact.paths.map((d) => <path class="stage__path" d={d} />)}
         <path class="stage__envelope" d={compact.upper}></path>
         <path class="stage__envelope" d={compact.lower}></path>
+        <path class="stage__trace" d="" data-trace></path>
       </g>
       <g class="stage__density" style={`transform-origin: ${origin(C.xT, C.y0, C)}`}>
         <path class="stage__density-curve" d={compact.density}></path>
       </g>
       <path class="stage__expected" d={compact.expected}></path>
       <circle class="stage__now" cx={C.x0} cy={C.y0} r="4"></circle>
+      <g class="stage__ambient">
+        <circle class="stage__pulse" cx={C.x0} cy={C.y0} r="4" data-pulse></circle>
+        <path class="stage__landing" d="" data-landing></path>
+        <circle class="stage__head" cx={C.x0} cy={C.y0} r="2.6" data-head></circle>
+      </g>
       <g class="stage__labels">
         <text x="28" y={C.y0 - 22}>Masa lalu</text>
         <text x={C.x0} y={C.axis - 8} text-anchor="middle">Sekarang</text>
@@ -117,51 +146,239 @@ const origin = (x: number, y: number, box: { w: number; h: number }) => `${pct(x
 </figure>
 
 <script>
-  import { horizonAt } from '../../lib/outcome-field';
+  import { horizonAt, nextTraceIndex, traceAt } from '../../lib/outcome-field';
 
   const fmt = (v: number, digits: number) =>
     new Intl.NumberFormat('id-ID', { minimumFractionDigits: digits, maximumFractionDigits: digits }).format(v);
+  const r1 = (n: number) => Math.round(n * 10) / 10;
+  // Durasi token dalam ms; minifier CSS menulis ulang `6400ms` menjadi `6.4s`, jadi satuannya harus dibaca.
+  const toMs = (v: string) => {
+    const n = parseFloat(v);
+    if (!Number.isFinite(n)) return 0;
+    return v.trim().endsWith('ms') ? n : v.trim().endsWith('s') ? n * 1000 : n;
+  };
+  // Jalur daun hanya berisi perintah M/L (outcome-field.ts), jadi cukup ambil pasangan angkanya.
+  const toPoints = (d: string): [number, number][] =>
+    [...d.matchAll(/[ML](-?[\d.]+) (-?[\d.]+)/g)].map((m) => [Number(m[1]), Number(m[2])]);
+
+  type Field = { x0: number; y0: number; xT: number; sigmaT: number; dw: number };
+  type Layer = {
+    svg: SVGSVGElement;
+    field: Field;
+    leaves: [number, number][][];
+    trace: SVGPathElement;
+    pulse: SVGCircleElement;
+    head: SVGCircleElement;
+    landing: SVGPathElement;
+    r0: number;
+    index: number;
+  };
 
   const stage = document.querySelector<HTMLElement>('[data-stage]');
   const reduce = window.matchMedia('(prefers-reduced-motion: reduce)');
+  const finePointer = window.matchMedia('(hover: hover) and (pointer: fine)');
+
   if (stage && 'IntersectionObserver' in window) {
     const horizonOut = stage.querySelector<HTMLElement>('[data-stage-out="horizon"]')!;
     const spreadOut = stage.querySelector<HTMLElement>('[data-stage-out="spread"]')!;
-    let frame = 0;
-    let visible = false;
-    let last = '';
+    const layers: Layer[] = [...stage.querySelectorAll<SVGSVGElement>('[data-field]')].map((svg) => {
+      const trace = svg.querySelector<SVGPathElement>('[data-trace]')!;
+      const pulse = svg.querySelector<SVGCircleElement>('[data-pulse]')!;
+      const field = JSON.parse(svg.dataset.field!) as Field;
+      const leaves = [...svg.querySelectorAll('.stage__path')].map((p) => toPoints(p.getAttribute('d') ?? ''));
+      // Siklus pertama: hasil yang paling khas (mendarat paling dekat ke puncak kurva), bukan ekor.
+      const gap = (pts: [number, number][]) => Math.abs(pts[pts.length - 1]![1] - field.y0);
+      const typical = leaves.reduce((best, pts, i) => (gap(pts) < gap(leaves[best]!) ? i : best), 0);
+      return {
+        svg,
+        field,
+        leaves,
+        trace,
+        pulse,
+        head: svg.querySelector<SVGCircleElement>('[data-head]')!,
+        landing: svg.querySelector<SVGPathElement>('[data-landing]')!,
+        r0: Number(pulse.getAttribute('r')),
+        index: typical,
+      };
+    });
 
-    // Kemajuan 0–1 dari jarak gulir halaman (hero ada di puncak): 0 saat dimuat, 1 setelah ±90% tinggi panggung.
-    const update = () => {
-      frame = 0;
+    let visible = false;
+    let spread = 1;
+    let last = '';
+    let scrollFrame = 0;
+    let loop = 0;
+    let lastTime = 0;
+    let cycleStart = -1;
+    let cycle = 0;
+    let period = 0;
+    let parallaxOn = false;
+    // Paralaks kursor: target (dari kursor) dan nilai yang dihaluskan menuju target, keduanya −1…1.
+    const target = { x: 0, y: 0 };
+    const eased = { x: 0, y: 0 };
+
+    const readTokens = () => {
+      const css = getComputedStyle(stage);
+      period = toMs(css.getPropertyValue('--motion-ambient'));
+      parallaxOn = finePointer.matches && (parseFloat(css.getPropertyValue('--parallax-pointer')) || 0) > 0;
+    };
+
+    // Gulir (R9.1): kemajuan 0–1 dari jarak gulir halaman (hero ada di puncak).
+    const updateScroll = () => {
+      scrollFrame = 0;
       const progress = Math.min(1, Math.max(0, window.scrollY / (stage.offsetHeight * 0.9)));
-      const { horizon, spread } = horizonAt(progress);
+      const h = horizonAt(progress);
+      spread = h.spread;
       stage.style.setProperty('--stage-progress', progress.toFixed(3));
       stage.style.setProperty('--stage-spread', spread.toFixed(3));
-      const text = `${fmt(horizon, 1)}|${fmt(spread, 2)}`;
+      const text = `${fmt(h.horizon, 1)}|${fmt(spread, 2)}`;
       if (text !== last) {
         last = text;
-        horizonOut.textContent = fmt(horizon, 1);
+        horizonOut.textContent = fmt(h.horizon, 1);
         spreadOut.textContent = fmt(spread, 2);
       }
     };
     const onScroll = () => {
-      if (visible && !frame) frame = requestAnimationFrame(update);
+      if (visible && !scrollFrame) scrollFrame = requestAnimationFrame(updateScroll);
     };
+
+    const active = () => layers.find((l) => l.svg.getClientRects().length > 0 && getComputedStyle(l.svg).display !== 'none');
+
+    const pickNext = (layer: Layer) => {
+      layer.index = nextTraceIndex(layer.index, layer.leaves.length);
+    };
+
+    // Potongan jalur sampai waktu xNow (jejak maju merata di sumbu waktu) + titik ujungnya (interpolasi).
+    const cut = (pts: [number, number][], xNow: number) => {
+      const out: [number, number][] = [pts[0]!];
+      for (let i = 1; i < pts.length; i++) {
+        const [xa, ya] = pts[i - 1]!;
+        const [xb, yb] = pts[i]!;
+        if (xb <= xNow) {
+          out.push([xb, yb]);
+          continue;
+        }
+        const t = (xNow - xa) / (xb - xa);
+        out.push([xNow, ya + (yb - ya) * t]);
+        break;
+      }
+      return out;
+    };
+
+    // Satu frame siklus jejak pada komposisi yang sedang tampil.
+    const drawTrace = (layer: Layer, u: number) => {
+      const f = traceAt(u);
+      const { x0, y0, xT, sigmaT, dw } = layer.field;
+      layer.pulse.setAttribute('r', r1(layer.r0 + f.pulseGrow * layer.r0 * 3.2).toString());
+      layer.pulse.style.opacity = (f.pulse * 0.85).toFixed(3);
+      const pts = cut(layer.leaves[layer.index]!, x0 + (xT - x0) * f.drawn);
+      layer.trace.setAttribute('d', pts.map(([x, y], i) => `${i ? 'L' : 'M'}${r1(x)} ${r1(y)}`).join(' '));
+      layer.trace.style.opacity = f.opacity.toFixed(3);
+      // Kepala di ujung jejak; grup sebaran diskalakan vertikal di sekitar y0, jadi y ikut diskalakan.
+      const pt = { x: pts[pts.length - 1]![0], y: pts[pts.length - 1]![1] };
+      const y = y0 + (pt.y - y0) * spread;
+      layer.head.setAttribute('cx', r1(pt.x).toString());
+      layer.head.setAttribute('cy', r1(y).toString());
+      layer.head.style.opacity = (f.drawn >= 1 ? f.opacity * 0.6 : f.opacity).toFixed(3);
+      // Pendaratan: garis dari sumbu T ke kurva kepadatan pada hasil yang sama (satu hasil di bawah kurva).
+      if (f.landed) {
+        const z = (pt.y - y0) / sigmaT;
+        const xCurve = xT + (dw * Math.exp(-0.5 * z * z)) / spread;
+        layer.landing.setAttribute('d', `M${r1(xT)} ${r1(y)} H${r1(xCurve)}`);
+        layer.landing.style.opacity = f.opacity.toFixed(3);
+      } else {
+        layer.landing.style.opacity = '0';
+      }
+    };
+
+    const tick = (now: number) => {
+      loop = 0;
+      if (!visible || reduce.matches) return;
+      const dt = lastTime ? Math.min(64, now - lastTime) : 16;
+      lastTime = now;
+
+      if (parallaxOn) {
+        const k = 1 - Math.exp(-dt / 140);
+        eased.x += (target.x - eased.x) * k;
+        eased.y += (target.y - eased.y) * k;
+        stage.style.setProperty('--px', eased.x.toFixed(4));
+        stage.style.setProperty('--py', eased.y.toFixed(4));
+      }
+
+      const layer = period > 0 ? active() : undefined;
+      if (layer) {
+        if (cycleStart < 0) cycleStart = now;
+        const elapsed = (now - cycleStart) / period;
+        const n = Math.floor(elapsed);
+        if (n !== cycle) {
+          cycle = n;
+          pickNext(layer);
+        }
+        drawTrace(layer, elapsed - n);
+      }
+      loop = requestAnimationFrame(tick);
+    };
+
+    const start = () => {
+      if (!loop && visible && !reduce.matches) {
+        lastTime = 0;
+        loop = requestAnimationFrame(tick);
+      }
+    };
+    const stop = () => {
+      if (loop) cancelAnimationFrame(loop);
+      loop = 0;
+    };
+
     const reset = () => {
-      stage.style.removeProperty('--stage-progress');
-      stage.style.removeProperty('--stage-spread');
+      stop();
+      for (const p of ['--stage-progress', '--stage-spread', '--px', '--py']) stage.style.removeProperty(p);
+      for (const l of layers) {
+        for (const el of [l.pulse, l.trace, l.head, l.landing]) el.style.opacity = '0';
+      }
+      target.x = target.y = eased.x = eased.y = 0;
+      spread = 1;
       horizonOut.textContent = fmt(1, 1);
       spreadOut.textContent = fmt(1, 2);
       last = '';
     };
 
+    // Kursor di mana pun di atas hero (bukan hanya panggung): posisi relatif terhadap pusat panggung, dibatasi −1…1.
+    const hero = stage.closest('section') ?? stage;
+    hero.addEventListener(
+      'pointermove',
+      (e) => {
+        if (!parallaxOn || e.pointerType !== 'mouse') return;
+        const r = stage.getBoundingClientRect();
+        target.x = Math.max(-1, Math.min(1, (e.clientX - (r.left + r.width / 2)) / (r.width / 2)));
+        target.y = Math.max(-1, Math.min(1, (e.clientY - (r.top + r.height / 2)) / (r.height / 2)));
+      },
+      { passive: true },
+    );
+    hero.addEventListener('pointerleave', () => {
+      target.x = target.y = 0;
+    });
+
+    readTokens();
     new IntersectionObserver(([entry]) => {
       visible = !!entry?.isIntersecting && !reduce.matches;
-      if (visible) onScroll();
+      if (visible) {
+        onScroll();
+        start();
+      } else stop();
     }).observe(stage);
     window.addEventListener('scroll', onScroll, { passive: true });
-    reduce.addEventListener('change', () => (reduce.matches ? reset() : onScroll()));
+    reduce.addEventListener('change', () => {
+      readTokens();
+      if (reduce.matches) {
+        visible = false;
+        reset();
+      } else {
+        visible = stage.getBoundingClientRect().bottom > 0;
+        onScroll();
+        start();
+      }
+    });
+    finePointer.addEventListener('change', readTokens);
   }
 </script>
 
@@ -169,6 +386,8 @@ const origin = (x: number, y: number, box: { w: number; h: number }) => `${pct(x
   .stage {
     --stage-progress: 0;
     --stage-spread: 1;
+    --px: 0;
+    --py: 0;
     container: stage / inline-size;
     min-width: 0;
     margin: 0;
@@ -182,10 +401,22 @@ const origin = (x: number, y: number, box: { w: number; h: number }) => `${pct(x
     position: relative;
     overflow: hidden;
     aspect-ratio: 600 / 760;
+  }
+
+  /* Lapisan 1 sebagai elemen semu sendiri (lebih besar satu sel di tiap sisi) agar paralaks kursor tidak membuka tepi. */
+  .stage__field::before {
+    content: '';
+    position: absolute;
+    inset: calc(-1 * var(--grid-cell));
     background-image:
       linear-gradient(to right, var(--plate-grid) var(--stroke-hair), transparent var(--stroke-hair)),
       linear-gradient(to bottom, var(--plate-grid) var(--stroke-hair), transparent var(--stroke-hair));
     background-size: var(--grid-cell) var(--grid-cell);
+    transform: translate3d(
+      calc(var(--px) * var(--parallax-pointer) * -0.25),
+      calc(var(--py) * var(--parallax-pointer) * -0.25),
+      0
+    );
   }
 
   .stage__svg {
@@ -194,6 +425,10 @@ const origin = (x: number, y: number, box: { w: number; h: number }) => `${pct(x
     width: 100%;
     height: 100%;
     overflow: visible;
+    /* Lapisan terdepan: geser penuh + kemiringan kecil ke arah kursor (R9.2). Nol saat diam/gerak dikurangi. */
+    transform: perspective(1600px)
+      translate3d(calc(var(--px) * var(--parallax-pointer) * -1), calc(var(--py) * var(--parallax-pointer) * -1), 0)
+      rotateY(calc(var(--px) * var(--tilt-max))) rotateX(calc(var(--py) * var(--tilt-max) * -1));
   }
 
   .stage__svg--wide {
@@ -242,6 +477,34 @@ const origin = (x: number, y: number, box: { w: number; h: number }) => `${pct(x
     fill: var(--plate);
     stroke: var(--plate-mark);
     stroke-width: var(--stroke-trace);
+  }
+
+  /* R9.2: siklus jejak. Tak terlihat tanpa JS / gerak dikurangi (keadaan diam = gambar R9.1). Tanpa blur/glow. */
+  .stage__trace {
+    fill: none;
+    stroke: var(--plate-ink);
+    stroke-width: var(--stroke-trace);
+    stroke-linejoin: round;
+    opacity: 0;
+  }
+
+  .stage__pulse {
+    fill: none;
+    stroke: var(--plate-mark);
+    stroke-width: var(--stroke-hair);
+    opacity: 0;
+  }
+
+  .stage__head {
+    fill: var(--plate-ink);
+    opacity: 0;
+  }
+
+  .stage__landing {
+    fill: none;
+    stroke: var(--plate-ink);
+    stroke-width: var(--stroke-trace);
+    opacity: 0;
   }
 
   .stage__cut {
@@ -293,7 +556,12 @@ const origin = (x: number, y: number, box: { w: number; h: number }) => `${pct(x
     top: calc(-10 / 500 * 100%);
     width: calc(700 / 600 * 100%);
     mix-blend-mode: screen;
-    transform: translateY(calc(var(--stage-progress) * var(--parallax-shift) * -1));
+    /* Gulir (R9.1) + kursor (R9.2, lapisan tengah 55%). */
+    transform: translate3d(
+      calc(var(--px) * var(--parallax-pointer) * -0.55),
+      calc(var(--py) * var(--parallax-pointer) * -0.55 - var(--stage-progress) * var(--parallax-shift)),
+      0
+    );
   }
 
   .stage__art-inner :global(.emblem--plate) {

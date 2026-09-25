@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { horizonAt, outcomeField } from '../src/lib/outcome-field';
+import { horizonAt, nextTraceIndex, outcomeField, traceAt } from '../src/lib/outcome-field';
 
 const opts = { x0: 100, y0: 300, xT: 500, sigmaT: 60 };
 
@@ -56,5 +56,47 @@ describe('horizonAt', () => {
     expect(horizonAt(1).spread).toBeCloseTo(Math.SQRT2, 9);
     expect(horizonAt(5).horizon).toBe(2);
     expect(horizonAt(-1).horizon).toBe(1);
+  });
+});
+
+describe('traceAt (siklus ambien R9.2)', () => {
+  it('mulai tak terlihat dengan denyut penuh, berakhir diam', () => {
+    const a = traceAt(0);
+    expect(a.drawn).toBe(0);
+    expect(a.opacity).toBe(0);
+    expect(a.pulse).toBe(1);
+    const z = traceAt(0.97);
+    expect(z.opacity).toBe(0);
+    expect(z.pulse).toBe(0);
+    expect(z.landed).toBe(false);
+  });
+
+  it('jejak menempuh jalur secara monoton, lalu mendarat di T', () => {
+    let prev = -1;
+    for (let u = 0; u <= 0.66; u += 0.01) {
+      const { drawn } = traceAt(u);
+      expect(drawn).toBeGreaterThanOrEqual(prev);
+      prev = drawn;
+    }
+    expect(traceAt(0.7)).toMatchObject({ drawn: 1, opacity: 1, landed: true });
+  });
+
+  it('periodik: u dan u + 1 sama', () => {
+    expect(traceAt(1.3)).toEqual(traceAt(0.3));
+    expect(traceAt(-0.7)).toEqual(traceAt(0.3));
+  });
+});
+
+describe('nextTraceIndex', () => {
+  it('setiap jalur mendapat giliran sebelum ada yang berulang', () => {
+    for (const n of [1, 12, 24, 14]) {
+      const seen = new Set<number>();
+      let i = 0;
+      for (let k = 0; k < n; k++) {
+        seen.add(i);
+        i = nextTraceIndex(i, n);
+      }
+      expect(seen.size).toBe(n);
+    }
   });
 });

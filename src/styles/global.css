@@ -171,7 +171,10 @@
   --motion-slow: 480ms; /* mis. jejak grafik digambar sekali */
   --motion-reveal: 560ms; /* section muncul sekali saat di-scroll ke layar */
   --reveal-shift: 8px; /* jarak naik saat muncul: kecil, tanpa efek melayang */
-  --parallax-shift: 18px; /* geser emblem di panggung hero saat menggulir: satu-satunya paralaks */
+  --parallax-shift: 18px; /* geser emblem di panggung hero saat menggulir */
+  --parallax-pointer: 10px; /* R9.2: paralaks kursor di panggung hero, geser lapisan terdepan (kisi 25%, emblem 55%, medan 100%) */
+  --tilt-max: 1.2deg; /* R9.2: kemiringan maksimum medan hasil mengikuti kursor */
+  --motion-ambient: 6400ms; /* R9.2: satu siklus jejak di panggung hero (denyut → tempuh → mendarat → pudar) */
   --ease: cubic-bezier(0.2, 0, 0, 1);
 
   /* Tata letak — grid editorial */
@@ -237,6 +240,9 @@
     --motion-reveal: 0ms;
     --reveal-shift: 0px;
     --parallax-shift: 0px;
+    --parallax-pointer: 0px;
+    --tilt-max: 0deg;
+    --motion-ambient: 0ms;
   }
 }
 
