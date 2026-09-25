@@ -1,0 +1,215 @@
+---
+// Alat: distribusi hasil setelah beberapa periode. Pusat (E, kuningan), sebaran (±1σ, ±2σ), dan ekor di
+// bawah ambang kerugian (isian lembut). Sakelar "ekor tebal" menumpuk model Student-t dengan σ yang sama,
+// untuk memperlihatkan bahwa hasil ekstrem bisa lebih sering daripada tebakan model normal.
+// Menjawab: "seberapa lebar hasil yang wajar?" dan "seberapa mungkin rugi lebih dari X?".
+import ToolFrame from './ToolFrame.astro';
+import { describeDistribution, formatChance } from '../../lib/calc/describe';
+import {
+  cumulative,
+  distributionChart,
+  distributionLabels,
+  distributionTicks,
+  horizon,
+  labelEdge,
+} from '../../lib/calc/distribution';
+import { formatNumber } from '../../lib/format';
+
+interface Props {
+  /** Awalan ID (harus unik bila alat ini dipakai lebih dari sekali di satu halaman). */
+  id?: string;
+}
+
+const { id: uid = 'distribusi' } = Astro.props;
+
+const defaults = { meanPerPeriod: 0.5, sdPerPeriod: 3, periods: 4, threshold: -10 };
+const h = horizon(defaults);
+const chart = distributionChart(h.mean, h.sd, defaults.threshold);
+const labels = distributionLabels(chart.at);
+const ticks = distributionTicks(chart.domain);
+const pNormal = cumulative(defaults.threshold, h.mean, h.sd, 'normal');
+const pLoss = cumulative(0, h.mean, h.sd, 'normal');
+const signed = (v: number) => `${v >= 0 ? '+' : '−'}${formatNumber(Math.abs(Math.round(v * 10) / 10))}%`;
+const range = (k: number) => `${signed(h.mean - k * h.sd)} … ${signed(h.mean + k * h.sd)}`;
+const sigmaTags = [
+  ['minus2', '−2σ'],
+  ['minus1', '−1σ'],
+  ['plus1', '+1σ'],
+  ['plus2', '+2σ'],
+] as const;
+---
+
+<ToolFrame
+  tool="distribution"
+  title="Distribusi hasil: pusat, sebaran, dan ekor"
+  description="Atur rata-rata dan volatilitas return per periode, lama horizon, dan ambang kerugian. Kurva menunjukkan seberapa mungkin setiap hasil kumulatif; area berisi adalah peluang hasil di bawah ambang."
+  summary={describeDistribution({ periods: defaults.periods, mean: h.mean, sd: h.sd, threshold: defaults.threshold, pNormal })}
+  note="Model untuk belajar, bukan ramalan. Return dianggap saling independen dan dijumlahkan sederhana; data harga nyata bisa berekor lebih tebal dan volatilitasnya berubah dari waktu ke waktu."
+>
+  <Fragment slot="inputs">
+    <div class="field">
+      <span><label for={`${uid}-mean`}>Rata-rata return / periode</label>: <output for={`${uid}-mean`} data-out="meanLabel">{signed(defaults.meanPerPeriod)}</output></span>
+      <input id={`${uid}-mean`} name="meanPerPeriod" type="range" min="-2" max="3" step="0.1" value={defaults.meanPerPeriod} />
+    </div>
+    <div class="field">
+      <span><label for={`${uid}-sd`}>Volatilitas (σ) / periode</label>: <output for={`${uid}-sd`} data-out="sdLabel">{formatNumber(defaults.sdPerPeriod)}%</output></span>
+      <input id={`${uid}-sd`} name="sdPerPeriod" type="range" min="0.5" max="8" step="0.1" value={defaults.sdPerPeriod} />
+    </div>
+    <div class="field">
+      <span><label for={`${uid}-periods`}>Horizon</label>: <output for={`${uid}-periods`} data-out="periodsLabel">{defaults.periods} periode</output></span>
+      <input id={`${uid}-periods`} name="periods" type="range" min="1" max="20" step="1" value={defaults.periods} />
+    </div>
+    <div class="field">
+      <span><label for={`${uid}-threshold`}>Ambang kerugian</label>: <output for={`${uid}-threshold`} data-out="thresholdLabel">{signed(defaults.threshold)}</output></span>
+      <input id={`${uid}-threshold`} name="threshold" type="range" min="-60" max="0" step="1" value={defaults.threshold} />
+    </div>
+    <label class="toggle"><input name="fat" type="checkbox" /> Bandingkan dengan model ekor tebal</label>
+  </Fragment>
+  <Fragment slot="results">
+    <dl class="readout">
+      <div><dt>Rentang ±1σ (≈68%)</dt><dd data-out="range1">{range(1)}</dd></div>
+      <div><dt>Rentang ±2σ (≈95%)</dt><dd data-out="range2">{range(2)}</dd></div>
+      <div><dt>Peluang berakhir rugi</dt><dd data-out="pLoss">{formatChance(pLoss)}</dd></div>
+      <div class="readout__primary"><dt>Peluang ≤ ambang, normal</dt><dd data-out="pNormal">{formatChance(pNormal)}</dd></div>
+      <div data-out="fatRow" hidden><dt>Peluang ≤ ambang, ekor tebal</dt><dd data-out="pFat">—</dd></div>
+    </dl>
+    <figure class="plot">
+      <figcaption class="plot__caption">
+        <span class="sim-tag">Model</span> Hasil kumulatif setelah horizon. Garis kuningan: rata-rata (E). Garis putus-putus: ±1σ dan ±2σ.<span data-out="fatCaption" hidden> Garis putus-putus panjang: model ekor tebal (σ sama).</span>
+      </figcaption>
+      <div class="plot__stage">
+        <svg class="plot__svg" viewBox={`0 0 ${chart.width} ${chart.height}`} preserveAspectRatio="none" role="img" aria-label="Kurva distribusi hasil; angka-angkanya dirangkum di bawah grafik">
+          <path class="dist__tail" data-out="tail" d={chart.tail}></path>
+          {sigmaTags.map(([key]) => <line class="svg-guide" data-line={key} x1={chart.x[key]} x2={chart.x[key]} y1="0" y2={chart.height}></line>)}
+          <path class="svg-trace svg-trace--alt" data-out="fat" d={chart.fat} visibility="hidden"></path>
+          <path class="svg-trace" data-out="normal" d={chart.normal}></path>
+          <line class="dist__threshold" data-line="threshold" x1={chart.x.threshold} x2={chart.x.threshold} y1="0" y2={chart.height}></line>
+          <line class="dist__mean" data-line="mean" x1={chart.x.mean} x2={chart.x.mean} y1="0" y2={chart.height}></line>
+        </svg>
+        <div class="dist__tags" aria-hidden="true">
+          {
+            sigmaTags.map(([key, text]) => (
+              <span class="plot__tag dist__sigma" data-tag={key} data-edge={labelEdge(chart.at[key])} style={`left: ${chart.at[key]}%`} hidden={!labels.showSigma}>{text}</span>
+            ))
+          }
+          <span class="plot__tag plot__tag--ink" data-tag="threshold" data-edge={labelEdge(chart.at.threshold)} data-row={labels.thresholdRow} style={`left: ${chart.at.threshold}%`}>Ambang</span>
+          <span class="plot__tag plot__tag--mark" data-tag="mean" data-edge={labelEdge(chart.at.mean)} style={`left: ${chart.at.mean}%`}>E</span>
+        </div>
+      </div>
+      <p class="plot__axis" aria-hidden="true" data-out="ticks">{ticks.map((t, i) => <span class="plot__tick" style={`left: ${i * 25}%`}>{t}</span>)}</p>
+      <p class="plot__axis-title" aria-hidden="true">Return kumulatif →</p>
+    </figure>
+  </Fragment>
+</ToolFrame>
+
+<script>
+  import { describeDistribution, formatChance } from '../../lib/calc/describe';
+  import {
+    cumulative,
+    distributionChart,
+    distributionLabels,
+    distributionTicks,
+    horizon,
+    labelEdge,
+  } from '../../lib/calc/distribution';
+  import { formatNumber } from '../../lib/format';
+
+  const signed = (v: number) => `${v >= 0 ? '+' : '−'}${formatNumber(Math.abs(Math.round(v * 10) / 10))}%`;
+  const LINES = ['minus2', 'minus1', 'plus1', 'plus2', 'threshold', 'mean'] as const;
+
+  for (const form of document.querySelectorAll<HTMLFormElement>('form[data-tool="distribution"]')) {
+    const input = (name: string) => form.elements.namedItem(name) as HTMLInputElement;
+    const out = <T extends Element = HTMLElement>(name: string) => form.querySelector<T>(`[data-out="${name}"]`)!;
+    const summary = form.querySelector<HTMLElement>('[data-summary]')!;
+    const ticks = [...out('ticks').children] as HTMLElement[];
+    let frame = 0;
+
+    const update = (): void => {
+      frame = 0;
+      const params = {
+        meanPerPeriod: input('meanPerPeriod').valueAsNumber,
+        sdPerPeriod: input('sdPerPeriod').valueAsNumber,
+        periods: input('periods').valueAsNumber,
+      };
+      const threshold = input('threshold').valueAsNumber;
+      const fat = input('fat').checked;
+      const h = horizon(params);
+      const chart = distributionChart(h.mean, h.sd, threshold);
+      const labels = distributionLabels(chart.at);
+
+      out('meanLabel').textContent = signed(params.meanPerPeriod);
+      out('sdLabel').textContent = `${formatNumber(params.sdPerPeriod)}%`;
+      out('periodsLabel').textContent = `${params.periods} periode`;
+      out('thresholdLabel').textContent = signed(threshold);
+
+      const pNormal = cumulative(threshold, h.mean, h.sd, 'normal');
+      const pFat = fat ? cumulative(threshold, h.mean, h.sd, 'fat') : undefined;
+      out('range1').textContent = `${signed(h.mean - h.sd)} … ${signed(h.mean + h.sd)}`;
+      out('range2').textContent = `${signed(h.mean - 2 * h.sd)} … ${signed(h.mean + 2 * h.sd)}`;
+      out('pLoss').textContent = formatChance(cumulative(0, h.mean, h.sd, 'normal'));
+      out('pNormal').textContent = formatChance(pNormal);
+      out('pFat').textContent = pFat === undefined ? '—' : formatChance(pFat);
+      out('fatRow').hidden = !fat;
+      out('fatCaption').hidden = !fat;
+
+      out('tail').setAttribute('d', chart.tail);
+      out('normal').setAttribute('d', chart.normal);
+      out('fat').setAttribute('d', chart.fat);
+      out('fat').setAttribute('visibility', fat ? 'visible' : 'hidden');
+      for (const key of LINES) {
+        const line = form.querySelector(`[data-line="${key}"]`)!;
+        line.setAttribute('x1', String(chart.x[key]));
+        line.setAttribute('x2', String(chart.x[key]));
+        const tag = form.querySelector<HTMLElement>(`[data-tag="${key}"]`)!;
+        tag.style.left = `${chart.at[key]}%`;
+        tag.dataset.edge = labelEdge(chart.at[key]);
+        if (key === 'threshold') tag.dataset.row = String(labels.thresholdRow);
+        else if (key !== 'mean') tag.hidden = !labels.showSigma;
+      }
+      distributionTicks(chart.domain).forEach((text, i) => {
+        if (ticks[i]) ticks[i].textContent = text;
+      });
+
+      summary.textContent = describeDistribution({ periods: params.periods, mean: h.mean, sd: h.sd, threshold, pNormal, pFat });
+    };
+
+    // Slider bisa memicu banyak event per frame; hitung paling banyak sekali per frame.
+    form.addEventListener('input', () => {
+      if (!frame) frame = requestAnimationFrame(update);
+    });
+    form.addEventListener('submit', (event) => event.preventDefault());
+    update();
+  }
+</script>
+
+<style>
+  .dist__tail {
+    fill: var(--mark-soft);
+    stroke: none;
+  }
+
+  .dist__threshold {
+    stroke: var(--ink);
+    stroke-width: var(--stroke-axis);
+  }
+
+  .dist__mean {
+    stroke: var(--mark);
+    stroke-width: var(--stroke-trace-bold);
+  }
+
+  .dist__tags {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+  }
+
+  .dist__tags [data-row='2'] {
+    top: 1.25rem;
+  }
+
+  .dist__tags .dist__sigma {
+    top: auto;
+    bottom: var(--space-1);
+  }
+</style>

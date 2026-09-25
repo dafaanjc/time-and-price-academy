@@ -16,9 +16,13 @@ interface Props {
   variant?: 'default' | 'instrument';
   /** Label kecil di atas judul. */
   label?: string;
+  /** Catatan batasan alat (default: catatan spesifikasi instrumen/broker untuk alat hitung posisi). */
+  note?: string;
 }
 
-const { tool, title, description, summary, variant = 'default', label = 'Alat hitung' } = Astro.props;
+const DEFAULT_NOTE =
+  'Alat bantu hitung untuk belajar, bukan rekomendasi. Spesifikasi (nilai per poin, margin, level stop out) berbeda tiap instrumen dan broker.';
+const { tool, title, description, summary, variant = 'default', label = 'Alat hitung', note = DEFAULT_NOTE } = Astro.props;
 ---
 
 <form class:list={['tool', { 'tool--instrument': variant === 'instrument' }]} data-tool={tool} novalidate>
@@ -34,10 +38,7 @@ const { tool, title, description, summary, variant = 'default', label = 'Alat hi
     <slot name="results" />
   </div>
   <p class="tool__summary" data-summary aria-live="polite">{summary}</p>
-  <p class="tool__note">
-    Alat bantu hitung untuk belajar, bukan rekomendasi. Spesifikasi (nilai per poin, margin, level stop out)
-    berbeda tiap instrumen dan broker.
-  </p>
+  <p class="tool__note">{note}</p>
   <noscript><p class="tool__note">Aktifkan JavaScript untuk menghitung dengan angka Anda sendiri.</p></noscript>
 </form>
 
@@ -112,8 +113,9 @@ const { tool, title, description, summary, variant = 'default', label = 'Alat hi
     color: var(--ink-2);
   }
 
+  /* Target sentuh ≥ 44px (2,75rem) untuk input, slider, dan tombol di semua alat. */
   .tool :global(.field input) {
-    min-height: 2.5rem;
+    min-height: 2.75rem;
     padding: 0 var(--space-3);
     font: inherit;
     font-variant-numeric: tabular-nums;
@@ -133,6 +135,190 @@ const { tool, title, description, summary, variant = 'default', label = 'Alat hi
   .tool :global(.field input:focus-visible) {
     outline: 2px solid var(--ink);
     outline-offset: 1px;
+  }
+
+  .tool :global(.field input[aria-invalid='true']) {
+    border-color: var(--loss);
+  }
+
+  .tool :global(.field output) {
+    font-variant-numeric: tabular-nums;
+    color: var(--ink);
+  }
+
+  /* Tombol sekunder bersama (mis. "Simulasi ulang"): garis tipis, tanpa isian. */
+  .tool :global(.tool__button) {
+    min-height: 2.75rem;
+    padding: 0 var(--space-4);
+    font: inherit;
+    font-size: var(--text-sm);
+    font-weight: 600;
+    color: var(--ink);
+    background: transparent;
+    border: var(--border-hair) solid var(--ink-3);
+    border-radius: var(--radius-1);
+    cursor: pointer;
+    touch-action: manipulation;
+    transition: border-color var(--motion-fast) var(--ease);
+  }
+
+  .tool :global(.tool__button:hover) {
+    border-color: var(--ink);
+  }
+
+  .tool :global(.tool__button:focus-visible) {
+    outline: 2px solid var(--ink);
+    outline-offset: 2px;
+  }
+
+  /* Sakelar (checkbox) satu baris dengan target sentuh penuh. */
+  .tool :global(.toggle) {
+    display: flex;
+    gap: var(--space-2);
+    align-items: center;
+    min-height: 2.75rem;
+    font-size: var(--text-sm);
+    color: var(--ink-2);
+    cursor: pointer;
+  }
+
+  .tool :global(.toggle input) {
+    width: 1.125rem;
+    height: 1.125rem;
+    margin: 0;
+    accent-color: var(--mark);
+  }
+
+  /* ---------- Plot alat (SVG + label HTML) ----------
+     SVG meregang ke lebar wadah (preserveAspectRatio="none") dengan garis non-scaling, sehingga garis
+     tetap setipis rambut di ponsel. Label ditulis sebagai HTML yang diposisikan dengan persen, jadi tetap
+     terbaca (tidak ikut mengecil bersama viewBox). */
+  .tool :global(.plot) {
+    margin: var(--space-6) 0 0;
+  }
+
+  .tool :global(.plot__caption) {
+    margin-bottom: var(--space-2);
+    font-size: var(--text-xs);
+    color: var(--ink-3);
+  }
+
+  .tool :global(.plot__stage) {
+    position: relative;
+  }
+
+  .tool :global(.plot__svg) {
+    display: block;
+    width: 100%;
+    height: clamp(9rem, 42vw, 13.5rem);
+    overflow: visible;
+  }
+
+  .tool :global(.plot__svg--short) {
+    height: clamp(5.5rem, 22vw, 7.5rem);
+  }
+
+  .tool :global(.plot__svg *) {
+    vector-effect: non-scaling-stroke;
+  }
+
+  .tool :global(.plot__axis) {
+    position: relative;
+    height: 1.5rem;
+    margin: 0;
+    border-top: var(--border-hair) solid var(--rule-strong);
+  }
+
+  .tool :global(.plot__tick),
+  .tool :global(.plot__tag) {
+    position: absolute;
+    font-family: var(--font-label);
+    font-size: var(--text-2xs);
+    letter-spacing: var(--tracking-mono);
+    text-transform: uppercase;
+    white-space: nowrap;
+    color: var(--ink-3);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .tool :global(.plot__tick) {
+    top: var(--space-1);
+    transform: translateX(-50%);
+  }
+
+  .tool :global(.plot__tick::before) {
+    content: '';
+    position: absolute;
+    top: calc(-1 * var(--space-1) - 1px);
+    left: 50%;
+    width: var(--stroke-hair);
+    height: var(--tick-minor);
+    background: var(--rule-strong);
+  }
+
+  .tool :global(.plot__tick:first-child) {
+    transform: none;
+  }
+
+  .tool :global(.plot__tick:first-child::before) {
+    left: 0;
+  }
+
+  .tool :global(.plot__tick:last-child) {
+    transform: translateX(-100%);
+  }
+
+  .tool :global(.plot__tick:last-child::before) {
+    left: auto;
+    right: 0;
+  }
+
+  .tool :global(.plot__axis-title) {
+    margin: var(--space-1) 0 0;
+    font-family: var(--font-label);
+    font-size: var(--text-2xs);
+    letter-spacing: var(--tracking-mono);
+    text-transform: uppercase;
+    text-align: right;
+    color: var(--ink-3);
+  }
+
+  .tool :global(.plot__tag) {
+    top: 0;
+    padding: 0 var(--space-1);
+    transform: translateX(-50%);
+    background: var(--surface);
+  }
+
+  .tool :global(.plot__tag--mark) {
+    color: var(--mark);
+  }
+
+  .tool :global(.plot__tag--ink) {
+    color: var(--ink);
+  }
+
+  /* Label tanda di dekat tepi tidak keluar dari bidang. */
+  .tool :global(.plot__tag[data-edge='start']) {
+    transform: none;
+  }
+
+  .tool :global(.plot__tag[data-edge='end']) {
+    transform: translateX(-100%);
+  }
+
+  .tool :global(.plot__tag[hidden]) {
+    display: none;
+  }
+
+  .tool :global(.sim-tag) {
+    margin-right: var(--space-2);
+    padding: 0 var(--space-2);
+    font-weight: 600;
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+    color: var(--caution);
+    background: var(--caution-bg);
   }
 
   .tool :global(.readout) {

@@ -53,6 +53,8 @@ src/
       margin.ts            margin terpakai/level, jarak ke margin call & stop out
       drawdown.ts          kalah beruntun (tetap vs digandakan) & pemulihan
       expected-value.ts    nilai harapan (R), titik impas, simulasi ber-seed
+      distribution.ts      distribusi hasil per horizon (σ ∝ √t): normal vs ekor tebal (t, ν = 3), koordinat kurva
+      equity.ts            kurva ekuitas berlipat, drawdown maksimum, persentil, histogram drawdown
       describe.ts          kalimat ringkasan hasil (dipakai server & browser)
     chart.ts            Koordinat SVG grafik simulasi
     format.ts           Format angka Indonesia (Rp1.000.000; 0,5)
@@ -174,10 +176,12 @@ Detail skema dan cara menambah konsep ada di [`content-model.md`](./content-mode
 | `figures/TimePriceFigure` | FIG. 01, gambar teknik isometrik Waktu × Harga (SVG inline; geometri dari `src/lib/iso.ts`); `bare` = tanpa figure/caption, dipakai sebagai fallback RiskField |
 | `figures/CategoryMotif` | Motif SVG teknis per kategori (`motif` di `categories.ts`: axes, band, oscillation, kink, tree) |
 | `tools/ToolFrame` | Kerangka alat hitung: label, judul, input, hasil, ringkasan `aria-live`, catatan "bukan rekomendasi" |
-| `tools/UkuranPosisi` | Risiko per transaksi → ukuran posisi; risiko sebenarnya dari "lot yang biasa dipakai"; `variant="instrument"` (beranda) menambah meter risiko (`riskGauge`) |
+| `tools/UkuranPosisi` | Risiko per transaksi → ukuran posisi; rugi di stop loss setelah lot dibulatkan; risiko sebenarnya dan stop maksimum untuk "lot yang biasa dipakai"; meter risiko (`riskGauge`) di semua varian; `variant="instrument"` untuk beranda |
 | `tools/SimulasiMargin` | Margin level dan jarak (poin) ke margin call / stop out |
 | `tools/TabelKalahBeruntun` | Sisa modal saat kalah beruntun: risiko tetap vs digandakan |
 | `tools/PenjelajahNilaiHarapan` | Nilai harapan (R), titik impas, 20 rangkaian simulasi 100 transaksi (SVG) |
+| `tools/PenjelajahDistribusi` | Distribusi hasil setelah horizon: E (kuningan), ±1σ/±2σ, ekor di bawah ambang kerugian; sakelar model ekor tebal |
+| `tools/SimulasiEkuitas` | Nilai harapan → 200 kurva ekuitas (median, pita 5–95%, nilai harapan) → histogram drawdown maksimum dengan ambang |
 | `ConceptLayout` | Urutan halaman konsep: header → pita draf → [isi MDX + daftar isi] → masalah terkait → konsep terkait → prasyarat → sumber → navigasi jalur. Di ≥ 80rem daftar isi menjadi kolom kanan sticky |
 | `ConceptHeader` | Pembuka padat: meta satu baris, judul + istilah asli, deskripsi, byline |
 | `ConceptMeta` | Satu baris: kategori · tingkat · waktu baca · lencana Draf |
@@ -312,6 +316,9 @@ Karena situs berada di sub-path, **semua tautan internal wajib lewat `src/lib/ur
   server** dari nilai default (tetap berguna tanpa JavaScript), lalu skrip kecil menghitung ulang saat input
   berubah dengan fungsi yang sama. Kalimat ringkasan juga dari satu sumber (`calc/describe.ts`).
 - Tidak ada data yang disimpan atau dikirim; semua dihitung di browser.
+- Plot alat: SVG `preserveAspectRatio="none"` dengan garis `non-scaling-stroke`, label sumbu/tanda sebagai HTML
+  berposisi persen (tetap terbaca di ponsel). Kelas bersama `.plot*`, `.tool__button`, `.toggle` di `ToolFrame`.
+  Target sentuh input/slider/tombol ≥ 44px. Slider menghitung ulang paling banyak sekali per frame.
 - Simulasi nilai harapan memakai PRNG ber-seed (`mulberry32`): hasil sama untuk seed yang sama, dan diberi
   label "Simulasi".
 - Dipasang di MDX tanpa import lewat `src/components/tools/index.ts` (prop `components` di halaman konsep

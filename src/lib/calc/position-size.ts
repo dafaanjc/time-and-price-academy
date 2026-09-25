@@ -53,3 +53,13 @@ export function riskGauge(limitPercent: number, actualPercent: number): { max: n
   const at = (v: number) => Math.max(0, Math.min(100, (v / max) * 100));
   return { max, limitAt: at(limitPercent), actualAt: at(actualPercent) };
 }
+
+/**
+ * Jarak stop loss terjauh (poin) agar `lots` tertentu tetap dalam batas risiko: kebalikan dari ukuran
+ * posisi. Menjawab "dengan lot yang biasa gue pakai, stop gue harus sedekat apa?".
+ */
+export function maxStopForLots(input: Omit<PositionSizeInput, 'stopPoints' | 'lotStep'> & { lots: number }): number {
+  const { capital, riskPercent, valuePerPointPerLot, lots } = input;
+  if (lots <= 0 || valuePerPointPerLot <= 0) return Infinity;
+  return (capital * riskPercent) / 100 / (lots * valuePerPointPerLot);
+}

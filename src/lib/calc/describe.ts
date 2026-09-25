@@ -52,3 +52,59 @@ export function describeExpectancy(ev: number, breakeven: number, paths: number,
     `penurunan terdalam ${formatNumber(Math.round(s.deepestDrawdown * 10) / 10)}R.`
   );
 }
+
+export function describeMaxStop(lots: number, maxStopPoints: number, stopPoints: number): string {
+  const max = formatNumber(Math.floor(maxStopPoints));
+  const fits = stopPoints <= maxStopPoints * 1.001;
+  return fits
+    ? `Dengan ${formatNumber(lots)} lot, stop loss boleh sejauh ${max} poin sebelum melewati batas.`
+    : `Agar ${formatNumber(lots)} lot tetap dalam batas, stop loss harus dalam ${max} poin, atau lot diperkecil.`;
+}
+
+/** Persen peluang yang mudah dibaca: < 0,1% ditulis "< 0,1%". */
+export function formatChance(p: number): string {
+  const pct = p * 100;
+  if (pct > 0 && pct < 0.1) return '< 0,1%';
+  if (pct < 99.9 || pct >= 100) return `${formatNumber(Math.round(pct * 10) / 10)}%`;
+  return '> 99,9%';
+}
+
+const signedPct = (v: number) => `${v >= 0 ? '+' : '−'}${formatNumber(Math.abs(Math.round(v * 10) / 10))}%`;
+
+export function describeDistribution(d: {
+  periods: number;
+  mean: number;
+  sd: number;
+  threshold: number;
+  pNormal: number;
+  pFat?: number;
+}): string {
+  const range = (k: number) => `${signedPct(d.mean - k * d.sd)} sampai ${signedPct(d.mean + k * d.sd)}`;
+  const base =
+    `Setelah ${d.periods} periode: rata-rata ${signedPct(d.mean)}, simpangan baku ${formatNumber(Math.round(d.sd * 10) / 10)}%. ` +
+    `Sekitar 68% hasil di ${range(1)}; sekitar 95% di ${range(2)}. ` +
+    `Peluang hasil ${signedPct(d.threshold)} atau lebih buruk: ${formatChance(d.pNormal)} (model normal)`;
+  return d.pFat === undefined ? `${base}.` : `${base}, ${formatChance(d.pFat)} (model ekor tebal).`;
+}
+
+export function describeEquity(d: {
+  paths: number;
+  trades: number;
+  evR: number;
+  threshold: number;
+  medianEnd: number;
+  p5End: number;
+  p95End: number;
+  endedBelowStart: number;
+  hitThreshold: number;
+  medianMaxDrawdown: number;
+}): string {
+  const r = `${d.evR >= 0 ? '+' : '−'}${formatNumber(Math.abs(Math.round(d.evR * 100) / 100))}R`;
+  const eq = (v: number) => `${formatNumber(Math.round(v))}%`;
+  return (
+    `Nilai harapan ${r} per transaksi. Dari ${d.paths} simulasi ${d.trades} transaksi, median modal akhir ${eq(d.medianEnd)} ` +
+    `dari modal awal (90% rangkaian di ${eq(d.p5End)}–${eq(d.p95End)}); ${formatChance(d.endedBelowStart)} berakhir di bawah modal awal. ` +
+    `${formatChance(d.hitThreshold)} rangkaian pernah turun ${formatNumber(d.threshold)}% atau lebih dari puncaknya; ` +
+    `median penurunan terdalam ${formatNumber(Math.round(d.medianMaxDrawdown * 10) / 10)}%.`
+  );
+}

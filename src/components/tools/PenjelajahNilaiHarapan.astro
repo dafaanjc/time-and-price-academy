@@ -61,7 +61,7 @@ const signed = (v: number) => `${v >= 0 ? '+' : '−'}${formatNumber(Math.abs(Ma
         <g data-out="lines">{chart.lines.map((points) => <polyline class="sim__line" points={points} />)}</g>
         <polyline class="sim__expected" data-out="expected" points={chart.expected}></polyline>
       </svg>
-      <button class="sim__again" type="button" data-action="reseed">Simulasi ulang</button>
+      <button class="tool__button sim__again" type="button" data-action="reseed">Simulasi ulang</button>
     </figure>
   </Fragment>
 </ToolFrame>
@@ -169,21 +169,8 @@ const signed = (v: number) => `${v >= 0 ? '+' : '−'}${formatNumber(Math.abs(Ma
     stroke-dasharray: 6 4;
   }
 
+  /* Gaya tombol dari .tool__button (ToolFrame): target sentuh 44px. */
   .sim__again {
     margin-top: var(--space-3);
-    min-height: 2.5rem;
-    padding: 0 var(--space-4);
-    font: inherit;
-    font-size: var(--text-sm);
-    font-weight: 600;
-    color: var(--ink);
-    background: transparent;
-    border: var(--border-hair) solid var(--ink-3);
-    border-radius: var(--radius-1);
-    cursor: pointer;
-  }
-
-  .sim__again:hover {
-    border-color: var(--ink);
   }
 </style>

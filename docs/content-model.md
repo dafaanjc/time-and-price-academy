@@ -65,7 +65,7 @@ Sumber dirender oleh `SourceList` → `SourceCard`:
 
 ### Alat hitung di konten
 
-Empat alat bisa disisipkan di MDX konsep maupun masalah trader, tanpa import:
+Enam alat bisa disisipkan di MDX konsep maupun masalah trader, tanpa import:
 
 | Tag | Isi |
 |---|---|
@@ -73,6 +73,8 @@ Empat alat bisa disisipkan di MDX konsep maupun masalah trader, tanpa import:
 | `<SimulasiMargin />` | Jarak ke margin call / stop out |
 | `<TabelKalahBeruntun />` | Kalah beruntun: risiko tetap vs digandakan |
 | `<PenjelajahNilaiHarapan />` | Nilai harapan + simulasi |
+| `<PenjelajahDistribusi />` | Distribusi hasil: sebaran per horizon, peluang di bawah ambang, model ekor tebal |
+| `<SimulasiEkuitas />` | Nilai harapan → sebaran kurva ekuitas → distribusi drawdown |
 
 Taruh di bagian "Cara Kerja Konsep" (konsep) atau "Penerapan Praktis" (masalah). Satu alat yang sama
 cukup sekali per halaman.

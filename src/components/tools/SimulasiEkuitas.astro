@@ -1,0 +1,249 @@
+---
+// Alat: nilai harapan → sebaran kurva ekuitas → distribusi drawdown. Risiko per transaksi = persen modal
+// berjalan (hasil berlipat). Grafik atas: 200 rangkaian 100 transaksi (24 contoh tipis, pita 5–95% putus-putus,
+// median tebal, nilai harapan kuningan). Grafik bawah: histogram penurunan terdalam tiap rangkaian dengan ambang.
+// Menjawab: "nilai harapan gue positif, kenapa tetap bisa turun dalam?" dan "risiko segini, drawdown-nya berapa?".
+import ToolFrame from './ToolFrame.astro';
+import { describeEquity, formatChance } from '../../lib/calc/describe';
+import { labelEdge } from '../../lib/calc/distribution';
+import { drawdownHistogram, equityChart, expectedEquity, simulateEquity, summarizeEquity } from '../../lib/calc/equity';
+import { expectancyR } from '../../lib/calc/expected-value';
+import { formatNumber } from '../../lib/format';
+
+interface Props {
+  /** Awalan ID (harus unik bila alat ini dipakai lebih dari sekali di satu halaman). */
+  id?: string;
+}
+
+const { id: uid = 'ekuitas' } = Astro.props;
+
+const PATHS = 200;
+const TRADES = 100;
+const SAMPLES = 24;
+const defaults = { winRate: 40, avgWinR: 2, riskPercent: 2, threshold: 20, seed: 1 };
+const ev = expectancyR(defaults);
+const paths = simulateEquity(defaults, PATHS, TRADES, defaults.seed);
+const expected = expectedEquity(defaults, TRADES);
+const s = summarizeEquity(paths, defaults.threshold);
+const chart = equityChart(paths, expected, SAMPLES);
+const hist = drawdownHistogram(s.drawdowns, defaults.threshold);
+const signedR = (v: number) => `${v >= 0 ? '+' : '−'}${formatNumber(Math.abs(Math.round(v * 100) / 100))}R`;
+const pct = (v: number) => `${formatNumber(Math.round(v))}%`;
+const ddTicks = (domain: number) => [0, 0.25, 0.5, 0.75, 1].map((k) => `${formatNumber(k * domain)}%`);
+const summary = describeEquity({ paths: PATHS, trades: TRADES, evR: ev, threshold: defaults.threshold, ...s });
+---
+
+<ToolFrame
+  tool="equity"
+  title="Nilai harapan, kurva ekuitas, dan drawdown"
+  description="Atur peluang menang, rata-rata untung (dalam R), risiko per transaksi, dan ambang drawdown. Simulasi menjalankan 200 rangkaian 100 transaksi dengan risiko tetap dari modal berjalan."
+  summary={summary}
+  note="Simulasi untuk belajar, bukan rekomendasi atau perkiraan hasil. Karakteristik strategi dianggap tetap dan tiap transaksi independen; biaya dan selisih harga eksekusi tidak dihitung."
+>
+  <Fragment slot="inputs">
+    <div class="field">
+      <span><label for={`${uid}-winRate`}>Peluang menang</label>: <output for={`${uid}-winRate`} data-out="winRateLabel">{defaults.winRate}%</output></span>
+      <input id={`${uid}-winRate`} name="winRate" type="range" min="10" max="90" step="1" value={defaults.winRate} />
+    </div>
+    <div class="field">
+      <span><label for={`${uid}-avgWinR`}>Untung rata-rata saat menang</label>: <output for={`${uid}-avgWinR`} data-out="avgWinLabel">{formatNumber(defaults.avgWinR)}R</output></span>
+      <input id={`${uid}-avgWinR`} name="avgWinR" type="range" min="0.5" max="5" step="0.1" value={defaults.avgWinR} />
+    </div>
+    <div class="field">
+      <span><label for={`${uid}-risk`}>Risiko per transaksi (1R)</label>: <output for={`${uid}-risk`} data-out="riskLabel">{formatNumber(defaults.riskPercent)}%</output></span>
+      <input id={`${uid}-risk`} name="riskPercent" type="range" min="0.25" max="10" step="0.25" value={defaults.riskPercent} />
+    </div>
+    <div class="field">
+      <span><label for={`${uid}-threshold`}>Ambang drawdown</label>: <output for={`${uid}-threshold`} data-out="thresholdLabel">{defaults.threshold}%</output></span>
+      <input id={`${uid}-threshold`} name="threshold" type="range" min="5" max="60" step="5" value={defaults.threshold} />
+    </div>
+  </Fragment>
+  <Fragment slot="results">
+    <dl class="readout">
+      <div><dt>Nilai harapan</dt><dd data-out="ev" class:list={[{ 'is-gain': ev > 0, 'is-loss': ev < 0 }]}>{signedR(ev)} / transaksi</dd></div>
+      <div><dt>Median modal akhir</dt><dd data-out="medianEnd">{pct(s.medianEnd)}</dd></div>
+      <div class="readout__primary"><dt>Pernah turun ≥ ambang</dt><dd data-out="hit">{formatChance(s.hitThreshold)}</dd></div>
+      <div><dt>Median penurunan terdalam</dt><dd data-out="medianDd">{formatNumber(Math.round(s.medianMaxDrawdown * 10) / 10)}%</dd></div>
+    </dl>
+
+    <figure class="plot">
+      <figcaption class="plot__caption">
+        <span class="sim-tag">Simulasi</span> Modal (persen modal awal) per transaksi. Garis tebal: median. Garis kuningan: nilai harapan. Putus-putus: batas 5% dan 95% rangkaian. Garis tipis: 24 contoh rangkaian.
+      </figcaption>
+      <div class="plot__stage">
+        <svg class="plot__svg" viewBox={`0 0 ${chart.width} ${chart.height}`} preserveAspectRatio="none" role="img" aria-label="Grafik kurva ekuitas simulasi; angka-angkanya dirangkum di bawah grafik">
+          <line class="svg-guide" data-out="startLine" x1="0" x2={chart.width} y1={chart.startY} y2={chart.startY}></line>
+          <g data-out="samples">{chart.samples.map((points) => <polyline class="eq__sample" points={points} />)}</g>
+          <polyline class="svg-trace svg-trace--alt" data-out="p5" points={chart.p5}></polyline>
+          <polyline class="svg-trace svg-trace--alt" data-out="p95" points={chart.p95}></polyline>
+          <polyline class="svg-trace eq__median" data-out="median" points={chart.median}></polyline>
+          <polyline class="eq__expected" data-out="expected" points={chart.expected}></polyline>
+        </svg>
+        <div class="eq__tags" aria-hidden="true">
+          <span class="plot__tag" data-edge="start" data-out="maxTag">{pct(chart.max)}</span>
+          <span class="plot__tag eq__tag--bottom" data-edge="start" data-out="minTag">{pct(chart.min)}</span>
+          <span class="plot__tag eq__tag--start" data-edge="end" data-out="startTag" style={`top: ${chart.startAt}%`}>Modal awal</span>
+        </div>
+      </div>
+      <p class="plot__axis" aria-hidden="true">{[0, 25, 50, 75, 100].map((t) => <span class="plot__tick" style={`left: ${t}%`}>{t}</span>)}</p>
+      <p class="plot__axis-title" aria-hidden="true">Transaksi →</p>
+    </figure>
+
+    <figure class="plot">
+      <figcaption class="plot__caption">
+        Distribusi penurunan terdalam dari puncak di 200 rangkaian. Area berisi: rangkaian yang turun melewati ambang.
+      </figcaption>
+      <div class="plot__stage">
+        <svg class="plot__svg plot__svg--short" viewBox={`0 0 ${hist.width} ${hist.height}`} preserveAspectRatio="none" role="img" aria-label="Histogram penurunan terdalam; angka-angkanya dirangkum di bawah grafik">
+          <path class="eq__beyond" data-out="beyond" d={hist.beyond}></path>
+          <path class="svg-trace" data-out="outline" d={hist.outline}></path>
+          <line class="eq__threshold" data-out="thresholdLine" x1={hist.thresholdX} x2={hist.thresholdX} y1="0" y2={hist.height}></line>
+        </svg>
+        <div class="eq__tags" aria-hidden="true">
+          <span class="plot__tag plot__tag--ink" data-out="thresholdTag" data-edge={labelEdge(hist.thresholdAt)} style={`left: ${hist.thresholdAt}%`}>Ambang</span>
+        </div>
+      </div>
+      <p class="plot__axis" aria-hidden="true" data-out="ddTicks">{ddTicks(hist.domain).map((t, i) => <span class="plot__tick" style={`left: ${i * 25}%`}>{t}</span>)}</p>
+      <p class="plot__axis-title" aria-hidden="true">Penurunan terdalam dari puncak →</p>
+    </figure>
+
+    <button class="tool__button" type="button" data-action="reseed">Simulasi ulang</button>
+  </Fragment>
+</ToolFrame>
+
+<script>
+  import { describeEquity, formatChance } from '../../lib/calc/describe';
+  import { labelEdge } from '../../lib/calc/distribution';
+  import { drawdownHistogram, equityChart, expectedEquity, simulateEquity, summarizeEquity } from '../../lib/calc/equity';
+  import { expectancyR } from '../../lib/calc/expected-value';
+  import { formatNumber } from '../../lib/format';
+
+  const PATHS = 200;
+  const TRADES = 100;
+  const SAMPLES = 24;
+  const signedR = (v: number) => `${v >= 0 ? '+' : '−'}${formatNumber(Math.abs(Math.round(v * 100) / 100))}R`;
+  const pct = (v: number) => `${formatNumber(Math.round(v))}%`;
+
+  for (const form of document.querySelectorAll<HTMLFormElement>('form[data-tool="equity"]')) {
+    const value = (name: string) => (form.elements.namedItem(name) as HTMLInputElement).valueAsNumber;
+    const out = <T extends Element = HTMLElement>(name: string) => form.querySelector<T>(`[data-out="${name}"]`)!;
+    const summary = form.querySelector<HTMLElement>('[data-summary]')!;
+    // Kelas scoped (data-astro-cid) diambil dari polyline server agar garis baru tetap bergaya.
+    const sampleTemplate = out('samples').querySelector('polyline')!.cloneNode() as SVGPolylineElement;
+    const ddTicks = [...out('ddTicks').children] as HTMLElement[];
+    let seed = 1;
+    let frame = 0;
+
+    const update = (): void => {
+      frame = 0;
+      const input = { winRate: value('winRate'), avgWinR: value('avgWinR'), riskPercent: value('riskPercent') };
+      const threshold = value('threshold');
+      const ev = expectancyR(input);
+      const paths = simulateEquity(input, PATHS, TRADES, seed);
+      const expected = expectedEquity(input, TRADES);
+      const s = summarizeEquity(paths, threshold);
+      const chart = equityChart(paths, expected, SAMPLES);
+      const hist = drawdownHistogram(s.drawdowns, threshold);
+
+      out('winRateLabel').textContent = `${input.winRate}%`;
+      out('avgWinLabel').textContent = `${formatNumber(input.avgWinR)}R`;
+      out('riskLabel').textContent = `${formatNumber(input.riskPercent)}%`;
+      out('thresholdLabel').textContent = `${threshold}%`;
+
+      out('ev').textContent = `${signedR(ev)} / transaksi`;
+      out('ev').classList.toggle('is-gain', ev > 0);
+      out('ev').classList.toggle('is-loss', ev < 0);
+      out('medianEnd').textContent = pct(s.medianEnd);
+      out('hit').textContent = formatChance(s.hitThreshold);
+      out('medianDd').textContent = `${formatNumber(Math.round(s.medianMaxDrawdown * 10) / 10)}%`;
+
+      const start = out('startLine');
+      start.setAttribute('y1', String(chart.startY));
+      start.setAttribute('y2', String(chart.startY));
+      out('samples').replaceChildren(
+        ...chart.samples.map((points) => {
+          const line = sampleTemplate.cloneNode() as SVGPolylineElement;
+          line.setAttribute('points', points);
+          return line;
+        }),
+      );
+      for (const key of ['p5', 'p95', 'median', 'expected'] as const) out(key).setAttribute('points', chart[key]);
+      out('maxTag').textContent = pct(chart.max);
+      out('minTag').textContent = pct(chart.min);
+      out('startTag').style.top = `${chart.startAt}%`;
+
+      out('beyond').setAttribute('d', hist.beyond);
+      out('outline').setAttribute('d', hist.outline);
+      const tLine = out('thresholdLine');
+      tLine.setAttribute('x1', String(hist.thresholdX));
+      tLine.setAttribute('x2', String(hist.thresholdX));
+      const tTag = out('thresholdTag');
+      tTag.style.left = `${hist.thresholdAt}%`;
+      tTag.dataset.edge = labelEdge(hist.thresholdAt);
+      [0, 0.25, 0.5, 0.75, 1].forEach((k, i) => {
+        if (ddTicks[i]) ddTicks[i].textContent = `${formatNumber(k * hist.domain)}%`;
+      });
+
+      summary.textContent = describeEquity({ paths: PATHS, trades: TRADES, evR: ev, threshold, ...s });
+    };
+
+    // Slider bisa memicu banyak event per frame; simulasi ulang paling banyak sekali per frame.
+    form.addEventListener('input', () => {
+      if (!frame) frame = requestAnimationFrame(update);
+    });
+    form.addEventListener('submit', (event) => event.preventDefault());
+    form.querySelector('[data-action="reseed"]')?.addEventListener('click', () => {
+      seed += 1;
+      update();
+    });
+  }
+</script>
+
+<style>
+  .eq__sample {
+    fill: none;
+    stroke: var(--ink-3);
+    stroke-width: var(--stroke-hair);
+    stroke-opacity: 0.22;
+  }
+
+  .eq__median {
+    stroke-width: var(--stroke-trace-bold);
+  }
+
+  .eq__expected {
+    fill: none;
+    stroke: var(--mark);
+    stroke-width: var(--stroke-trace-bold);
+  }
+
+  .eq__beyond {
+    fill: var(--mark-soft);
+    stroke: none;
+  }
+
+  .eq__threshold {
+    stroke: var(--ink);
+    stroke-width: var(--stroke-axis);
+  }
+
+  .eq__tags {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+  }
+
+  .eq__tags .eq__tag--bottom {
+    top: auto;
+    bottom: 0;
+  }
+
+  .eq__tags .eq__tag--start {
+    left: 100%;
+    translate: 0 -50%;
+  }
+
+  .tool__button {
+    margin-top: var(--space-4);
+  }
+</style>
