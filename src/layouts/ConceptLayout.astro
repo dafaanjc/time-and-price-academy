@@ -14,7 +14,7 @@ import ConceptMap from '../components/ConceptMap.astro';
 import ProblemList from '../components/ProblemList.astro';
 import { getCategory } from '../data/categories';
 import { layoutLocalGraph } from '../lib/local-graph';
-import { conceptHref, getConcepts, getConceptsByIds, getPathContext, type Concept } from '../lib/concepts';
+import { conceptHref, getConcepts, getConceptsByCategory, getConceptsByIds, getPathContext, type Concept } from '../lib/concepts';
 import { getProblemsForConcept } from '../lib/problems';
 import { layoutSectionIds } from '../lib/sections';
 import { absoluteUrl, conceptOgImage } from '../lib/url';
@@ -41,6 +41,9 @@ const localGraph = layoutLocalGraph({
   next: dependents.map(toNode),
   related: relatedConcepts.map(toNode),
 });
+// Nomor jilid = urutan konsep di kategorinya.
+const siblings = (await getConceptsByCategory()).get(category) ?? [];
+const volume = { n: siblings.findIndex((c) => c.id === concept.id) + 1, total: siblings.length };
 const shareUrl = absoluteUrl(Astro.url.pathname, Astro.site);
 ---
 
@@ -53,7 +56,7 @@ const shareUrl = absoluteUrl(Astro.url.pathname, Astro.site);
   sidebar
 >
   <article class="concept">
-    <ConceptHeader concept={concept} url={shareUrl} />
+    <ConceptHeader concept={concept} url={shareUrl} volume={volume.n > 0 ? volume : undefined} />
     {pathContext && <PathPosition context={pathContext} />}
 
     {
@@ -65,7 +68,20 @@ const shareUrl = absoluteUrl(Astro.url.pathname, Astro.site);
     }
 
     <div class="concept__body">
-      <TableOfContents sections={sections} />
+      <!-- Margin: daftar isi + sidenote prasyarat. Desktop = kolom kanan sticky; mobile = daftar isi di atas isi,
+           prasyarat di bawah isi (urutan lewat `order`). -->
+      <div class="margin">
+        <TableOfContents sections={sections} />
+        <aside class="margin__note" aria-label="Catatan pinggir">
+          <ConceptLinkList
+            id={layoutSectionIds.prerequisites}
+            title="Prasyarat"
+            concepts={prerequisiteConcepts}
+            empty="Tidak ada prasyarat. Konsep ini bisa dipelajari lebih dulu."
+            note
+          />
+        </aside>
+      </div>
       <div class="content">
         <slot />
       </div>
@@ -88,38 +104,71 @@ const shareUrl = absoluteUrl(Astro.url.pathname, Astro.site);
           concepts={relatedConcepts}
           empty="Belum ada konsep terkait."
         />
-
-        <ConceptLinkList
-          id={layoutSectionIds.prerequisites}
-          title="Prasyarat"
-          concepts={prerequisiteConcepts}
-          empty="Tidak ada prasyarat. Konsep ini bisa dipelajari lebih dulu."
-        />
       </div>
       <ConceptMap graph={localGraph} currentTitle={title} />
     </div>
 
-    <SourceList sources={sources} />
+    <div class="concept__foot">
+      <SourceList sources={sources} />
+    </div>
 
     {pathContext && <PathNav context={pathContext} />}
   </article>
 </BaseLayout>
 
 <style>
-  /* Layar lebar: isi (lebar baca) di kiri, daftar isi sticky di kolom kanan. */
+  .concept {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+  }
+
+  /* Mobile: satu kolom — daftar isi, isi, lalu sidenote di bawah isi. */
+  .concept__body {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .margin {
+    display: contents;
+  }
+
+  .margin > :global(.toc) {
+    order: 0;
+  }
+
+  .concept__body > .content {
+    order: 1;
+  }
+
+  .margin__note {
+    order: 2;
+    margin-top: var(--space-8);
+  }
+
+  /* Layar lebar: isi (lebar baca) di kiri, margin sticky (daftar isi + prasyarat) di kolom kanan. */
   @media (min-width: 80rem) {
     .concept__body {
       display: grid;
-      grid-template-columns: minmax(0, var(--measure)) 13rem;
+      grid-template-columns: minmax(0, var(--measure)) 15rem;
       gap: var(--space-12);
       align-items: start;
     }
 
-    .concept__body > :global(.toc) {
+    .margin {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-8);
       grid-column: 2;
       grid-row: 1;
       position: sticky;
       top: calc(var(--header-height) + var(--space-8));
+      max-height: calc(100vh - var(--header-height) - var(--space-12));
+      overflow-y: auto;
+    }
+
+    .margin__note {
+      margin-top: 0;
     }
 
     .concept__body > .content {
@@ -164,9 +213,17 @@ const shareUrl = absoluteUrl(Astro.url.pathname, Astro.site);
     font-size: var(--text-xl);
   }
 
-  .concept {
-    display: flex;
-    flex-direction: column;
-    gap: 2rem;
+  /* Sumber = label objek di margin (desktop lebar, sejajar kolom kanan); di layar sempit di bawah isi. */
+  @media (min-width: 80rem) {
+    .concept__foot {
+      display: grid;
+      grid-template-columns: minmax(0, var(--measure)) 15rem;
+      gap: var(--space-12);
+    }
+
+    .concept__foot > :global(.source-list) {
+      grid-column: 2;
+      max-width: none;
+    }
   }
 </style>

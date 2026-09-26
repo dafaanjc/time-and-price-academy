@@ -2,7 +2,7 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import ConceptRows from '../../components/ConceptRows.astro';
 import PageHead from '../../components/PageHead.astro';
-import CategoryMotif from '../../components/figures/CategoryMotif.astro';
+import CategoryObject from '../../components/figures/CategoryObject.astro';
 import ProblemList from '../../components/ProblemList.astro';
 import { categories, categoryIndexLabel, type Category } from '../../data/categories';
 import { getConceptsByCategory, groupByTopic } from '../../lib/concepts';
@@ -36,7 +36,7 @@ const problems = (await getProblems()).filter((p) => p.data.concepts.some((id) =
       index={[categoryIndexLabel(category.id), 'Kategori', concepts.length > 0 ? `${concepts.length} konsep` : 'Segera hadir']}
     >
       <p>{category.description}</p>
-      <CategoryMotif slot="figure" motif={category.motif} />
+      <div slot="figure" class="category-object"><CategoryObject object={category.object} /></div>
     </PageHead>
   </div>
 
@@ -67,6 +67,13 @@ const problems = (await getProblems()).filter((p) => p.data.concepts.some((id) =
 </BaseLayout>
 
 <style>
+  /* Objek ukiran kategori (Tahap 4) sebagai gambar kepala halaman; ukurannya seperti gambar kartu katalog. */
+  .category-object {
+    width: 100%;
+    max-width: 9rem;
+    margin-inline-start: auto;
+  }
+
   /* Topik: bagian bernomor dengan garis tegas di atas (seperti bab), daftar konsep di bawahnya. */
   .topic {
     padding-top: var(--space-3);

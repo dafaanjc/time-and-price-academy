@@ -20,13 +20,19 @@ Hard rules that already exist in the codebase:
 ## Redesign "Kabinet Risiko" (active — `docs/redesign-brief.md`)
 The brief is the source of truth for the visual redesign and **overrides the "Visual Design System" section
 below wherever they conflict**; work one stage (Tahap) at a time. Done: Stage 1 (foundation), Stage 2 (logo system),
-Stage 3 (hero "Pelat Ukiran"), Stage 4 (homepage sections).
+Stage 3 (hero "Pelat Ukiran"), Stage 4 (homepage sections), Stage 5 (concept/category/path/map pages).
 - Stage 4 patterns: problems = archive index cards (`HomeProblems`: numbered head with brass double rule, quote in
   Newsreader italic, ruled meta rows, punch hole); concept chain = CSS 3D bookshelf (`LearningSystem`: spine out,
   hover/focus pulls the book out and turns it `--book-turn` to show the cover; touch/narrow = books resting angled
   in a scroll-snap row); calculators = brass precision instrument (`ToolFrame` for every tool: brass inner frame,
   italic small-caps labels, Plex Mono inputs/results/axis numbers; `UkuranPosisi` graduated risk meter with a brass
   pointer); category index = engraved `figures/CategoryObject` (`object` in `categories.ts`).
+- Stage 5 patterns: concept page = book chapter (`ConceptHeader`: brass double rule, "Jilid NN" = position in its
+  category, Bodoni title up to `--text-5xl`); prerequisites (`ConceptLinkList note`) and sources (`SourceList`) are
+  **sidenotes** in a 15rem right margin at ≥ 80rem (`.margin` sticky with the TOC; `.concept__foot`), below the
+  text/at the end on narrow screens; catalogue entries (`ConceptRows`, `LearningPath`, `PathNav`) use Bodoni brass
+  volume numerals; `KnowledgeGraph` nodes are framed catalogue labels with ink edges, hovered paths brass; the
+  category page uses `figures/CategoryObject` in its `PageHead` (`CategoryMotif` is no longer mounted).
 - Substance never changes: no edits to MDX, copy, argument order, data or formulas. Only layout, type, colour,
   illustration, motion, visual components and the logo.
 - One theme only: light (`color-scheme: light`, no dark variants). Palette: `--paper`, `--paper-deep`, `--ink`,
