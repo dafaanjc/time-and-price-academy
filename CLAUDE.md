@@ -10,10 +10,49 @@ Hard rules that already exist in the codebase:
   `scripts/check-branding.mjs` fails the build otherwise.
 - Internal links via `withBase()` / `routes` (`src/lib/url.ts`).
 - Brand emblem at most once per page (home: Objek 00 on the hero stage, `figures/HeroStage`, black version;
-  other pages: footer), never in the header, never redrawn, recoloured, stretched, bevelled/3D/metallic.
-  The only allowed crop is the hero stage's **frame crop** (lower drapery and far-left shoulder); the head and
-  the hourglass are always fully visible.
+  other pages: `Emblem variant="footer"` plate), never in the header (header = `Monogram` + wordmark), artwork
+  never redrawn, recoloured, stretched, bevelled/3D/metallic. Allowed crops: the hero stage's **frame crop**
+  and the `Emblem` plate's circular fade (lower drapery only); the head and the hourglass are always fully
+  visible. Official art: `src/assets/brand/logo-plate.png`. Emblem/monogram/spiral geometry lives in
+  `src/lib/emblem.ts`, `monogram.ts`, `golden-spiral.ts` (tested).
 - Do not edit content MDX (`src/content/**`) as part of design work.
+
+## Redesign "Kabinet Risiko" (active — `docs/redesign-brief.md`)
+The brief is the source of truth for the visual redesign and **overrides the "Visual Design System" section
+below wherever they conflict**; work one stage (Tahap) at a time. Done: Stage 1 (foundation), Stage 2 (logo system),
+Stage 3 (hero "Pelat Ukiran"), Stage 4 (homepage sections), Stage 5 (concept/category/path/map pages), Stage 6 (polish & audit).
+- Stage 4 patterns: problems = archive index cards (`HomeProblems`: numbered head with brass double rule, quote in
+  Newsreader italic, ruled meta rows, punch hole); concept chain = CSS 3D bookshelf (`LearningSystem`: spine out,
+  hover/focus pulls the book out and turns it `--book-turn` to show the cover; touch/narrow = books resting angled
+  in a scroll-snap row); calculators = brass precision instrument (`ToolFrame` for every tool: brass inner frame,
+  italic small-caps labels, Plex Mono inputs/results/axis numbers; `UkuranPosisi` graduated risk meter with a brass
+  pointer); category index = engraved `figures/CategoryObject` (`object` in `categories.ts`).
+- Stage 5 patterns: concept page = book chapter (`ConceptHeader`: brass double rule, "Jilid NN" = position in its
+  category, Bodoni title up to `--text-5xl`); prerequisites (`ConceptLinkList note`) and sources (`SourceList`) are
+  **sidenotes** in a 15rem right margin at ≥ 80rem (`.margin` sticky with the TOC; `.concept__foot`), below the
+  text/at the end on narrow screens; catalogue entries (`ConceptRows`, `LearningPath`, `PathNav`) use Bodoni brass
+  volume numerals; `KnowledgeGraph` nodes are framed catalogue labels with ink edges, hovered paths brass; the
+  category page uses `figures/CategoryObject` in its `PageHead` (`CategoryMotif` is no longer mounted).
+- Stage 6 audit rules: interactive targets ≥ 44px (`min-height: 2.75rem`, inline-flex for links in lists); fonts used above
+  the fold are preloaded in `SeoHead` (Newsreader 400/600/italic, Bodoni 500) so the hero doesn't shift on font swap;
+  accessible name of a link must contain its visible text; `aria-current` never on an `<a>` without `href`.
+  Measured (Lighthouse mobile, static build): Performance 96–100, Accessibility 100.
+- Substance never changes: no edits to MDX, copy, argument order, data or formulas. Only layout, type, colour,
+  illustration, motion, visual components and the logo.
+- One theme only: light (`color-scheme: light`, no dark variants). Palette: `--paper`, `--paper-deep`, `--ink`,
+  `--ink-soft`, `--rule`, `--brass` (non-text) / `--brass-ink` (text), `--plate`, `--loss` (rare); old token
+  names stay as aliases. Paper grain via `--paper-grain` (inline SVG noise, ≤ 0.05).
+- Type: Bodoni Moda (display), Newsreader (text/UI, prose 1.6 in `.prose` 68ch), IBM Plex Mono (calculation
+  results and inputs only), all via `@fontsource` (latin). Labels are italic serif small caps (`.label`), not
+  mono caps. Modular scale 1.333, fluid `clamp()`.
+- 1px `--rule` lines, radius ≤ 2px, no grey drop shadows; depth from hatching, layers and parallax. One ornament
+  per area (double frame, brass spiral, registration mark).
+- At large sizes the logo is always a dark engraved plate framed on light paper (`Emblem.astro`: double frame,
+  inscription ring from `siteConfig`, art in the centre); ≤ 32px it is the hourglass `Monogram` (also the
+  favicon). The golden spiral is redrawn as a brass vector motif (`figures/GoldenSpiral`). OG images use the
+  `og` plate; raster colours come from `src/lib/brand-palette.ts` (tested against `global.css`).
+- Motion: one hero moment (CSS scroll-driven with static fallback); otherwise only responses to user actions.
+- Mobile first (test 360 / 768 / 1280), visible focus, AA contrast, reduced motion honoured, no 3D library.
 
 ## Visual Design System
 
@@ -59,7 +98,8 @@ Both light and dark themes are required (`prefers-color-scheme`).
 ### Typography
 - **Serif** (`--font-serif`, Source Serif 4): headings and display. `h1` uses `--tracking-display`;
   exhibit titles may use `--text-5xl` with `--leading-display` on desktop only. The homepage hero title
-  (`siteConfig.heroLine`) is sentence case, up to `--text-6xl` with `--leading-hero`, desktop only.
+  (`siteConfig.heroLine`) is sentence case, `clamp(--text-3xl, 3.8vw, --text-4xl)` with `--leading-hero` on desktop
+  (question in `--text-lg`): the lead and both CTAs must stay above the fold at 1440×900 and 1920×1080.
 - **Sans** (`--font-sans`, Source Sans 3): body and UI. Highly readable: `--text-base` (17px),
   `--leading-body` 1.6, line length `--measure` (66ch), leads `--measure-narrow`.
 - **Mono** (`--font-label`): metadata and labels, always **small, uppercase, tracked**. Use the
@@ -87,7 +127,7 @@ axis, graph traces, tick marks, dashed guides, measurement annotations.
 - They should read as **technical drawings**: hairline strokes, labelled axes, annotation leaders,
   one brass pointer at most. No fills beyond `--surface` / `--mark-soft`.
 - **Inline or local SVG only.** No stock illustrations, no image assets from external websites,
-  no icon fonts, no raster art (except the official emblem in `src/assets/Logo/`). The single exception
+  no icon fonts, no raster art (except the official emblem in `src/assets/brand/`). The single exception
   is the **Risk Field** (three.js, procedural geometry; see "3D: Risk Field"), currently not mounted.
 - Every figure has a text equivalent (`<title>`/`aria-label` or an adjacent caption).
 - Not trading charts: no candlesticks, no volume bars, no indicator overlays unless a concept is
@@ -114,25 +154,22 @@ axis, graph traces, tick marks, dashed guides, measurement annotations.
   the hero or anything above the fold, never stagger children, never re-animate on scroll back.
 - **Capital hourglass sand:** moves only when the user acts (changes risk, takes another loss, resets),
   once per action, `--motion-slow`. Never idle, never a looping trickle.
-- **Hero stage (the one scroll-linked interaction, R9.1):** while the page scrolls past the hero, the outcome
-  field's horizon grows 1T → 2T and its spread widens ∝ √t (CSS `scale` on SVG groups driven by
-  `--stage-spread`), the readout updates, and the emblem shifts by at most `--parallax-shift`.
-  rAF-throttled, passive listener, only while the stage is intersecting; off under
-  reduced motion (static 1T state, `--parallax-shift: 0`).
-- **Hero stage depth & ambient trace (R9.2, requested by the owner; the only continuous motion on the site):**
-  confined to `figures/HeroStage`, one rAF loop that runs only while the stage intersects (and the tab is visible),
-  never under reduced motion (tokens collapse to 0 and the loop never starts; static R9.1 state).
-  - *Pointer parallax* (mouse + fine pointer only): layers shift by `--parallax-pointer` × depth — grid 25 %,
-    emblem 55 %, outcome field 100 % — and the field tilts at most `--tilt-max`. Eased (~140 ms), `transform` only.
-    These and the scroll shift are the only parallax on the site.
-  - *Trace cycle* (`traceAt`, `nextTraceIndex` in `lib/outcome-field.ts`, tested; period `--motion-ambient`):
-    a hairline brass ring pulses once at "now" (sand leaving the hourglass) → one leaf path is walked at uniform
-    speed along the time axis in `--plate-ink` → a landing mark joins T to the density curve at that outcome →
-    fade; the next cycle takes another path. Opacity/geometry only: no blur, no glow filter, no brass tracer
-    (the E[P] line stays the one brass trajectory). The emblem itself is only moved, never animated inside.
+- **Hero "Pelat Ukiran" (Tahap 3; the one motion moment, replaces the R9.1 scroll readout and the R9.2
+  ambient trace loop):** confined to `figures/HeroStage`. CSS scroll-driven only (`view-timeline: --stage` on the
+  plate for mobile/tablet; `scroll(root)` from the top on desktop), inside `@supports (animation-timeline: view())`
+  + `prefers-reduced-motion: no-preference`; otherwise the plate is static and complete (final state).
+  - *Scroll:* layers shift at different speeds (`translate`; `--hero-shift-back/mid/front`, halved on mobile);
+    branches draw from the hourglass and the golden spiral unwinds from its eye in the hourglass
+    (`stroke-dashoffset`, `pathLength="1"`); then one thin sheen (`--hero-sheen`) sweeps the plate; the brass
+    thread from "Sekarang" down to `00 Anggaran salah` draws on its own `view()`.
+  - *Pointer (desktop, fine pointer, ≥ 64rem only):* tilt ≤ `--hero-tilt` (4°) + per-layer shift
+    (`--hero-pointer`: back 30 %, middle 60 %, front 100 %), `transform` only. Tiny script attached on
+    `requestIdleCallback`; rAF only until the value settles (no continuous loop).
+  - Write animation **longhands** (`animation-name`, `-timing-function`, `-fill-mode`, `-timeline`,
+    `-range`): the CSS minifier merges `animation:` + `animation-timeline` into a shorthand Chrome rejects.
 - **Risk Field camera:** a very slow drift (`--field-drift-period`, about ±3°) plus small pointer/scroll
   parallax, only inside the Risk Field figure and only while it is on screen. Never a rotation/spin.
-  (The figure is not mounted anywhere since R9; the only continuous motion is the R9.2 hero stage cycle.)
+  (The figure is not mounted anywhere since R9; the site has no continuous motion.)
 - **R10 motion vocabulary** (tokens + classes in `global.css`; each word has one meaning):
   1. *Page entrance* — `.rule-measure`: the measuring rule under a page header draws once from the left
      (`PageHead`). Content pages use this, never `data-reveal` (which stays homepage-only).
@@ -142,8 +179,8 @@ axis, graph traces, tick marks, dashed guides, measurement annotations.
   3. *Consequence* — `.value-changed`: a brass underline shrinks once under a result number that changed
      because the user acted (ToolFrame arms it on the first input/change/click; never on load).
   4. *State* — hover/focus/open transitions (`--motion-fast` / `--motion-base`).
-- Otherwise no decorative entrance animations, parallax, looping motion or scroll-jacking (the R9.2 hero stage is
-  the one exception, above).
+- Otherwise no decorative entrance animations, parallax, looping motion or scroll-jacking (the Tahap 3 hero plate
+  is the one exception, above).
 - All durations collapse to 0 under `prefers-reduced-motion` (handled in the tokens).
 
 ### Content concept order (respect it in navigation, paths and visuals)
@@ -152,18 +189,24 @@ Visuals should build along this chain (e.g. a band of outcomes → a probability
 weighted mean marker → a ±σ spread), not present the ideas as unrelated cards. The chain lives in
 `src/data/concept-chain.ts` (label, question, glyph); `LearningSystem` + `figures/ChainGlyph` draw it.
 
-### Hero: stage (R9.1) + Capital Hourglass section
+### Hero: engraved plate (Tahap 3) + Capital Hourglass section
 The hero establishes Time & Price Academy → Risk Lab, states the philosophy and poses the question; the
 section directly below lets the visitor answer it.
-- Hero left, on the wall: brand line (`masterBrand` mono over `product` serif), `siteConfig.heroLine`
+- Hero left, on the wall (no brand eyebrow: the header is the identity): `siteConfig.heroLine`
   ("Trading bukan cuma soal entry."), the question in serif italic, a lead, two links (problems; `#jam-pasir`).
   No stats row, no controls.
-- Hero right: `figures/HeroStage`, one `.plate` that bleeds to the right viewport edge on desktop (edge to
-  edge on mobile). Layers in one fixed-aspect coordinate space (wide 1000×720, compact 600×760): faint dark
-  grid → procedural **outcome field** (`src/lib/outcome-field.ts`, tested: from "now" at the figure's
+- Hero right: `figures/HeroStage`, one `.plate` with a double frame, whole on the paper in columns 6–12 on
+  desktop (edge to edge on mobile). Layers in one fixed-aspect coordinate space (wide 1000×720, compact 600×760):
+  back = faint dark grid + `figures/GoldenSpiral` anchored with its eye on the figure's hourglass (`spiralEye`)
+  → middle = the emblem art (`BrandEmblem`) → front = procedural **outcome field** (`src/lib/outcome-field.ts`, tested: from "now" at the figure's
   hourglass, 4 → 12 → 24 branching paths, ±2σ envelope ∝ √t, flat brass E[P] — no drift implied — and a
-  density curve at T; compact adds one past path) → the emblem at monumental scale (frame crop only).
-  Caption: FIG. 00 (what the field means) + OBJEK 00. It is an artefact, not a widget: no inputs.
+  density curve at T; compact adds one past path). Emblem at monumental scale (frame crop only); in the wide
+  composition it sits left of the Harga axis with a gap and a dashed guide from the hourglass to "now".
+  Chart labels (Harga, Sekarang, T, Waktu, E[P]) use the caption style (italic small caps) with a plate-coloured
+  halo (`paint-order: stroke`) and never sit on a line.
+  Caption: FIG. 00 (what the field means) + OBJEK 00. It is an artefact, not a widget: no inputs. Below the plate a
+  brass thread continues the "Sekarang" guide down to the `00 Anggaran salah` heading, ending in
+  `HourglassGlyph` (length = hero bottom padding + next section top padding, `--stage-thread-length`).
 - Section `00 Anggaran salah` (directly under the hero): **Instrumen 00** (`figures/CapitalHourglass`) on a
   light surface panel, theme-neutral tokens. Sand = capital; each wrong decision drops a fixed % of *current* capital
   (same maths as `losingStreak(…, 'fixed')`); the neck opening = risk per trade; the scale is calibrated
@@ -207,15 +250,17 @@ per-vertex opacity. No lights, shadows, glow, bloom, neon or spinning.
 Single source of truth: `src/data/categories.ts` (`foundations`, `risk-management`, `psychology`,
 `behavioral-finance`, `decision-theory`). Array order = display order = index number, rendered by
 `categoryIndexLabel()` as `01 / 05` (the total follows the array length). Each entry has a `motif`
-(`axes`, `band`, `oscillation`, `kink`, `tree`) drawn by `components/figures/CategoryMotif.astro`, and a
+(`axes`, `band`, `oscillation`, `kink`, `tree`) drawn by `components/figures/CategoryMotif.astro` (category page),
+an engraved `object` (`dice-hourglass`, `scales`, `bust`, `coin`, `dividers`; unique, tested) drawn by
+`components/figures/CategoryObject.astro` (homepage index; the category page follows in Tahap 5), and a
 `marker` shape (`circle`, `square`, `diamond`, `triangle`, `cross`; unique per category, tested) used on the
 knowledge map.
 Optional `topics` = sub-categories (concept frontmatter `topic`, validated per category; the category page
 groups by topic). Learning paths are tiered via `requires` in `src/data/learning-paths.ts`
 (Fondasi → Heuristik dan Bias → Keputusan di Bawah Risiko); curriculum map in `docs/content-model.md`.
 Containers carry `data-category="<id>"` (hook for `--category-accent` and any per-category tweak in
-`global.css`). To add a category: one entry in `categories.ts` (plus a new motif value and its branch
-in `CategoryMotif` if none of the existing ones fits). `CategoryIndex` (the editorial list on the homepage) picks it up automatically.
+`global.css`). To add a category: one entry in `categories.ts` (plus a new motif/object value and its branch
+in `CategoryMotif` / `CategoryObject` if none of the existing ones fits). `CategoryIndex` (the editorial list on the homepage) picks it up automatically.
 Labels are rendered in markup, never via CSS `content`, so they stay accessible.
 
 ### Planned components (architecture only, built in later phases)

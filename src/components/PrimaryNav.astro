@@ -41,18 +41,22 @@ const pathname = Astro.url.pathname;
   a {
     display: block;
     color: var(--ink-2);
-    font-weight: 600;
     text-decoration: none;
+    transition:
+      color var(--motion-fast) var(--ease),
+      border-color var(--motion-fast) var(--ease);
   }
 
   .primary-nav--row a {
     padding-block: var(--space-2);
-    border-bottom: var(--border-mark) solid transparent;
+    border-bottom: var(--stroke-trace-bold) solid transparent;
   }
 
   .primary-nav--column a {
-    padding: var(--space-2) 0;
+    padding: var(--space-3) 0;
+    font-family: var(--font-display);
     font-size: var(--text-lg);
+    line-height: var(--leading-tight);
     border-bottom: var(--border-hair) solid var(--rule);
   }
 
@@ -60,17 +64,21 @@ const pathname = Astro.url.pathname;
     color: var(--ink);
   }
 
-  /* Bagian aktif: garis tinta di bawah (desktop) atau teks tinta (mobile). */
+  .primary-nav--row a:hover {
+    border-bottom-color: var(--rule-strong);
+  }
+
+  /* Bagian aktif: garis kuningan di bawah (desktop) atau di kiri (mobile); teks tinta. */
   a[aria-current] {
     color: var(--ink);
   }
 
   .primary-nav--row a[aria-current] {
-    border-bottom-color: var(--ink);
+    border-bottom-color: var(--brass);
   }
 
   .primary-nav--column a[aria-current] {
     padding-left: var(--space-3);
-    border-left: var(--border-mark) solid var(--ink);
+    border-left: var(--border-hair) solid var(--brass);
   }
 </style>

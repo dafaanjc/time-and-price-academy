@@ -1,9 +1,11 @@
 ---
-// Sistem belajar: rantai konsep inti sebagai diagram teknis di atas satu sumbu bertick.
+// Sistem belajar (Tahap 4 redesign): rak buku CSS 3D. Enam konsep inti = enam jilid berurutan
 // Risiko → Ketidakpastian → Probabilitas → Distribusi → Nilai Harapan → Varians (src/data/concept-chain.ts).
-// Tiap langkah: glyph bertumpuk (figures/ChainGlyph) dalam bidang koordinat, nomor "01 / 06",
-// nama konsep (tautan), dan pertanyaan yang dijawabnya. Desktop: enam kolom mendatar dengan mata panah
-// di ujung sumbu; layar sempit: sumbu tegak di kiri.
+// Setiap jilid adalah buku 3D sungguhan: punggung (nomor jilid + judul) menghadap keluar, sampul menghadap ke
+// samping (diputar 90°). Desktop dengan kursor: hover/fokus menarik buku keluar dan memutarnya menampilkan sampul
+// (nomor "01 / 06", judul, glyph rantai, pertanyaan). Layar sempit/sentuh: buku berdiri miring memperlihatkan
+// sampul, rak digeser mendatar (scroll-snap). Tanpa bayangan: kedalaman dari perspektif dan arsiran papan rak.
+// Gerak hanya respons (hover/fokus, --motion-slow); di bawah gerak dikurangi langsung ke keadaan akhir.
 import { conceptChain } from '../data/concept-chain';
 import { conceptHref, getConceptsByIds } from '../lib/concepts';
 import { routes, withBase } from '../lib/url';
@@ -34,38 +36,45 @@ const total = pad(conceptChain.length);
     more={{ href: withBase(routes.learningPaths), label: 'Jalur belajar' }}
   />
 
-  <div class="system__intro">
-    <p class="system__statement">Enam konsep, satu rantai.</p>
-    <p class="system__lead">
-      Setiap langkah memakai langkah sebelumnya: dari satu jalur yang bisa rugi, ke sebaran kemungkinan, ke
-      angka yang bisa dihitung sebelum mengambil keputusan.
-    </p>
+  <div class="system__layout">
+    <div class="system__intro">
+      <p class="system__statement">Enam konsep, satu rantai.</p>
+      <p class="system__lead">
+        Setiap langkah memakai langkah sebelumnya: dari satu jalur yang bisa rugi, ke sebaran kemungkinan, ke
+        angka yang bisa dihitung sebelum mengambil keputusan.
+      </p>
+      <p class="system__more">
+        <a href={withBase(routes.map)}>Lihat hubungan antar-konsep di peta pengetahuan →</a>
+      </p>
+    </div>
+
+    <div class="shelf">
+      <ol class="shelf__row" aria-label="Rantai konsep inti">
+        {
+          conceptChain.map((step, i) => (
+            <li class="shelf__slot">
+              <a class="book" href={conceptHref(step.id)}>
+                <span class="book__spine" aria-hidden="true">
+                  <span class="book__vol">{pad(i + 1)}</span>
+                  <span class="book__spine-title">{step.label}</span>
+                </span>
+                <span class="book__cover">
+                  <span class="label book__index">
+                    <span class="label__index">{pad(i + 1)}</span> / {total}
+                  </span>
+                  <span class="book__title">{step.label}</span>
+                  <span class="book__plate plot-field">
+                    <ChainGlyph glyph={step.glyph} />
+                  </span>
+                  <span class="book__question">{step.question}</span>
+                </span>
+              </a>
+            </li>
+          ))
+        }
+      </ol>
+    </div>
   </div>
-
-  <ol class="system__chain" aria-label="Rantai konsep inti">
-    {
-      conceptChain.map((step, i) => (
-        <li class:list={['system__step', { 'system__step--mark': step.glyph === 'mean' }]}>
-          <div class="system__plate plot-field">
-            <ChainGlyph glyph={step.glyph} />
-          </div>
-          <div class="system__text">
-            <p class="label">
-              <span class="label__index">{pad(i + 1)}</span> / {total}
-            </p>
-            <h3 class="system__name">
-              <a href={conceptHref(step.id)}>{step.label}</a>
-            </h3>
-            <p class="system__question">{step.question}</p>
-          </div>
-        </li>
-      ))
-    }
-  </ol>
-
-  <p class="system__more">
-    <a href={withBase(routes.map)}>Lihat hubungan antar-konsep di peta pengetahuan →</a>
-  </p>
 </section>
 
 <style>
@@ -75,9 +84,9 @@ const total = pad(conceptChain.length);
 
   .system__statement {
     margin: 0;
-    font-family: var(--font-serif);
+    font-family: var(--font-display);
     font-size: var(--text-2xl);
-    font-weight: 600;
+    font-weight: var(--weight-display);
     line-height: var(--leading-tight);
     letter-spacing: var(--tracking-display);
   }
@@ -88,145 +97,230 @@ const total = pad(conceptChain.length);
     color: var(--ink-2);
   }
 
-  /* Mobile: sumbu tegak di kiri, tick per langkah; glyph kecil di kiri teks. */
-  .system__chain {
-    position: relative;
-    display: grid;
-    gap: var(--space-6);
-    margin: var(--space-12) 0 0;
-    padding: 0 0 0 var(--space-6);
-    list-style: none;
-    border-left: var(--stroke-axis) solid var(--axis);
+  .system__more {
+    margin: var(--space-6) 0 0;
+    font-weight: var(--weight-strong);
   }
 
-  .system__step {
-    position: relative;
-    display: grid;
-    grid-template-columns: 7rem minmax(0, 1fr);
+  /* ---------- Rak ----------
+     Ukuran jilid: punggung --book-t, sampul --book-d, tinggi --book-h. --book-turn = putaran buku untuk
+     memperlihatkan sampul (−72°: sampul hampir sejajar layar, punggung tinggal sebaris tipis). */
+  .shelf {
+    --book-t: 3.5rem;
+    --book-d: 11.5rem;
+    --book-h: 17rem;
+    --book-turn: -72deg;
+    margin-top: var(--space-8);
+  }
+
+  /* Layar sempit/sentuh: buku berdiri miring (sampul terlihat), rak digeser mendatar. */
+  .shelf__row {
+    display: flex;
     gap: var(--space-4);
-    align-items: center;
+    margin: 0 calc(-1 * var(--gutter));
+    padding: var(--space-6) var(--gutter) 0;
+    list-style: none;
+    padding-bottom: var(--space-2);
+    overflow: auto hidden;
+    overscroll-behavior-x: contain;
+    scroll-snap-type: x mandatory;
+    scroll-padding-inline: var(--gutter);
+    scrollbar-width: thin;
+    scrollbar-color: var(--rule-strong) transparent;
   }
 
-  .system__step::before {
+  /* Lebar slot = lebar tampak buku yang diputar (punggung × cos 72° + sampul × sin 72°). */
+  .shelf__slot {
+    position: relative;
+    flex: none;
+    width: calc(var(--book-t) * 0.31 + var(--book-d) * 0.95);
+    height: var(--book-h);
+    perspective: 1400px;
+    scroll-snap-align: start;
+  }
+
+  /* Papan rak: garis tinta + pita arsiran di bawahnya (kedalaman dari arsiran, bukan bayangan). */
+  .shelf::after {
+    content: '';
+    display: block;
+    height: var(--space-3);
+    border-top: var(--stroke-trace-bold) solid var(--ink);
+    background: repeating-linear-gradient(-45deg, var(--rule-strong) 0 var(--stroke-hair), transparent var(--stroke-hair) 5px);
+  }
+
+  .book {
+    position: absolute;
+    top: 0;
+    left: 0;
+    display: block;
+    width: var(--book-t);
+    height: var(--book-h);
+    color: var(--ink);
+    text-decoration: none;
+    transform-style: preserve-3d;
+    transform-origin: left center;
+    transform: rotateY(var(--book-turn));
+    transition: transform var(--motion-slow) var(--ease);
+  }
+
+  .book:focus-visible {
+    outline-offset: 4px;
+  }
+
+  /* Punggung: kain kertas tua, dua pasang pita kuningan (seperti rusuk jilid), nomor jilid, judul tegak. */
+  .book__spine {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: var(--space-3) 0;
+    background: var(--paper-deep);
+    border: var(--border-hair) solid var(--rule-strong);
+    backface-visibility: hidden;
+    transition: border-color var(--motion-fast) var(--ease);
+  }
+
+  .book__spine::before,
+  .book__spine::after {
     content: '';
     position: absolute;
-    top: 50%;
-    left: calc(-1 * var(--space-6));
-    width: var(--tick-major);
-    height: var(--stroke-hair);
-    background: var(--axis);
+    inset-inline: 0;
+    height: var(--frame-gap);
+    border-block: var(--border-hair) solid var(--brass);
   }
 
-  .system__step--mark::before {
-    width: 7px;
-    height: 7px;
-    margin: -3px 0 0 -4px;
-    background: var(--mark);
+  .book__spine::before {
+    top: var(--space-12);
   }
 
-  .system__plate {
+  .book__spine::after {
+    bottom: var(--space-8);
+  }
+
+  .book__vol {
+    font-family: var(--font-display);
+    font-size: var(--text-lg);
+    line-height: 1;
+    color: var(--brass-ink);
+  }
+
+  .book__spine-title {
+    margin-top: var(--space-12);
+    font-family: var(--font-display);
+    font-size: var(--text-lg);
+    line-height: 1;
+    letter-spacing: 0.02em;
+    white-space: nowrap;
+    writing-mode: vertical-rl;
+  }
+
+  /* Sampul: menempel di tepi kanan punggung, diputar 90° ke dalam rak. Bingkai ganda tipis. */
+  .book__cover {
+    position: absolute;
+    top: 0;
+    left: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    width: var(--book-d);
+    height: var(--book-h);
+    padding: var(--space-4);
+    background: var(--surface);
+    border: var(--border-hair) solid var(--rule-strong);
+    outline: var(--border-hair) solid var(--rule);
+    outline-offset: calc(-1 * var(--space-2));
+    transform-origin: left center;
+    transform: rotateY(90deg);
+    backface-visibility: hidden;
+  }
+
+  .book__index {
+    margin-top: var(--space-1);
+  }
+
+  .book__title {
+    font-family: var(--font-display);
+    font-size: var(--text-lg);
+    line-height: var(--leading-tight);
+  }
+
+  .book__plate {
+    margin-top: auto;
     padding: var(--space-2);
   }
 
-  .system__text .label {
-    color: var(--ink-3);
-  }
-
-  .system__name {
-    margin: var(--space-1) 0 0;
-    font-size: var(--text-lg);
-  }
-
-  .system__name a {
-    color: var(--ink);
-    text-decoration: none;
-  }
-
-  .system__name a:hover {
-    text-decoration: underline;
-    text-decoration-thickness: 1px;
-    text-decoration-color: var(--mark);
-    text-underline-offset: 0.2em;
-  }
-
-  .system__question {
-    margin: var(--space-1) 0 0;
+  .book__question {
     font-size: var(--text-sm);
+    font-style: italic;
+    line-height: 1.35;
     color: var(--ink-2);
   }
 
-  .system__more {
-    margin: var(--space-8) 0 0;
-    font-weight: 600;
-  }
+  /* Desktop dengan kursor: punggung menghadap keluar; hover/fokus menarik buku keluar & memutarnya. */
+  @media (hover: hover) and (min-width: 64rem) {
+    .shelf {
+      --book-t: 4rem;
+      --book-d: 13rem;
+      --book-h: 20rem;
+      margin-top: 0;
+    }
 
-  @media (min-width: 40rem) {
-    .system__chain {
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: var(--space-8) var(--grid-gap);
+    .shelf__row {
+      gap: var(--space-2);
+      margin: 0;
       padding: var(--space-6) 0 0;
-      border-left: 0;
-      border-top: var(--stroke-axis) solid var(--axis);
+      overflow: visible;
     }
 
-    .system__step {
-      grid-template-columns: minmax(0, 1fr);
-      align-items: start;
-      align-content: start; /* langkah pendek tidak meregang: teks sejajar di semua kolom */
+    .shelf__slot {
+      width: var(--book-t);
     }
 
-    .system__step::before {
-      top: calc(-1 * var(--space-6));
-      left: 0;
-      width: var(--stroke-hair);
-      height: var(--tick-major);
+    /* Buku yang ditunjuk digambar di atas tetangganya. */
+    .shelf__slot:hover,
+    .shelf__slot:focus-within {
+      z-index: 1;
     }
 
-    .system__step--mark::before {
-      width: 7px;
-      height: 7px;
-      margin: -3px 0 0 -3px;
+    .book {
+      transform: none;
+    }
+
+    .book:hover,
+    .book:focus-visible {
+      transform: translateZ(3rem) translateY(calc(-1 * var(--space-2))) rotateY(var(--book-turn));
+    }
+
+    .book:hover .book__spine,
+    .book:focus-visible .book__spine {
+      border-color: var(--ink);
     }
   }
 
-  /* Desktop: enam langkah di satu sumbu mendatar, dengan mata panah di ujung kanan. */
   @media (min-width: 64rem) {
     .system {
       padding-top: var(--space-24);
     }
 
-    .system__intro {
+    .system__layout {
       display: grid;
       grid-template-columns: repeat(var(--grid-columns), minmax(0, 1fr));
       gap: var(--grid-gap);
       align-items: end;
     }
 
+    .system__intro {
+      grid-column: 1 / span 4;
+      align-self: start;
+    }
+
     .system__statement {
-      grid-column: 1 / span 5;
       font-size: var(--text-3xl);
     }
 
-    .system__lead {
-      grid-column: 7 / -1;
-      margin: 0;
-    }
-
-    .system__chain {
-      grid-template-columns: repeat(6, minmax(0, 1fr));
-      margin-top: var(--space-16);
-    }
-
-    .system__chain::after {
-      content: '';
-      position: absolute;
-      top: -4px;
-      right: 0;
-      width: 7px;
-      height: 7px;
-      border-top: var(--stroke-axis) solid var(--axis);
-      border-right: var(--stroke-axis) solid var(--axis);
-      transform: rotate(45deg);
+    .shelf {
+      grid-column: 5 / -1;
     }
   }
 </style>

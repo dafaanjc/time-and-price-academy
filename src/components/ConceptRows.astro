@@ -1,5 +1,5 @@
 ---
-// Baris konsep bernomor bergaya daftar isi: judul, istilah asli, tingkat, deskripsi.
+// Katalog jilid (Tahap 5): tiap konsep satu entri — nomor jilid Bodoni, judul, istilah asli, tingkat, deskripsi.
 // Dipakai oleh ConceptIndex (/konsep/) dan halaman kategori. Tick kuningan saat ditunjuk (`.row-link`, R10).
 import { conceptHref, difficultyLabels, type Concept } from '../lib/concepts';
 
@@ -37,28 +37,32 @@ const { concepts } = Astro.props;
 
   .concept-rows__item {
     display: grid;
-    grid-template-columns: 2.25rem minmax(0, 1fr) auto;
+    grid-template-columns: 3rem minmax(0, 1fr) auto;
     column-gap: var(--space-2);
-    padding-block: var(--space-3);
+    padding-block: var(--space-1);
     border-bottom: var(--border-hair) solid var(--rule);
     counter-increment: concept;
   }
 
-  .concept-rows__item:first-child {
-    padding-top: 0;
-  }
-
-  /* Nomor urut seperti daftar isi buku. */
+  /* Nomor jilid seperti kartu katalog perpustakaan: Bodoni, kuningan. */
   .concept-rows__item::before {
     content: counter(concept, decimal-leading-zero);
     grid-row: 1 / span 2;
-    font-size: var(--text-sm);
-    color: var(--ink-3);
-    line-height: 1.9;
+    font-family: var(--font-display);
+    font-size: var(--text-xl);
+    line-height: 2.75rem;
+    letter-spacing: var(--tracking-display);
+    color: var(--mark);
   }
 
   .concept-rows__title {
-    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.75rem;
+    font-family: var(--font-display);
+    font-size: var(--text-lg);
+    font-weight: var(--weight-display);
+    line-height: var(--leading-tight);
     color: var(--ink);
     text-decoration: none;
   }
@@ -70,7 +74,9 @@ const { concepts } = Astro.props;
   .concept-rows__meta {
     display: flex;
     gap: var(--space-3);
-    font-size: var(--text-xs);
+    font-family: var(--font-label);
+    font-size: var(--text-sm);
+    font-variant-caps: small-caps;
     color: var(--ink-3);
     white-space: nowrap;
   }

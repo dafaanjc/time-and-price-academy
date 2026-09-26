@@ -48,15 +48,20 @@ import PrimaryNav from './PrimaryNav.astro';
     display: inline-flex;
     align-items: center;
     gap: var(--space-2);
-    min-height: 2.5rem;
+    min-height: 2.75rem;
     padding: 0 var(--space-3);
     font: inherit;
     font-size: var(--text-sm);
     color: var(--ink);
     background: transparent;
-    border: var(--border-hair) solid var(--ink-3);
+    border: var(--border-hair) solid var(--rule-strong);
     border-radius: var(--radius-1);
     cursor: pointer;
+    transition: border-color var(--motion-fast) var(--ease);
+  }
+
+  .mobile-nav__open:hover {
+    border-color: var(--ink);
   }
 
   @media (min-width: 64rem) {
@@ -71,15 +76,17 @@ import PrimaryNav from './PrimaryNav.astro';
     max-height: none;
     margin: 0 0 0 auto;
     padding: 0 var(--space-6) var(--space-8);
-    background: var(--surface);
+    /* Panel = area sekunder (kertas tua), seperti daftar isi buku. */
+    background-color: var(--paper-deep);
+    background-image: var(--paper-grain);
     color: var(--ink);
     border: 0;
-    border-left: 1px solid var(--rule);
+    border-left: var(--border-hair) solid var(--rule-strong);
     overflow-y: auto;
   }
 
   .mobile-nav::backdrop {
-    background: rgb(0 0 0 / 0.4);
+    background: var(--scrim);
   }
 
   .mobile-nav__bar {
@@ -90,8 +97,9 @@ import PrimaryNav from './PrimaryNav.astro';
     justify-content: space-between;
     height: var(--header-height);
     margin-bottom: var(--space-4);
-    background: var(--surface);
-    border-bottom: 1px solid var(--rule);
+    background-color: var(--paper-deep);
+    background-image: var(--paper-grain);
+    border-bottom: var(--border-hair) solid var(--rule-strong);
   }
 
   .mobile-nav__primary {
@@ -99,14 +107,17 @@ import PrimaryNav from './PrimaryNav.astro';
   }
 
   .mobile-nav__title {
-    font-weight: 600;
+    font-style: italic;
+    font-variant-caps: small-caps;
+    letter-spacing: 0.02em;
+    color: var(--ink-2);
   }
 
   .mobile-nav__close {
     display: grid;
     place-items: center;
-    width: 2.5rem;
-    height: 2.5rem;
+    width: 2.75rem;
+    height: 2.75rem;
     color: var(--ink);
     background: transparent;
     border: 0;

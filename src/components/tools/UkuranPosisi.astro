@@ -148,10 +148,11 @@ const pctOfCapital = (percent: number) => `${formatNumber(Math.round(percent * 1
   .readout__aside {
     display: inline-block;
     font-family: var(--font-label);
-    font-size: var(--text-label);
+    font-size: var(--text-sm);
+    font-style: italic;
     font-weight: 400;
-    letter-spacing: var(--tracking-mono);
-    text-transform: uppercase;
+    font-variant-caps: small-caps;
+    letter-spacing: 0.02em;
     color: var(--ink-3);
   }
 
@@ -161,20 +162,28 @@ const pctOfCapital = (percent: number) => `${formatNumber(Math.round(percent * 1
     color: var(--ink-2);
   }
 
-  /* ---------- Meter risiko (varian instrumen) ----------
-     Penggaris mendatar bertick. Penunjuk kuningan = batas yang Anda tetapkan; jarum grafit = risiko lot
-     yang biasa dipakai. Melewati batas: jarum & zona di atas batas memakai --loss (data, bukan dekorasi). */
+  /* ---------- Meter risiko ----------
+     Penggaris ukur instrumen kuningan (Tahap 4): garis dasar dengan tick minor tiap 2 % dan tick mayor tiap 10 %
+     lebar skala. Penunjuk kuningan (segitiga + tangkai) = batas yang Anda tetapkan; jarum grafit = risiko lot yang
+     biasa dipakai. Melewati batas: jarum & zona di atas batas memakai --loss (data, bukan dekorasi).
+     Posisi dari --limit-at / --actual-at (diisi skrip; logika tidak berubah). */
   .gauge {
     margin-top: var(--space-6);
   }
 
   .gauge__title,
-  .gauge__ends,
   .gauge__tag {
     font-family: var(--font-label);
-    font-size: var(--text-2xs);
-    letter-spacing: var(--tracking-mono);
-    text-transform: uppercase;
+    font-size: var(--text-sm);
+    font-style: italic;
+    font-variant-caps: small-caps;
+    letter-spacing: 0.02em;
+    color: var(--ink-3);
+  }
+
+  .gauge__ends {
+    font-family: var(--font-num);
+    font-size: var(--text-xs);
     color: var(--ink-3);
   }
 
@@ -184,11 +193,12 @@ const pctOfCapital = (percent: number) => `${formatNumber(Math.round(percent * 1
 
   .gauge__scale {
     position: relative;
-    height: var(--tick-major);
+    height: calc(var(--tick-major) + var(--space-1));
     margin-top: var(--space-6);
     background:
-      linear-gradient(var(--rule-strong), var(--rule-strong)) bottom / 100% var(--stroke-hair) no-repeat,
-      repeating-linear-gradient(to right, var(--rule-strong) 0 var(--stroke-hair), transparent var(--stroke-hair) 10%) bottom / 100% var(--tick-minor) no-repeat;
+      linear-gradient(var(--ink-2), var(--ink-2)) bottom / 100% var(--stroke-hair) no-repeat,
+      repeating-linear-gradient(to right, var(--ink-2) 0 var(--stroke-hair), transparent var(--stroke-hair) 10%) bottom / calc(100% + var(--stroke-hair)) calc(var(--tick-major) + var(--space-1)) no-repeat,
+      repeating-linear-gradient(to right, var(--rule-strong) 0 var(--stroke-hair), transparent var(--stroke-hair) 2%) bottom / calc(100% + var(--stroke-hair)) var(--tick-minor) no-repeat;
   }
 
   .gauge__zone {
@@ -216,7 +226,19 @@ const pctOfCapital = (percent: number) => `${formatNumber(Math.round(percent * 1
   .gauge__limit {
     left: var(--limit-at);
     height: calc(var(--tick-major) * 2);
-    background: var(--mark);
+    background: var(--brass);
+  }
+
+  /* Kepala penunjuk: segitiga kuningan kecil di bawah garis dasar, seperti penunjuk skala instrumen. */
+  .gauge__limit::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    border: var(--space-1) solid transparent;
+    border-bottom: calc(var(--space-2) - 1px) solid var(--brass);
+    border-top: 0;
+    transform: translate(-50%, 1px);
   }
 
   .gauge__needle {
@@ -233,11 +255,13 @@ const pctOfCapital = (percent: number) => `${formatNumber(Math.round(percent * 1
     display: none;
   }
 
+  /* Latar bidang hasil di belakang label, agar tick skala tidak menembus teks. */
   .gauge__tag {
     position: absolute;
     bottom: 100%;
     left: 50%;
     padding-bottom: var(--space-1);
+    background: var(--paper);
     white-space: nowrap;
     transform: translateX(-50%);
   }
@@ -248,13 +272,13 @@ const pctOfCapital = (percent: number) => `${formatNumber(Math.round(percent * 1
     bottom: 0;
     padding: 0 var(--space-2) 0 0;
     transform: none;
-    color: var(--mark);
+    color: var(--brass-ink);
   }
 
   .gauge__ends {
     display: flex;
     justify-content: space-between;
-    margin: var(--space-1) 0 0;
+    margin: var(--space-3) 0 0;
   }
 
   .gauge.is-invalid {

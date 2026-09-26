@@ -1,9 +1,10 @@
 ---
-// Wordmark tipografis "MEREK INDUK │ Produk" dari siteConfig. Ini penulisan nama, bukan logo:
-// artwork emblem terlalu detail untuk ukuran header dan hanya tampil di hero/footer.
+// Monogram jam pasir + wordmark tipografis "Merek induk │ Produk" (Bodoni Moda) dari siteConfig.
+// Bukan gambar logo penuh: artwork emblem terlalu detail untuk header dan hanya tampil sebagai pelat (Emblem).
 // Desktop: wordmark · navigasi utama · cari. Mobile: wordmark · cari · menu.
 import { siteConfig } from '../config/site';
 import MobileNav from './MobileNav.astro';
+import Monogram from './Monogram.astro';
 import PrimaryNav from './PrimaryNav.astro';
 import { routes, withBase } from '../lib/url';
 
@@ -12,10 +13,14 @@ const onSearch = Astro.url.pathname === searchHref;
 ---
 
 <header class="site-header">
-  <a class="wordmark" href={withBase(routes.home)} aria-label={`${siteConfig.name} — Beranda`}>
-    <span class="wordmark__master">{siteConfig.masterBrand}</span>
-    <span class="wordmark__divider" aria-hidden="true"></span>
-    <span class="wordmark__product">{siteConfig.product}</span>
+  <a class="wordmark" href={withBase(routes.home)}>
+    <Monogram />
+    <span class="wordmark__text">
+      <span class="wordmark__master">{siteConfig.masterBrand}</span>{' '}
+      <span class="wordmark__divider" aria-hidden="true"></span>
+      <span class="wordmark__product">{siteConfig.product}</span>
+      <span class="visually-hidden"> — Beranda</span>
+    </span>
   </a>
 
   <nav class="site-header__nav" aria-label="Navigasi utama">
@@ -44,7 +49,8 @@ const onSearch = Astro.url.pathname === searchHref;
     gap: var(--space-6);
     height: var(--header-height);
     padding-inline: var(--gutter);
-    background: var(--paper);
+    background-color: var(--paper);
+    background-image: var(--paper-grain);
     border-bottom: var(--border-hair) solid var(--rule);
   }
 
@@ -59,24 +65,34 @@ const onSearch = Astro.url.pathname === searchHref;
     text-decoration: none;
   }
 
+  .wordmark__text {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    min-width: 0;
+  }
+
+  /* Merek induk: italic small caps ala katalog; produk: Bodoni Moda. */
   .wordmark__master {
-    font-size: var(--text-xs);
-    font-weight: 600;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
+    font-size: var(--text-sm);
+    font-style: italic;
+    font-variant-caps: small-caps;
+    letter-spacing: 0.03em;
+    color: var(--ink-2);
     white-space: nowrap;
   }
 
   .wordmark__divider {
     width: var(--border-hair);
     height: 1.25rem;
-    background: var(--ink-3);
+    background: var(--rule-strong);
   }
 
   .wordmark__product {
-    font-family: var(--font-serif);
+    font-family: var(--font-display);
     font-size: var(--text-lg);
-    font-weight: 600;
+    font-weight: var(--weight-display);
+    letter-spacing: var(--tracking-display);
     line-height: 1;
     white-space: nowrap;
   }
@@ -96,11 +112,13 @@ const onSearch = Astro.url.pathname === searchHref;
     display: inline-flex;
     align-items: center;
     gap: var(--space-2);
-    min-height: 2.5rem;
+    justify-content: center;
+    min-height: 2.75rem;
+    min-width: 2.75rem;
     padding: 0 var(--space-2);
     color: var(--ink-2);
-    font-weight: 600;
     text-decoration: none;
+    transition: color var(--motion-fast) var(--ease);
   }
 
   .site-header__search:hover,
@@ -129,14 +147,18 @@ const onSearch = Astro.url.pathname === searchHref;
     }
 
     .wordmark {
+      gap: var(--space-2);
+    }
+
+    .wordmark__text {
       flex-direction: column;
       align-items: flex-start;
       gap: var(--space-1);
     }
 
     .wordmark__master {
-      font-size: var(--text-2xs);
-      letter-spacing: 0.12em;
+      font-size: var(--text-xs);
+      line-height: 1;
     }
 
     .wordmark__divider {

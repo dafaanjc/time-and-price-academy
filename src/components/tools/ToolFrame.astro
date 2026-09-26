@@ -279,6 +279,8 @@ const { tool, title, description, summary, variant = 'default', label = 'Alat hi
 
   .tool :global(.plot__tick) {
     top: var(--space-1);
+    font-family: var(--font-num);
+    letter-spacing: 0;
     transform: translateX(-50%);
   }
 
@@ -386,15 +388,18 @@ const { tool, title, description, summary, variant = 'default', label = 'Alat hi
     color: var(--gain);
   }
 
-  /* ---------- Gaya instrumen (semua alat) ----------
-     Pelat instrumen: bingkai garis tegas, label mono, input angka mono rata kanan seperti jendela
-     pembacaan, hasil sebagai angka serif besar. Tanpa bayangan; sorotan hanya garis kuningan. */
+  /* ---------- Gaya instrumen (semua alat; Tahap 4 redesign) ----------
+     Instrumen kuningan presisi: bingkai tipis ganda (garis luar grafit + garis dalam kuningan), label katalog
+     italic small caps, input dan angka hasil IBM Plex Mono rata kanan seperti jendela pembacaan.
+     Tanpa bayangan; sorotan hanya garis kuningan. */
   .tool--instrument {
     max-width: none;
     margin: 0;
     padding: 0;
     border: var(--border-hair) solid var(--rule-strong);
     border-top: var(--border-hair) solid var(--rule-strong);
+    outline: var(--border-hair) solid var(--brass);
+    outline-offset: calc(-1 * var(--frame-gap) - 2 * var(--border-hair));
   }
 
   .tool--instrument .tool__header {
@@ -405,10 +410,13 @@ const { tool, title, description, summary, variant = 'default', label = 'Alat hi
 
   .tool--instrument .tool__label {
     font-family: var(--font-label);
-    font-size: var(--text-label);
+    font-size: var(--text-sm);
+    font-style: italic;
     font-weight: 400;
-    letter-spacing: var(--tracking-mono);
-    color: var(--mark);
+    font-variant-caps: small-caps;
+    letter-spacing: 0.02em;
+    text-transform: none;
+    color: var(--brass-ink);
   }
 
   .tool--instrument .tool__title {
@@ -460,14 +468,19 @@ const { tool, title, description, summary, variant = 'default', label = 'Alat hi
 
   .tool--instrument :global(.field span) {
     font-family: var(--font-label);
-    font-size: var(--text-label);
-    letter-spacing: var(--tracking-mono);
-    text-transform: uppercase;
+    font-size: var(--text-sm);
+    font-style: italic;
+    font-variant-caps: small-caps;
+    letter-spacing: 0.02em;
     color: var(--ink-3);
   }
 
+  .tool--instrument :global(.field input),
+  .tool--instrument :global(.field output) {
+    font-family: var(--font-num);
+  }
+
   .tool--instrument :global(.field input) {
-    font-family: var(--font-mono);
     font-size: var(--text-base);
     text-align: right;
     background: var(--surface);
@@ -488,15 +501,21 @@ const { tool, title, description, summary, variant = 'default', label = 'Alat hi
 
   .tool--instrument :global(.readout dt) {
     font-family: var(--font-label);
-    font-size: var(--text-label);
+    font-size: var(--text-sm);
+    font-style: italic;
     font-weight: 400;
-    letter-spacing: var(--tracking-mono);
+    font-variant-caps: small-caps;
+    letter-spacing: 0.02em;
+    text-transform: none;
   }
 
+  /* Angka hasil hitungan: Plex Mono, bukan display. */
   .tool--instrument :global(.readout dd) {
-    font-family: var(--font-serif);
-    font-size: var(--text-2xl);
-    line-height: 1.1;
+    font-family: var(--font-num);
+    font-size: var(--text-lg);
+    font-weight: 400;
+    line-height: 1.15;
+    letter-spacing: -0.01em;
   }
 
   .tool--instrument :global(.readout > div) {

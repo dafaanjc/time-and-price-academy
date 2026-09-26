@@ -9,13 +9,15 @@ interface Props {
   title: string;
   concepts: Concept[];
   empty: string;
+  /** Sidenote di margin (Tahap 5): judul kecil bergaya label, tanpa ringkasan, daftar rapat. */
+  note?: boolean;
 }
 
-const { id, title, concepts, empty } = Astro.props;
+const { id, title, concepts, empty, note = false } = Astro.props;
 const pad = (n: number) => String(n).padStart(2, '0');
 ---
 
-<section class="concept-links" aria-labelledby={id}>
+<section class:list={['concept-links', { 'concept-links--note': note }]} aria-labelledby={id}>
   <h2 id={id}>{title}</h2>
   {
     concepts.length > 0 ? (
@@ -55,7 +57,7 @@ const pad = (n: number) => String(n).padStart(2, '0');
     display: grid;
     grid-template-columns: 2.25rem minmax(0, 1fr);
     column-gap: var(--space-2);
-    padding-block: var(--space-3);
+    padding-block: var(--space-1);
     border-bottom: var(--border-hair) solid var(--rule);
   }
 
@@ -64,11 +66,14 @@ const pad = (n: number) => String(n).padStart(2, '0');
     font-family: var(--font-label);
     font-size: var(--text-label);
     letter-spacing: var(--tracking-mono);
-    line-height: 2;
+    line-height: 2.75rem;
     color: var(--mark);
   }
 
   a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.75rem;
     font-weight: 600;
     color: var(--ink);
   }
@@ -77,6 +82,39 @@ const pad = (n: number) => String(n).padStart(2, '0');
     margin-top: var(--space-1);
     font-size: var(--text-sm);
     color: var(--ink-2);
+  }
+
+  /* Sidenote: judul italic small caps (label), garis kuningan di atas, baris rapat. */
+  .concept-links--note {
+    max-width: none;
+    padding-top: var(--space-2);
+    border-top: var(--border-mark) double var(--brass);
+  }
+
+  .concept-links--note h2 {
+    margin: 0 0 var(--space-2);
+    font-family: var(--font-label);
+    font-size: var(--text-sm);
+    font-style: italic;
+    font-weight: 400;
+    font-variant-caps: small-caps;
+    letter-spacing: 0.02em;
+    color: var(--ink-3);
+  }
+
+  .concept-links--note li {
+    grid-template-columns: 1.75rem minmax(0, 1fr);
+    padding-block: 0;
+  }
+
+  /* Sidenote hanya memuat judul; ringkasan ada di halaman konsepnya. */
+  .concept-links--note .concept-links__desc {
+    display: none;
+  }
+
+  .concept-links--note a {
+    font-size: var(--text-sm);
+    line-height: 1.35;
   }
 
   .concept-links__empty {

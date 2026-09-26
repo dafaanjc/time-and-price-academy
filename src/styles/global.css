@@ -1,101 +1,78 @@
-/* ---------- Font (self-hosted, subset latin; OFL — lihat src/assets/fonts/README.md) ---------- */
-@font-face {
-  font-family: "Source Sans 3";
-  font-style: normal;
-  font-weight: 400;
-  font-display: swap;
-  src: url("../assets/fonts/web/source-sans-3-latin-400-normal.woff2") format("woff2");
-  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
-}
-@font-face {
-  font-family: "Source Sans 3";
-  font-style: italic;
-  font-weight: 400;
-  font-display: swap;
-  src: url("../assets/fonts/web/source-sans-3-latin-400-italic.woff2") format("woff2");
-  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
-}
-@font-face {
-  font-family: "Source Sans 3";
-  font-style: normal;
-  font-weight: 600;
-  font-display: swap;
-  src: url("../assets/fonts/web/source-sans-3-latin-600-normal.woff2") format("woff2");
-  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
-}
-@font-face {
-  font-family: "Source Serif 4";
-  font-style: normal;
-  font-weight: 600;
-  font-display: swap;
-  src: url("../assets/fonts/web/source-serif-4-latin-600-normal.woff2") format("woff2");
-  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
-}
-@font-face {
-  font-family: "Source Serif 4";
-  font-style: italic;
-  font-weight: 400;
-  font-display: swap;
-  src: url("../assets/fonts/web/source-serif-4-latin-400-italic.woff2") format("woff2");
-  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
-}
+/* ---------- Font (self-hosted via @fontsource, subset latin, SIL OFL 1.1) ----------
+   Hanya bobot yang dipakai: Bodoni Moda 500 + 400 italic (display), Newsreader 400/600 + 400 italic
+   (teks & UI), IBM Plex Mono 400 (angka hasil hitungan & input). Lihat docs/redesign-brief.md. */
+@import "@fontsource/bodoni-moda/latin-500.css";
+@import "@fontsource/bodoni-moda/latin-400-italic.css";
+@import "@fontsource/newsreader/latin-400.css";
+@import "@fontsource/newsreader/latin-400-italic.css";
+@import "@fontsource/newsreader/latin-600.css";
+@import "@fontsource/ibm-plex-mono/latin-400.css";
 
 /* ---------- Token ---------- */
-/* Arah visual "Modern Digital Museum" (lihat CLAUDE.md → Visual Design System).
-   Galeri yang tenang untuk ide tentang waktu dan harga: kertas galeri, tinta grafit, satu aksen
-   kuningan untuk tanda ukur, dan geometri grafik (sumbu, tick, jejak) sebagai bahasa ilustrasi.
-   Warna non-netral HANYA untuk makna: --mark (tanda ukur/penunjuk), --loss/--gain/--caution (data).
-   Dilarang: biru neon, merah/hijau agresif, gradien berat, glassmorphism.
-   Nama token lama dipertahankan agar komponen tidak perlu diubah.
-   Semua pasangan teks/latar ≥ 4.5:1 (WCAG AA); garis sumbu/tick ≥ 3:1 bila membawa informasi. */
+/* Arah visual "Kabinet Risiko" (docs/redesign-brief.md): laboratorium & perpustakaan riset abad ke-18 —
+   kertas, tinta, pelat ukiran, instrumen kuningan. Satu tema: terang (varian gelap dihapus).
+   Warna non-netral HANYA untuk makna: kuningan (--brass/--mark: sorotan, penunjuk, nilai harapan) dan
+   --loss (rugi/bahaya, sangat jarang). Nama token lama (--ink-2/-3, --surface, --tint, --mark, --accent…)
+   dipertahankan sebagai alias agar komponen tidak perlu diubah.
+   Kontras (terhadap --paper #F3EEE4 / --paper-deep #E7DFD0): teks ≥ 4.5:1, garis ukur ≥ 3:1. */
 :root {
-  /* Warna — netral (kertas galeri & tinta grafit) */
-  --paper: #f3f1ec; /* dinding galeri */
-  --surface: #faf9f6; /* bidang terangkat: alat hitung, kartu */
-  --ink: #14171b; /* 15.9:1 pada paper */
-  --ink-2: #40464d; /* 8.5:1 */
-  --ink-3: #5c636a; /* 5.4:1 — label/meta */
-  --rule: #d4d0c7; /* garis dekoratif; batas input memakai --ink-3 */
-  --rule-strong: #7c8187; /* garis bingkai/sumbu yang harus terlihat: 3.5:1 */
-  --tint: #e9e6df; /* latar lembut: kode inline, item aktif */
+  /* Palet brief */
+  --paper: #f3eee4; /* latar utama */
+  --paper-deep: #e7dfd0; /* panel, rak, area sekunder */
+  --ink: #1c1a16; /* 15.0:1 paper · 13.1:1 deep */
+  --ink-soft: #5b554a; /* 6.4:1 paper · 5.6:1 deep */
+  --rule: #d6ccba; /* garis pemisah tipis (dekoratif) */
+  --brass: #9a7640; /* aksen non-teks: garis nilai harapan, sorotan, tanda. 3.6:1 paper */
+  --brass-ink: #7a5a2b; /* kuningan untuk teks: 5.5:1 paper · 4.8:1 deep */
+  --plate: #15130f; /* pelat ukiran gelap (hero, emblem) */
+  --loss: #8c2f24; /* 7.1:1 paper — hanya makna rugi/bahaya, sangat jarang */
 
-  /* Peran: aksen = tinta. Tautan dibedakan dengan garis bawah, bukan warna. */
+  /* Turunan (tetap dalam keluarga kertas/tinta) */
+  --surface: #f9f6ef; /* bidang terang terangkat: alat hitung, bidang plot. ink-soft 6.8:1 */
+  --ink-2: var(--ink-soft); /* teks sekunder */
+  --ink-3: #645d51; /* label/meta: 5.6:1 paper · 4.9:1 deep */
+  --rule-strong: #7f7565; /* bingkai/sumbu yang membawa informasi: 4.0:1 paper · 3.5:1 deep */
+  --tint: var(--paper-deep); /* latar lembut: kode inline, item aktif */
+
+  /* Peran: aksen = tinta. Tautan dibedakan dengan garis bawah, bukan warna teks. */
   --accent: var(--ink);
   --accent-soft: var(--tint);
+  --link-line: var(--rule-strong); /* garis bawah tautan saat diam */
+  --link-line-hover: var(--brass); /* garis bawah tautan saat ditunjuk / aktif */
+  --focus: var(--brass-ink); /* cincin fokus keyboard: 5.5:1 paper */
 
-  /* Tanda ukur — satu-satunya warna ekspresif: kuningan instrumen (jam pasir, pelat museum).
-     Untuk penunjuk, tick utama, nomor indeks, sorotan pilihan. Bukan untuk blok besar. */
-  --mark: #7b5a1f; /* 5.6:1 pada paper */
-  --mark-soft: #ece3cf;
+  /* Tanda ukur (nama lama --mark) = kuningan versi teks, karena juga dipakai untuk nomor indeks. */
+  --mark: var(--brass-ink);
+  --mark-soft: #ebe0c9; /* isian lembut / seleksi. brass-ink 5.0:1, ink 13.6:1 */
 
-  /* Pelat — bidang gelap untuk SATU objek pameran per halaman (beranda: hero jam pasir modal + emblem).
-     Gelap di kedua tema: emblem resmi versi hitam hanya bisa tampil besar di atas latar gelap
-     (tidak diwarnai ulang). Bukan untuk section biasa; bukan kaca, tanpa blur/bayangan. */
-  --plate: #16181b;
-  --plate-ink: #ece8df; /* 14.6:1 pada plate */
-  --plate-ink-2: #bdb8ae; /* 9.0:1 */
-  --plate-ink-3: #9d988e; /* 6.2:1 — label/meta di pelat */
-  --plate-rule: #3a3e43; /* garis dekoratif di pelat */
-  --plate-rule-strong: #6e7277; /* garis ukur/bingkai kaca: 3.7:1 */
-  --plate-mark: #cfae6b; /* kuningan di pelat: 8.4:1 */
+  /* Pelat — bidang gelap berbingkai untuk objek pameran (hero, emblem). */
+  --plate-ink: #ece6da; /* 14.9:1 pada plate */
+  --plate-ink-2: #bdb6a8; /* 9.2:1 */
+  --plate-ink-3: #9d968a; /* 6.3:1 — label/meta di pelat */
+  --plate-rule: #3a352d; /* garis dekoratif di pelat */
+  --plate-rule-strong: #716a5e; /* garis ukur/bingkai: 3.5:1 */
+  --plate-mark: #cfae6b; /* kuningan di pelat: 8.8:1 */
   --plate-sand: #6b5a3a; /* isian pasir (modal); tepinya selalu digaris --plate-mark */
-  --plate-grid: rgb(236 232 223 / 0.045); /* kisi koordinat di panggung gelap: samar */
-  /* Pasir di luar pelat (jam pasir modal di dinding terang). Isian non-teks; tepinya selalu --mark. */
+  --plate-grid: rgb(236 230 218 / 0.045); /* kisi koordinat di pelat: samar */
+  --scrim: rgb(21 19 15 / 0.45); /* latar redup di belakang dialog (warna pelat) */
+  /* Pasir di luar pelat (jam pasir modal di kertas). Isian non-teks; tepinya selalu --mark. */
   --sand: #dcc9a0;
 
-  /* Warna — semantik data (hanya di contoh/kalkulasi). Diredam, bukan merah/hijau terminal. */
-  --loss: #9b3a2c; /* 6.1:1 */
-  --gain: #2e6a4e; /* 5.7:1 */
-  --caution: #7a5410; /* 5.5:1 pada --caution-bg */
-  --caution-bg: #f2e6c6;
+  /* Semantik data (hanya di contoh/kalkulasi). Diredam, bukan merah/hijau terminal. */
+  --gain: #35654a; /* 5.8:1 */
+  --caution: #74501a; /* 5.7:1 pada --caution-bg */
+  --caution-bg: #efe2c4;
+
+  /* Tekstur kertas: noise SVG inline (opacity 0.05), tanpa file gambar. */
+  --paper-grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .11 0 0 0 0 .1 0 0 0 0 .086 1.4 0 0 0 -.4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.05'/%3E%3C/svg%3E");
 
   /* Geometri grafik — dipakai oleh SVG inline (stroke="var(--…)") dan bidang koordinat */
   --axis: var(--ink-2); /* sumbu waktu (x) & harga/nilai (y) */
   --tick: var(--ink-3);
   --trace: var(--ink); /* jejak utama */
   --trace-2: var(--ink-3); /* jejak pembanding (putus-putus) */
-  --grid-line: rgb(20 23 27 / 0.035); /* garis kisi minor */
-  --grid-line-major: rgb(20 23 27 / 0.065); /* garis kisi mayor (tiap 4 sel) */
+  --grid-line: rgb(28 26 22 / 0.04); /* garis kisi minor */
+  --grid-line-major: rgb(28 26 22 / 0.075); /* garis kisi mayor (tiap 4 sel) */
   --stroke-hair: 1px;
   --stroke-axis: 1px;
   --stroke-trace: 1.5px;
@@ -106,45 +83,53 @@
   --dash-guide: 3 3; /* stroke-dasharray garis bantu */
   --dash-trace: 6 4; /* stroke-dasharray jejak pembanding */
 
-  /* Risk Field — figur 3D hero (three.js). Dibaca src/lib/risk-field lewat getComputedStyle, jadi
-     warna 3D mengikuti tema tanpa ditulis di kode. Semua alias token di atas: tidak ada warna baru. */
-  --field-grid: var(--rule); /* kisi dinding waktu × harga */
-  --field-line-faint: var(--rule-strong); /* relief: ekor distribusi (memudar) */
-  --field-line: var(--ink-2); /* relief: punggung distribusi, jalur bercabang, garis bantu */
+  /* Risk Field (three.js, tidak dipasang). Alias palet: tidak ada warna baru. */
+  --field-grid: var(--rule);
+  --field-line-faint: var(--rule-strong);
+  --field-line: var(--ink-2);
   --field-axis: var(--axis);
-  --field-trace: var(--trace); /* jalur masa lalu & kurva probabilitas */
-  --field-highlight: var(--mark); /* SATU lintasan kuningan: nilai harapan */
-  --field-fill: var(--mark-soft); /* isian lembut di bawah kurva di horizon T */
-  --field-drift-period: 48s; /* satu siklus drift kamera: sangat pelan, bukan putaran */
-  --field-aspect: 6 / 5; /* rasio panggung figur (desktop) */
-  --field-aspect-compact: 1 / 1; /* rasio panggung di layar sempit */
+  --field-trace: var(--trace);
+  --field-highlight: var(--brass);
+  --field-fill: var(--mark-soft);
+  --field-drift-period: 48s;
+  --field-aspect: 6 / 5;
+  --field-aspect-compact: 1 / 1;
 
-  /* Tipografi — serif untuk bacaan & judul, sans untuk UI, mono untuk metadata/angka ukur */
-  --font-sans: "Source Sans 3", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
-  --font-serif: "Source Serif 4", "Iowan Old Style", "Palatino Linotype", Georgia, serif;
-  --font-mono: ui-monospace, "Cascadia Mono", "Cascadia Code", "SF Mono", Consolas, Menlo, monospace;
-  --font-label: var(--font-mono); /* label/metadata: FONDASI · 01 / 06 · 8 MNT BACA */
-  /* Skala 1.25, dasar 17px */
+  /* Tipografi — Bodoni Moda untuk display, Newsreader untuk teks & UI, IBM Plex Mono untuk angka ukur.
+     Nama lama tetap: --font-serif = display, --font-sans = teks/UI, --font-mono = angka,
+     --font-label = label katalog (italic serif small caps lewat .label). */
+  --font-display: "Bodoni Moda", "Didot", "Bodoni 72", "Iowan Old Style", Georgia, serif;
+  --font-text: "Newsreader", "Iowan Old Style", "Palatino Linotype", Georgia, serif;
+  --font-num: "IBM Plex Mono", ui-monospace, "Cascadia Mono", Consolas, Menlo, monospace;
+  --font-serif: var(--font-display);
+  --font-sans: var(--font-text);
+  --font-mono: var(--font-num);
+  --font-label: var(--font-text);
+  --weight-display: 500;
+  --weight-strong: 600;
+
+  /* Skala modular rasio 1.333 (desktop ≥ 1440px, dasar 18px), fluid dari rasio 1.2 (ponsel 360px, dasar
+     17px). Di bawah dasar: satu langkah (13px) dan setengah langkah (15px). 5xl = langkah 5½. */
   --text-2xs: 0.6875rem; /* 11 — hanya label sangat kecil */
   --text-xs: 0.8125rem; /* 13 */
   --text-sm: 0.9375rem; /* 15 */
-  --text-base: 1.0625rem; /* 17 */
-  --text-lg: 1.3125rem; /* 21 */
-  --text-xl: 1.6875rem; /* 27 */
-  --text-2xl: 2.0625rem; /* 33 */
-  --text-3xl: 2.625rem; /* 42 */
-  --text-4xl: 3.25rem; /* 52 */
-  --text-5xl: 4.125rem; /* 66 — judul pameran, hanya desktop */
-  --text-6xl: 5.25rem; /* 84 — judul hero beranda, hanya desktop */
-  --text-label: 0.75rem; /* 12 — label mono; mono tampak lebih besar dari sans di ukuran sama */
+  --text-base: clamp(1.0625rem, 1.042rem + 0.093vw, 1.125rem); /* 17 → 18 */
+  --text-lg: clamp(1.275rem, 1.2rem + 0.333vw, 1.5rem); /* 20 → 24 */
+  --text-xl: clamp(1.53rem, 1.374rem + 0.695vw, 2rem); /* 24 → 32 */
+  --text-2xl: clamp(1.836rem, 1.56rem + 1.228vw, 2.665rem); /* 29 → 43 */
+  --text-3xl: clamp(2.203rem, 1.754rem + 1.998vw, 3.552rem); /* 35 → 57 */
+  --text-4xl: clamp(2.644rem, 1.947rem + 3.098vw, 4.735rem); /* 42 → 76 */
+  --text-5xl: clamp(2.896rem, 2.039rem + 3.808vw, 5.467rem); /* 46 → 87 — judul pameran, desktop */
+  --text-6xl: clamp(3.173rem, 2.126rem + 4.650vw, 6.312rem); /* 51 → 101 — judul hero, desktop */
+  --text-label: 0.8125rem; /* 13 — label & metadata */
   --leading-body: 1.6;
-  --leading-tight: 1.15;
-  --leading-display: 1.04;
-  --leading-hero: 0.98; /* judul hero kalimat biasa (bukan kapital) di ukuran --text-6xl */
-  --tracking-label: 0.08em; /* label sans kapital */
-  --tracking-mono: 0.1em; /* label mono kapital */
-  --tracking-display: -0.022em;
-  --tracking-caps-display: 0.015em; /* judul serif kapital (hero): huruf pahatan dinding museum */
+  --leading-tight: 1.12;
+  --leading-display: 1.02;
+  --leading-hero: 0.96;
+  --tracking-label: 0.06em; /* label kapital */
+  --tracking-mono: 0.08em; /* label kapital lama (font-label) */
+  --tracking-display: -0.015em; /* Bodoni: rapat, sedikit negatif */
+  --tracking-caps-display: 0.015em;
   --leading-caps-display: 1.08;
 
   /* Jarak (dasar 4px) */
@@ -157,33 +142,38 @@
   --space-12: 3rem;
   --space-16: 4rem;
   --space-24: 6rem;
-  --space-32: 8rem; /* jeda antar-ruang pameran di desktop */
+  --space-32: 8rem; /* jeda antar-ruang di desktop */
 
-  /* Bentuk: sudut tegas, garis alih-alih bayangan. Tanpa blur, tanpa kaca. */
+  /* Bentuk: sudut tajam (maks 2px), garis 1px, tanpa bayangan abu. */
   --radius-0: 0;
   --radius-1: 2px;
   --border-hair: 1px;
   --border-mark: 3px;
+  --frame-gap: 3px; /* jarak garis bingkai ganda ala pelat buku */
 
-  /* Gerak: tertahan — hanya perubahan status & penampakan jejak; tanpa animasi masuk dekoratif */
+  /* Gerak: hanya momen hero + respons aksi pengguna. */
   --motion-fast: 120ms;
   --motion-base: 200ms;
   --motion-slow: 480ms; /* mis. jejak grafik digambar sekali */
-  --motion-reveal: 560ms; /* section muncul sekali saat di-scroll ke layar */
-  --reveal-shift: 8px; /* jarak naik saat muncul: kecil, tanpa efek melayang */
-  --parallax-shift: 18px; /* geser emblem di panggung hero saat menggulir */
-  --parallax-pointer: 10px; /* R9.2: paralaks kursor di panggung hero, geser lapisan terdepan (kisi 25%, emblem 55%, medan 100%) */
-  --tilt-max: 1.2deg; /* R9.2: kemiringan maksimum medan hasil mengikuti kursor */
-  --motion-ambient: 6400ms; /* R9.2: satu siklus jejak di panggung hero (denyut → tempuh → mendarat → pudar) */
+  --motion-reveal: 560ms;
+  --reveal-shift: 8px;
+  /* Hero "Pelat Ukiran" (Tahap 3): satu-satunya momen gerak utama. Geser lapisan saat menggulir (positif =
+     tertinggal dari pelat = terasa jauh), kemiringan kursor, dan paralaks kursor per lapisan. */
+  --hero-shift-back: 56px; /* kisi + spiral emas */
+  --hero-shift-mid: 28px; /* emblem */
+  --hero-shift-front: -12px; /* cabang kemungkinan (mendahului pelat) */
+  --hero-tilt: 4deg; /* kemiringan maksimum mengikuti kursor (desktop) */
+  --hero-pointer: 12px; /* paralaks kursor lapisan depan; belakang 30 %, tengah 60 % */
+  --hero-sheen: rgb(236 230 218 / 0.09); /* kilau tipis yang menyapu pelat, seperti logam terkena lampu */
   --ease: cubic-bezier(0.2, 0, 0, 1);
 
   /* Tata letak — grid editorial */
-  --measure: 66ch; /* lebar baca teks panjang */
+  --measure: 68ch; /* lebar baca prosa */
   --measure-narrow: 52ch; /* lead, keterangan */
   --container: 72rem; /* halaman tanpa sidebar */
   --container-wide: 90rem; /* halaman dengan sidebar */
   --sidebar-width: 17rem;
-  --header-height: 3.5rem;
+  --header-height: 3.75rem;
   --gutter: var(--space-4); /* margin luar halaman */
   --grid-columns: 12;
   --grid-gap: var(--space-4);
@@ -191,29 +181,12 @@
   color-scheme: light;
 }
 
-@media (prefers-color-scheme: dark) {
+/* Mobile: paralaks gulir dikurangi (tanpa kemiringan: skripnya hanya aktif di desktop dengan kursor). */
+@media (max-width: 63.99rem) {
   :root {
-    --paper: #0f1113;
-    --surface: #16191c;
-    --ink: #ebe8e1; /* 15.5:1 */
-    --ink-2: #b4b9bf; /* 9.6:1 */
-    --ink-3: #8b9198; /* 6.0:1 */
-    --rule: #2d3237;
-    --rule-strong: #6a7178; /* 3.8:1 */
-    --tint: #1d2125;
-    --mark: #cfae6b; /* 8.9:1 */
-    --mark-soft: #2a2418;
-    --plate: #1b1e22; /* sedikit lebih terang dari paper gelap; dibatasi --plate-rule */
-    --sand: #4d4130;
-    --plate-ink-3: #9d988e; /* 5.8:1 */
-    --plate-rule-strong: #6e7277; /* 3.5:1 */
-    --loss: #e08a7a;
-    --gain: #7cc3a0;
-    --caution: #e3c07a;
-    --caution-bg: #2f2718;
-    --grid-line: rgb(235 232 225 / 0.03);
-    --grid-line-major: rgb(235 232 225 / 0.055);
-    color-scheme: dark;
+    --hero-shift-back: 24px;
+    --hero-shift-mid: 12px;
+    --hero-shift-front: -6px;
   }
 }
 
@@ -239,10 +212,11 @@
     --motion-slow: 0ms;
     --motion-reveal: 0ms;
     --reveal-shift: 0px;
-    --parallax-shift: 0px;
-    --parallax-pointer: 0px;
-    --tilt-max: 0deg;
-    --motion-ambient: 0ms;
+    --hero-shift-back: 0px;
+    --hero-shift-mid: 0px;
+    --hero-shift-front: 0px;
+    --hero-tilt: 0deg;
+    --hero-pointer: 0px;
   }
 }
 
@@ -266,44 +240,47 @@ html {
   scroll-padding-top: calc(var(--header-height) + 1rem);
 }
 
-/* Latar: bidang koordinat yang sangat samar, seperti kertas gambar teknik di dinding galeri.
-   Garis, bukan gradien warna; kisi mayor tiap 4 sel. Ditempel pada kanvas, tidak ikut bergulir. */
+/* Latar: kertas riset dengan butir yang nyaris tak terlihat (noise SVG inline, bukan gambar). */
 body {
   margin: 0;
   /* Panggung hero menembus sampai tepi kanan layar (100vw termasuk scrollbar): potong luapan mendatar
      tanpa membuat wadah gulir baru (sticky tetap bekerja). */
   overflow-x: clip;
   background-color: var(--paper);
-  background-image:
-    linear-gradient(to right, var(--grid-line-major) var(--stroke-hair), transparent var(--stroke-hair)),
-    linear-gradient(to bottom, var(--grid-line-major) var(--stroke-hair), transparent var(--stroke-hair)),
-    linear-gradient(to right, var(--grid-line) var(--stroke-hair), transparent var(--stroke-hair)),
-    linear-gradient(to bottom, var(--grid-line) var(--stroke-hair), transparent var(--stroke-hair));
-  background-size:
-    calc(var(--grid-cell) * 4) calc(var(--grid-cell) * 4),
-    calc(var(--grid-cell) * 4) calc(var(--grid-cell) * 4),
-    var(--grid-cell) var(--grid-cell),
-    var(--grid-cell) var(--grid-cell);
-  background-attachment: fixed;
+  background-image: var(--paper-grain);
   color: var(--ink);
-  font-family: var(--font-sans);
+  font-family: var(--font-text);
   font-size: var(--text-base);
   line-height: var(--leading-body);
   font-variant-numeric: tabular-nums;
+  font-optical-sizing: auto;
+  /* Hanya bobot yang dimuat yang tampil: tidak ada tebal palsu. Small caps boleh disintesis. */
+  font-synthesis-weight: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
 }
 
+/* Judul: Bodoni Moda — kontras tinggi, rapat, tracking sedikit negatif. */
 h1,
 h2,
 h3 {
-  font-family: var(--font-serif);
-  font-weight: 600;
+  font-family: var(--font-display);
+  font-weight: var(--weight-display);
   line-height: var(--leading-tight);
-  letter-spacing: -0.01em;
+  letter-spacing: var(--tracking-display);
   text-wrap: balance;
 }
 
 h1 {
-  letter-spacing: var(--tracking-display);
+  line-height: var(--leading-display);
+}
+
+h4,
+h5,
+h6 {
+  font-family: var(--font-text);
+  font-weight: var(--weight-strong);
+  line-height: var(--leading-tight);
 }
 
 p {
@@ -312,17 +289,38 @@ p {
 
 strong,
 b {
-  font-weight: 600;
+  font-weight: var(--weight-strong);
 }
 
+/* Angka hasil hitungan & input instrumen: IBM Plex Mono (hanya di sana). */
+input,
+select,
+textarea,
+button {
+  font: inherit;
+}
+
+output,
+input[type="number"],
+kbd,
+samp {
+  font-family: var(--font-num);
+}
+
+/* Tautan: warna tinta, dibedakan garis bawah tipis; ditunjuk → garis kuningan lebih tebal. */
 a {
   color: var(--accent);
+  text-decoration-line: underline;
+  text-decoration-color: var(--link-line);
   text-decoration-thickness: 1px;
-  text-underline-offset: 0.18em;
-  transition: text-decoration-thickness var(--motion-fast) var(--ease);
+  text-underline-offset: 0.2em;
+  transition:
+    text-decoration-color var(--motion-fast) var(--ease),
+    text-decoration-thickness var(--motion-fast) var(--ease);
 }
 
 a:hover {
+  text-decoration-color: var(--link-line-hover);
   text-decoration-thickness: 2px;
 }
 
@@ -341,9 +339,10 @@ hr {
     repeating-linear-gradient(to right, var(--rule-strong) 0 var(--stroke-hair), transparent var(--stroke-hair) var(--grid-cell));
 }
 
+/* Fokus keyboard: cincin kuningan-tinta 2px, jelas di kertas maupun panel (≥ 4.5:1). */
 :focus-visible {
-  outline: 2px solid var(--accent);
-  outline-offset: 2px;
+  outline: 2px solid var(--focus);
+  outline-offset: 3px;
   border-radius: var(--radius-1);
 }
 
@@ -379,22 +378,20 @@ svg {
   top: 0.5rem;
 }
 
-/* Lebar baca untuk teks panjang. */
-.prose {
-  max-width: var(--measure);
-}
-
-/* ---------- Label & metadata: mono kecil kapital ---------- */
-/* Contoh: FONDASI · 01 / 06 · 8 MNT BACA. Angka ukur, indeks, dan keterangan sumbu memakai gaya ini. */
+/* ---------- Label katalog: italic serif small caps ---------- */
+/* Gaya katalog tua: *Fig. 00* · *Objek 00* · *Instrumen 01*. Teks ditulis kalimat biasa di markup;
+   small caps yang membuatnya berbunyi katalog. Pakai hanya di tempat label sudah ada. */
 .label,
 .eyebrow {
   margin: 0;
   font-family: var(--font-label);
-  font-size: var(--text-label);
+  font-size: var(--text-sm);
+  font-style: italic;
   font-weight: 400;
+  font-variant-caps: small-caps;
   line-height: 1.4;
-  letter-spacing: var(--tracking-mono);
-  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  text-transform: none;
   color: var(--ink-3);
 }
 
@@ -421,7 +418,7 @@ svg {
   font-family: var(--font-label);
   font-size: var(--text-2xs);
   font-weight: 400;
-  letter-spacing: var(--tracking-mono);
+  letter-spacing: var(--tracking-label);
   text-transform: uppercase;
   border: 1px solid var(--rule);
   border-radius: var(--radius-1);
@@ -592,6 +589,10 @@ svg {
   --ink: var(--plate-ink);
   --ink-2: var(--plate-ink-2);
   --ink-3: var(--plate-ink-3);
+  --brass: var(--plate-mark);
+  --focus: var(--plate-mark);
+  --link-line: var(--plate-rule-strong);
+  --link-line-hover: var(--plate-mark);
   color: var(--plate-ink);
   background: var(--plate);
   border: var(--border-hair) solid var(--plate-rule);
@@ -650,74 +651,81 @@ svg {
   text-transform: uppercase;
 }
 
-/* ---------- Isi panjang (body MDX) ---------- */
-.content {
+/* ---------- Prosa (.prose; .content = body MDX, gaya sama) ----------
+   Newsreader, line-height 1.6, lebar baca 68ch. Judul di dalam prosa tetap Bodoni, lebih kecil dari
+   judul halaman. Kutipan: Newsreader italic dengan garis kuningan tipis. */
+:is(.prose, .content) {
   max-width: var(--measure);
+  font-family: var(--font-text);
+  line-height: var(--leading-body);
 }
 
-.content h2 {
-  margin: 2.5rem 0 0.75rem;
+:is(.prose, .content) h2 {
+  margin: var(--space-12) 0 var(--space-3);
   font-size: var(--text-xl);
 }
 
-.content h3 {
-  margin: 2rem 0 0.5rem;
+:is(.prose, .content) h3 {
+  margin: var(--space-8) 0 var(--space-2);
   font-size: var(--text-lg);
 }
 
-.content p,
-.content ul,
-.content ol,
-.content blockquote,
-.content table,
-.content pre {
+:is(.prose, .content) :is(h2, h3):first-child {
+  margin-top: 0;
+}
+
+:is(.prose, .content) :is(p, ul, ol, blockquote, table, pre) {
   margin: 0 0 1.125rem;
 }
 
-.content ul,
-.content ol {
+:is(.prose, .content) :is(ul, ol) {
   padding-left: 1.5rem;
 }
 
-.content li + li {
+:is(.prose, .content) li + li {
   margin-top: 0.25rem;
 }
 
-.content blockquote {
-  padding-left: 1rem;
-  color: var(--ink-2);
-  border-left: 3px solid var(--rule);
+:is(.prose, .content) li::marker {
+  color: var(--ink-3);
 }
 
-.content code {
+:is(.prose, .content) blockquote {
+  padding-left: var(--space-4);
+  font-style: italic;
+  color: var(--ink-2);
+  border-left: var(--border-hair) solid var(--brass);
+}
+
+:is(.prose, .content) code {
   font-family: var(--font-mono);
-  font-size: 0.9em;
+  font-size: 0.86em;
   padding: 0.1em 0.3em;
   background: var(--accent-soft);
   border-radius: var(--radius-1);
 }
 
-/* Blok `text` = rumus/hitungan: bidang lembut dengan garis kiri, bukan kotak kode. */
-.content pre {
+/* Blok `text` = rumus/hitungan: bidang kertas tua dengan garis kiri, bukan kotak kode. */
+:is(.prose, .content) pre {
   padding: var(--space-3) var(--space-4);
   /* Rumus dibungkus alih-alih digulir, agar terbaca di layar sempit tanpa scroll. */
   white-space: pre-wrap;
   overflow-wrap: anywhere;
   line-height: 1.7;
   background: var(--tint);
-  border-left: var(--border-mark) solid var(--ink-3);
+  border-left: var(--border-hair) solid var(--rule-strong);
 }
 
-.content pre code {
+:is(.prose, .content) pre code {
   padding: 0;
   background: none;
 }
 
-.content :not(pre) > code {
+:is(.prose, .content) :not(pre) > code {
   white-space: nowrap;
 }
 
-.content table {
+:is(.prose, .content) table {
   display: block;
   max-width: 100%;
   overflow-x: auto;
@@ -725,9 +733,14 @@ svg {
   font-size: var(--text-sm);
 }
 
-.content th,
-.content td {
+:is(.prose, .content) th,
+:is(.prose, .content) td {
   padding: 0.5rem 0.75rem;
   text-align: left;
-  border-bottom: 1px solid var(--rule);
+  border-bottom: var(--border-hair) solid var(--rule);
+}
+
+:is(.prose, .content) th {
+  font-weight: var(--weight-strong);
+  border-bottom-color: var(--rule-strong);
 }

@@ -1,25 +1,30 @@
 ---
-// Panggung hero (R9.1): artefak filosofis + visualisasi risiko dalam satu bidang gelap.
+// Hero "Pelat Ukiran" (docs/redesign-brief.md → Tahap 3): satu pelat gelap besar berbingkai ganda di atas
+// kertas, berisi logo dengan kedalaman berlapis (2.5D, tanpa library):
+//   1. belakang: kisi waktu × harga (CSS) + spiral emas vektor (figures/GoldenSpiral) yang matanya tepat di jam
+//      pasir figur — waktu berputar masuk ke "sekarang";
+//   2. tengah: emblem resmi (BrandEmblem, versi hitam, dilebur `screen`, tidak diwarnai ulang). Potongan hanya
+//      tepi pelat (jubah bawah & bahu kiri); kepala dan jam pasir selalu utuh;
+//   3. depan: medan hasil prosedural (src/lib/outcome-field.ts) — cabang kemungkinan dari jam pasir, selubung
+//      ±2σ ∝ √t, garis E[P] kuningan (satu-satunya lintasan kuningan), kurva kepadatan di T.
+// Dua komposisi dipilih dari lebar panggung sendiri (container query ≥ 34rem): lebar 1000×720 (figur kiri, medan
+// kanan) dan ringkas 600×760 (figur atas, garis potong, medan di bawah dengan satu jalur masa lalu).
 //
-// Lapisan (satu sistem koordinat dengan rasio tetap, jadi posisi selalu sejajar):
-//   1. kisi koordinat samar (CSS);
-//   2. medan hasil prosedural (SVG, src/lib/outcome-field.ts): dari jam pasir di tangan figur ("sekarang"),
-//      masa depan bercabang ke kanan, selubung ±2σ, garis E[P] kuningan (satu-satunya), kurva kepadatan di T;
-//   3. emblem resmi (BrandEmblem `plate`, versi hitam, rata, tidak diwarnai ulang) dalam skala monumental.
-//      Potongan bingkai: tepi panggung hanya memotong jubah bawah dan bahu kiri; kepala dan jam pasir selalu utuh.
-// Dua komposisi, dipilih dari lebar panggung sendiri (container query, ≥ 34rem = lebar): lebar (1000×720, figur kiri &
-// medan kanan) dan ringkas (600×760, figur atas dipotong
-// garis, medan di bawah dengan garis bantu dari jam pasir ke "sekarang" dan satu jalur masa lalu).
-// Gerak (satu interaksi): saat menggulir melewati hero, horizon bertambah 1T → 2T dan sebaran melebar ∝ √t
-// (skala CSS pada grup SVG), emblem bergeser sangat sedikit (paralaks). Tanpa JS / gerak dikurangi: keadaan 1T diam.
-// R9.2 (kedalaman & gerak halus, hanya saat panggung terlihat, mati di bawah prefers-reduced-motion):
-//   - paralaks kursor per lapisan (kisi → emblem → medan) + kemiringan kecil medan (`--parallax-pointer`, `--tilt-max`);
-//   - siklus jejak (`traceAt`, `--motion-ambient`): denyut di "sekarang" (jam pasir) → satu jalur ditempuh sampai T →
-//     penanda pendaratan di kurva kepadatan → pudar; setiap siklus jalur lain. Tanpa blur/glow, hanya opasitas garis.
-//   Emblem sendiri tidak dianimasikan selain pergeseran (aturan merek: tidak digambar ulang/diwarnai ulang).
+// Gerak (satu momen utama situs), semuanya CSS scroll-driven (`view-timeline` pada pelat) dan hanya bila
+// `prefers-reduced-motion: no-preference` + browser mendukung `animation-timeline`; selain itu pelat tampil diam
+// dan lengkap (keadaan akhir):
+//   - lapisan bergeser dengan kecepatan berbeda (--hero-shift-back/mid/front; dikurangi di mobile);
+//   - cabang "tergambar" dari jam pasir, spiral terurai dari matanya di jam pasir (stroke-dashoffset, `pathLength="1"`);
+//   - lalu kilau tipis menyapu pelat (--hero-sheen), sekali per arah gulir.
+// Kemiringan kursor (maks --hero-tilt, 4°) + paralaks kursor per lapisan: skrip kecil, dipasang saat browser
+// idle, hanya desktop dengan kursor halus. Benang merah ke bagian "Anggaran salah": garis kuningan dari "Sekarang"
+// turun keluar pelat sampai judul bagian berikutnya, diakhiri glyph jam pasir.
 import { siteConfig } from '../../config/site';
+import { spiralEye } from '../../lib/golden-spiral';
 import { outcomeField } from '../../lib/outcome-field';
 import BrandEmblem from '../BrandEmblem.astro';
+import GoldenSpiral from './GoldenSpiral.astro';
+import HourglassGlyph from './HourglassGlyph.astro';
 
 // Komposisi lebar: 1000×720. Titik "sekarang" tepat di kanan jam pasir figur.
 const W = { w: 1000, h: 720, x0: 684, y0: 347, xT: 905, sigmaT: 66, axis: 664 };
@@ -41,382 +46,242 @@ const past = (() => {
 })();
 
 const pct = (v: number, of: number) => `${Math.round((v / of) * 10000) / 100}%`;
-const origin = (x: number, y: number, box: { w: number; h: number }) => `${pct(x, box.w)} ${pct(y, box.h)}`;
+
+// Kotak emblem per komposisi (satuan viewBox). Lebar: figur digeser ke kiri (revisi Tahap 3) agar ada jarak
+// antara jam pasir (tepi kanan ±603) dan sumbu Harga/"sekarang" (x0 = 684); kepala tetap utuh (tepi kiri ±49).
+// Garis bantu tipis menyambungkan jam pasir ke "sekarang". Ringkas tidak berubah.
+const ART_WIDE = { x: -220, y: -6, w: 860 };
+const ART_COMPACT = { x: -200, y: -10, w: 700 };
+
+// Spiral emas: matanya di pusat jam pasir yang dipegang figur. Pusat jam pasir pada aset 1024px ≈ (830, 420),
+// lalu dipetakan lewat kotak emblem tiap komposisi → lebar (477, 347), ringkas (367, 277).
+// Tepi kanan jam pasir pada aset ≈ 980/1024.
+const HOURGLASS = { x: 830 / 1024, y: 420 / 1024, right: 980 / 1024 };
+const hourglassRightWide = Math.round(ART_WIDE.x + HOURGLASS.right * ART_WIDE.w);
+const spiralBox = (box: { w: number; h: number }, art: { x: number; y: number; w: number }, width: number) => {
+  const [ex, ey] = spiralEye(1000);
+  const k = width / 1000;
+  const eye = { x: art.x + HOURGLASS.x * art.w, y: art.y + HOURGLASS.y * art.w };
+  return `left: ${pct(eye.x - ex * k, box.w)}; top: ${pct(eye.y - ey * k, box.h)}; width: ${pct(width, box.w)}`;
+};
+const spiralWide = spiralBox(W, ART_WIDE, 1400);
+const spiralCompact = spiralBox(C, ART_COMPACT, 900);
+const artWideStyle = `--art-wide-left: ${pct(ART_WIDE.x, W.w)}; --art-wide-top: ${pct(ART_WIDE.y, W.h)}; --art-wide-width: ${pct(ART_WIDE.w, W.w)}`;
 ---
 
-<figure class="stage plate" data-stage aria-labelledby="stage-caption">
-  <div class="stage__field">
-    <!-- Lapisan 2: medan hasil. Dekoratif-informatif; artinya ada di keterangan. -->
-    <svg
-      class="stage__svg stage__svg--wide"
-      viewBox={`0 0 ${W.w} ${W.h}`}
-      aria-hidden="true"
-      focusable="false"
-      data-field={JSON.stringify({ x0: W.x0, y0: W.y0, xT: W.xT, sigmaT: W.sigmaT, dw: 58 })}
-    >
-      <path class="svg-axis" d={`M${W.x0} ${W.axis} H${W.w - 24}`}></path>
-      <path class="svg-tick" d={[0, 1, 2, 3, 4, 5, 6].map((i) => `M${W.x0 + i * ((W.xT - W.x0) / 6)} ${W.axis} v6`).join(' ')}></path>
-      <path class="svg-guide" d={`M${W.x0} 96 V${W.axis}`}></path>
-      <path class="svg-guide" d={`M${W.xT} 96 V${W.axis}`}></path>
-      <g class="stage__spread" style={`transform-origin: ${origin(W.x0, W.y0, W)}`}>
-        {wide.paths.map((d) => <path class="stage__path" d={d} />)}
+<div class="stage-wrap">
+  <figure class="stage plate" data-stage aria-labelledby="stage-caption">
+    <div class="stage__field" style={artWideStyle}>
+      <!-- Lapisan 1b: spiral emas (belakang, di atas kisi). Dekoratif. -->
+      <div class="stage__spiral stage__spiral--wide" style={spiralWide}>
+        <GoldenSpiral iterations={10} />
+      </div>
+      <div class="stage__spiral stage__spiral--compact" style={spiralCompact}>
+        <GoldenSpiral iterations={10} />
+      </div>
+
+      <!-- Lapisan 2: emblem resmi. Hanya dipindah; potongan oleh tepi pelat. -->
+      <div class="stage__art">
+        <div class="stage__art-inner">
+          <BrandEmblem />
+        </div>
+      </div>
+
+      <!-- Lapisan 3: medan hasil. Dekoratif-informatif; artinya ada di keterangan. -->
+      <svg class="stage__svg stage__svg--wide" viewBox={`0 0 ${W.w} ${W.h}`} aria-hidden="true" focusable="false">
+        <path class="svg-axis" d={`M${W.x0} ${W.axis} H${W.w - 24}`}></path>
+        <path class="svg-tick" d={[0, 1, 2, 3, 4, 5, 6].map((i) => `M${W.x0 + i * ((W.xT - W.x0) / 6)} ${W.axis} v6`).join(' ')}></path>
+        <path class="svg-guide stage__now-guide" d={`M${W.x0} 96 V${W.h}`}></path>
+        <path class="svg-guide" d={`M${W.xT} 96 V${W.axis}`}></path>
+        <path class="svg-guide" d={`M${hourglassRightWide + 8} ${W.y0} H${W.x0 - 8}`}></path>
+        {wide.paths.map((d) => <path class="stage__path stage__draw" d={d} pathLength="1" />)}
         <path class="stage__envelope" d={wide.upper}></path>
         <path class="stage__envelope" d={wide.lower}></path>
-        <path class="stage__trace" d="" data-trace></path>
-      </g>
-      <g class="stage__density" style={`transform-origin: ${origin(W.xT, W.y0, W)}`}>
         <path class="stage__density-curve" d={wide.density}></path>
-      </g>
-      <path class="stage__expected" d={wide.expected}></path>
-      <circle class="stage__now" cx={W.x0} cy={W.y0} r="4.5"></circle>
-      <g class="stage__ambient">
-        <circle class="stage__pulse" cx={W.x0} cy={W.y0} r="4.5" data-pulse></circle>
-        <path class="stage__landing" d="" data-landing></path>
-        <circle class="stage__head" cx={W.x0} cy={W.y0} r="3" data-head></circle>
-      </g>
-      <g class="stage__labels">
-        <text x={W.x0} y={W.axis + 26} text-anchor="middle">Sekarang</text>
-        <text x={W.xT} y={W.axis + 26} text-anchor="middle">T</text>
-        <text x={W.w - 24} y={W.axis - 10} text-anchor="end">Waktu →</text>
-        <text x={W.x0 + 8} y="90">Harga</text>
-        <text class="stage__label-mark" x={W.xT - 6} y={W.y0 - 8} text-anchor="end">E[P]</text>
-      </g>
-    </svg>
+        <path class="stage__expected" d={wide.expected}></path>
+        <circle class="stage__now" cx={W.x0} cy={W.y0} r="4.5"></circle>
+        <g class="stage__labels stage__labels--wide">
+          <text x={W.x0 - 10} y={W.axis + 28} text-anchor="end">Sekarang</text>
+          <text x={W.xT + 8} y={W.axis - 10}>T</text>
+          <text x={W.w - 24} y={W.axis + 28} text-anchor="end">Waktu →</text>
+          <text x={W.x0 + 8} y="92">Harga</text>
+          <text class="stage__label-mark" x={W.xT - 8} y={W.y0 - 10} text-anchor="end">E[P]</text>
+        </g>
+      </svg>
 
-    <svg
-      class="stage__svg stage__svg--compact"
-      viewBox={`0 0 ${C.w} ${C.h}`}
-      aria-hidden="true"
-      focusable="false"
-      data-field={JSON.stringify({ x0: C.x0, y0: C.y0, xT: C.xT, sigmaT: C.sigmaT, dw: 40 })}
-    >
-      <path class="stage__cut" d={`M0 ${C.cut} H${C.w}`}></path>
-      <path class="svg-guide" d={`M${C.x0} 452 V${C.axis}`}></path>
-      <path class="svg-axis" d={`M24 ${C.axis} H${C.w - 16}`}></path>
-      <path class="stage__past" d={past}></path>
-      <g class="stage__spread" style={`transform-origin: ${origin(C.x0, C.y0, C)}`}>
-        {compact.paths.map((d) => <path class="stage__path" d={d} />)}
+      <svg class="stage__svg stage__svg--compact" viewBox={`0 0 ${C.w} ${C.h}`} aria-hidden="true" focusable="false">
+        <path class="stage__cut" d={`M0 ${C.cut} H${C.w}`}></path>
+        <path class="svg-guide stage__now-guide" d={`M${C.x0} 452 V${C.h}`}></path>
+        <path class="svg-axis" d={`M24 ${C.axis} H${C.w - 16}`}></path>
+        <path class="stage__past" d={past}></path>
+        {compact.paths.map((d) => <path class="stage__path stage__draw" d={d} pathLength="1" />)}
         <path class="stage__envelope" d={compact.upper}></path>
         <path class="stage__envelope" d={compact.lower}></path>
-        <path class="stage__trace" d="" data-trace></path>
-      </g>
-      <g class="stage__density" style={`transform-origin: ${origin(C.xT, C.y0, C)}`}>
         <path class="stage__density-curve" d={compact.density}></path>
-      </g>
-      <path class="stage__expected" d={compact.expected}></path>
-      <circle class="stage__now" cx={C.x0} cy={C.y0} r="4"></circle>
-      <g class="stage__ambient">
-        <circle class="stage__pulse" cx={C.x0} cy={C.y0} r="4" data-pulse></circle>
-        <path class="stage__landing" d="" data-landing></path>
-        <circle class="stage__head" cx={C.x0} cy={C.y0} r="2.6" data-head></circle>
-      </g>
-      <g class="stage__labels">
-        <text x="28" y={C.y0 - 22}>Masa lalu</text>
-        <text x={C.x0} y={C.axis - 8} text-anchor="middle">Sekarang</text>
-        <text x={C.xT} y={C.axis - 8} text-anchor="middle">T</text>
-        <text class="stage__label-mark" x={C.xT - 4} y={C.y0 - 6} text-anchor="end">E[P]</text>
-      </g>
-    </svg>
-
-    <!-- Lapisan 3: emblem resmi. Hanya dipindah & diperbesar; potongan oleh tepi panggung. -->
-    <div class="stage__art">
-      <div class="stage__art-inner">
-        <BrandEmblem variant="plate" />
-      </div>
+        <path class="stage__expected" d={compact.expected}></path>
+        <circle class="stage__now" cx={C.x0} cy={C.y0} r="4"></circle>
+        <g class="stage__labels stage__labels--compact">
+          <text x="28" y={C.y0 - 24}>Masa lalu</text>
+          <text x={C.x0 - 8} y={C.axis - 8} text-anchor="end">Sekarang</text>
+          <text x={C.xT - 8} y={C.axis - 8} text-anchor="end">T</text>
+          <text class="stage__label-mark" x={C.xT - 8} y={C.y0 - 8} text-anchor="end">E[P]</text>
+        </g>
+      </svg>
     </div>
 
-    <p class="stage__readout label" aria-hidden="true">
-      <span>Horizon <b data-stage-out="horizon">1,0</b>T</span><span class="label__sep">·</span><span>Sebaran ×<b data-stage-out="spread">1,00</b></span>
-    </p>
-  </div>
+    <figcaption id="stage-caption" class="stage__caption">
+      <p class="label">
+        <span class="label__index">Fig. 00</span><span class="label__sep" aria-hidden="true">·</span>Waktu × harga
+      </p>
+      <p class="stage__text">
+        Dari jam pasir di tangan figur, masa depan bercabang: setiap garis satu kemungkinan, garis kuningan nilai
+        harapan, kurva di T sebaran hasilnya. Semakin jauh horizon, semakin lebar sebarannya (σ ∝ √t). Ilustrasi
+        konsep, bukan data pasar.
+      </p>
+      <p class="label stage__object">
+        <span class="label__index">Objek 00</span><span class="label__sep" aria-hidden="true">·</span>{`Emblem ${siteConfig.masterBrand}`}
+      </p>
+    </figcaption>
+    <span class="stage__sheen" aria-hidden="true"></span>
+  </figure>
 
-  <figcaption id="stage-caption" class="stage__caption">
-    <p class="label">
-      <span class="label__index">Fig. 00</span><span class="label__sep" aria-hidden="true">·</span>Waktu × harga
-    </p>
-    <p class="stage__text">
-      Dari jam pasir di tangan figur, masa depan bercabang: setiap garis satu kemungkinan, garis kuningan nilai
-      harapan, kurva di T sebaran hasilnya. Semakin jauh horizon, semakin lebar sebarannya (σ ∝ √t). Ilustrasi
-      konsep, bukan data pasar.
-    </p>
-    <p class="label stage__object">
-      <span class="label__index">Objek 00</span><span class="label__sep" aria-hidden="true">·</span>{`Emblem ${siteConfig.masterBrand}`}
-    </p>
-  </figcaption>
-</figure>
+  <!-- Benang merah: "Sekarang" turun ke anggaran salah (jam pasir modal) di bagian berikutnya. -->
+  <div class="stage__thread" aria-hidden="true">
+    <span class="stage__thread-line"></span>
+    <HourglassGlyph fill={0.6} />
+  </div>
+</div>
 
 <script>
-  import { horizonAt, nextTraceIndex, traceAt } from '../../lib/outcome-field';
-
-  const fmt = (v: number, digits: number) =>
-    new Intl.NumberFormat('id-ID', { minimumFractionDigits: digits, maximumFractionDigits: digits }).format(v);
-  const r1 = (n: number) => Math.round(n * 10) / 10;
-  // Durasi token dalam ms; minifier CSS menulis ulang `6400ms` menjadi `6.4s`, jadi satuannya harus dibaca.
-  const toMs = (v: string) => {
-    const n = parseFloat(v);
-    if (!Number.isFinite(n)) return 0;
-    return v.trim().endsWith('ms') ? n : v.trim().endsWith('s') ? n * 1000 : n;
-  };
-  // Jalur daun hanya berisi perintah M/L (outcome-field.ts), jadi cukup ambil pasangan angkanya.
-  const toPoints = (d: string): [number, number][] =>
-    [...d.matchAll(/[ML](-?[\d.]+) (-?[\d.]+)/g)].map((m) => [Number(m[1]), Number(m[2])]);
-
-  type Field = { x0: number; y0: number; xT: number; sigmaT: number; dw: number };
-  type Layer = {
-    svg: SVGSVGElement;
-    field: Field;
-    leaves: [number, number][][];
-    trace: SVGPathElement;
-    pulse: SVGCircleElement;
-    head: SVGCircleElement;
-    landing: SVGPathElement;
-    r0: number;
-    index: number;
-  };
-
+  // Kemiringan kursor + paralaks kursor per lapisan (desktop, kursor halus). Dipasang saat browser idle agar tidak
+  // bersaing dengan render awal. Tidak ada loop terus-menerus: rAF hanya berjalan sampai nilai menetap.
   const stage = document.querySelector<HTMLElement>('[data-stage]');
+  const desktop = window.matchMedia('(hover: hover) and (pointer: fine) and (min-width: 64rem)');
   const reduce = window.matchMedia('(prefers-reduced-motion: reduce)');
-  const finePointer = window.matchMedia('(hover: hover) and (pointer: fine)');
+  const whenIdle = (fn: () => void) =>
+    typeof window.requestIdleCallback === 'function' ? window.requestIdleCallback(fn, { timeout: 2000 }) : setTimeout(fn, 1200);
 
-  if (stage && 'IntersectionObserver' in window) {
-    const horizonOut = stage.querySelector<HTMLElement>('[data-stage-out="horizon"]')!;
-    const spreadOut = stage.querySelector<HTMLElement>('[data-stage-out="spread"]')!;
-    const layers: Layer[] = [...stage.querySelectorAll<SVGSVGElement>('[data-field]')].map((svg) => {
-      const trace = svg.querySelector<SVGPathElement>('[data-trace]')!;
-      const pulse = svg.querySelector<SVGCircleElement>('[data-pulse]')!;
-      const field = JSON.parse(svg.dataset.field!) as Field;
-      const leaves = [...svg.querySelectorAll('.stage__path')].map((p) => toPoints(p.getAttribute('d') ?? ''));
-      // Siklus pertama: hasil yang paling khas (mendarat paling dekat ke puncak kurva), bukan ekor.
-      const gap = (pts: [number, number][]) => Math.abs(pts[pts.length - 1]![1] - field.y0);
-      const typical = leaves.reduce((best, pts, i) => (gap(pts) < gap(leaves[best]!) ? i : best), 0);
-      return {
-        svg,
-        field,
-        leaves,
-        trace,
-        pulse,
-        head: svg.querySelector<SVGCircleElement>('[data-head]')!,
-        landing: svg.querySelector<SVGPathElement>('[data-landing]')!,
-        r0: Number(pulse.getAttribute('r')),
-        index: typical,
-      };
-    });
+  if (stage) {
+    whenIdle(() => {
+      const hero = stage.closest('section') ?? stage;
+      const target = { x: 0, y: 0 };
+      const eased = { x: 0, y: 0 };
+      let frame = 0;
+      let last = 0;
+      const clamp = (n: number) => Math.max(-1, Math.min(1, n));
 
-    let visible = false;
-    let spread = 1;
-    let last = '';
-    let scrollFrame = 0;
-    let loop = 0;
-    let lastTime = 0;
-    let cycleStart = -1;
-    let cycle = 0;
-    let period = 0;
-    let parallaxOn = false;
-    // Paralaks kursor: target (dari kursor) dan nilai yang dihaluskan menuju target, keduanya −1…1.
-    const target = { x: 0, y: 0 };
-    const eased = { x: 0, y: 0 };
-
-    const readTokens = () => {
-      const css = getComputedStyle(stage);
-      period = toMs(css.getPropertyValue('--motion-ambient'));
-      parallaxOn = finePointer.matches && (parseFloat(css.getPropertyValue('--parallax-pointer')) || 0) > 0;
-    };
-
-    // Gulir (R9.1): kemajuan 0–1 dari jarak gulir halaman (hero ada di puncak).
-    const updateScroll = () => {
-      scrollFrame = 0;
-      const progress = Math.min(1, Math.max(0, window.scrollY / (stage.offsetHeight * 0.9)));
-      const h = horizonAt(progress);
-      spread = h.spread;
-      stage.style.setProperty('--stage-progress', progress.toFixed(3));
-      stage.style.setProperty('--stage-spread', spread.toFixed(3));
-      const text = `${fmt(h.horizon, 1)}|${fmt(spread, 2)}`;
-      if (text !== last) {
-        last = text;
-        horizonOut.textContent = fmt(h.horizon, 1);
-        spreadOut.textContent = fmt(spread, 2);
-      }
-    };
-    const onScroll = () => {
-      if (visible && !scrollFrame) scrollFrame = requestAnimationFrame(updateScroll);
-    };
-
-    const active = () => layers.find((l) => l.svg.getClientRects().length > 0 && getComputedStyle(l.svg).display !== 'none');
-
-    const pickNext = (layer: Layer) => {
-      layer.index = nextTraceIndex(layer.index, layer.leaves.length);
-    };
-
-    // Potongan jalur sampai waktu xNow (jejak maju merata di sumbu waktu) + titik ujungnya (interpolasi).
-    const cut = (pts: [number, number][], xNow: number) => {
-      const out: [number, number][] = [pts[0]!];
-      for (let i = 1; i < pts.length; i++) {
-        const [xa, ya] = pts[i - 1]!;
-        const [xb, yb] = pts[i]!;
-        if (xb <= xNow) {
-          out.push([xb, yb]);
-          continue;
-        }
-        const t = (xNow - xa) / (xb - xa);
-        out.push([xNow, ya + (yb - ya) * t]);
-        break;
-      }
-      return out;
-    };
-
-    // Satu frame siklus jejak pada komposisi yang sedang tampil.
-    const drawTrace = (layer: Layer, u: number) => {
-      const f = traceAt(u);
-      const { x0, y0, xT, sigmaT, dw } = layer.field;
-      layer.pulse.setAttribute('r', r1(layer.r0 + f.pulseGrow * layer.r0 * 3.2).toString());
-      layer.pulse.style.opacity = (f.pulse * 0.85).toFixed(3);
-      const pts = cut(layer.leaves[layer.index]!, x0 + (xT - x0) * f.drawn);
-      layer.trace.setAttribute('d', pts.map(([x, y], i) => `${i ? 'L' : 'M'}${r1(x)} ${r1(y)}`).join(' '));
-      layer.trace.style.opacity = f.opacity.toFixed(3);
-      // Kepala di ujung jejak; grup sebaran diskalakan vertikal di sekitar y0, jadi y ikut diskalakan.
-      const pt = { x: pts[pts.length - 1]![0], y: pts[pts.length - 1]![1] };
-      const y = y0 + (pt.y - y0) * spread;
-      layer.head.setAttribute('cx', r1(pt.x).toString());
-      layer.head.setAttribute('cy', r1(y).toString());
-      layer.head.style.opacity = (f.drawn >= 1 ? f.opacity * 0.6 : f.opacity).toFixed(3);
-      // Pendaratan: garis dari sumbu T ke kurva kepadatan pada hasil yang sama (satu hasil di bawah kurva).
-      if (f.landed) {
-        const z = (pt.y - y0) / sigmaT;
-        const xCurve = xT + (dw * Math.exp(-0.5 * z * z)) / spread;
-        layer.landing.setAttribute('d', `M${r1(xT)} ${r1(y)} H${r1(xCurve)}`);
-        layer.landing.style.opacity = f.opacity.toFixed(3);
-      } else {
-        layer.landing.style.opacity = '0';
-      }
-    };
-
-    const tick = (now: number) => {
-      loop = 0;
-      if (!visible || reduce.matches) return;
-      const dt = lastTime ? Math.min(64, now - lastTime) : 16;
-      lastTime = now;
-
-      if (parallaxOn) {
+      const step = (now: number) => {
+        const dt = last ? Math.min(64, now - last) : 16;
+        last = now;
         const k = 1 - Math.exp(-dt / 140);
         eased.x += (target.x - eased.x) * k;
         eased.y += (target.y - eased.y) * k;
-        stage.style.setProperty('--px', eased.x.toFixed(4));
-        stage.style.setProperty('--py', eased.y.toFixed(4));
-      }
+        stage.style.setProperty('--tx', eased.x.toFixed(4));
+        stage.style.setProperty('--ty', eased.y.toFixed(4));
+        const settled = Math.abs(target.x - eased.x) < 0.001 && Math.abs(target.y - eased.y) < 0.001;
+        frame = settled ? 0 : requestAnimationFrame(step);
+        if (settled) last = 0;
+      };
+      const kick = () => {
+        if (!frame) frame = requestAnimationFrame(step);
+      };
 
-      const layer = period > 0 ? active() : undefined;
-      if (layer) {
-        if (cycleStart < 0) cycleStart = now;
-        const elapsed = (now - cycleStart) / period;
-        const n = Math.floor(elapsed);
-        if (n !== cycle) {
-          cycle = n;
-          pickNext(layer);
-        }
-        drawTrace(layer, elapsed - n);
-      }
-      loop = requestAnimationFrame(tick);
-    };
-
-    const start = () => {
-      if (!loop && visible && !reduce.matches) {
-        lastTime = 0;
-        loop = requestAnimationFrame(tick);
-      }
-    };
-    const stop = () => {
-      if (loop) cancelAnimationFrame(loop);
-      loop = 0;
-    };
-
-    const reset = () => {
-      stop();
-      for (const p of ['--stage-progress', '--stage-spread', '--px', '--py']) stage.style.removeProperty(p);
-      for (const l of layers) {
-        for (const el of [l.pulse, l.trace, l.head, l.landing]) el.style.opacity = '0';
-      }
-      target.x = target.y = eased.x = eased.y = 0;
-      spread = 1;
-      horizonOut.textContent = fmt(1, 1);
-      spreadOut.textContent = fmt(1, 2);
-      last = '';
-    };
-
-    // Kursor di mana pun di atas hero (bukan hanya panggung): posisi relatif terhadap pusat panggung, dibatasi −1…1.
-    const hero = stage.closest('section') ?? stage;
-    hero.addEventListener(
-      'pointermove',
-      (e) => {
-        if (!parallaxOn || e.pointerType !== 'mouse') return;
-        const r = stage.getBoundingClientRect();
-        target.x = Math.max(-1, Math.min(1, (e.clientX - (r.left + r.width / 2)) / (r.width / 2)));
-        target.y = Math.max(-1, Math.min(1, (e.clientY - (r.top + r.height / 2)) / (r.height / 2)));
-      },
-      { passive: true },
-    );
-    hero.addEventListener('pointerleave', () => {
-      target.x = target.y = 0;
+      hero.addEventListener(
+        'pointermove',
+        (e) => {
+          if (e.pointerType !== 'mouse' || !desktop.matches || reduce.matches) return;
+          const r = stage.getBoundingClientRect();
+          target.x = clamp((e.clientX - (r.left + r.width / 2)) / (r.width / 2));
+          target.y = clamp((e.clientY - (r.top + r.height / 2)) / (r.height / 2));
+          kick();
+        },
+        { passive: true },
+      );
+      hero.addEventListener('pointerleave', () => {
+        target.x = target.y = 0;
+        kick();
+      });
+      const reset = () => {
+        if (desktop.matches && !reduce.matches) return;
+        if (frame) cancelAnimationFrame(frame);
+        frame = last = 0;
+        target.x = target.y = eased.x = eased.y = 0;
+        stage.style.removeProperty('--tx');
+        stage.style.removeProperty('--ty');
+      };
+      reduce.addEventListener('change', reset);
+      desktop.addEventListener('change', reset);
     });
-
-    readTokens();
-    new IntersectionObserver(([entry]) => {
-      visible = !!entry?.isIntersecting && !reduce.matches;
-      if (visible) {
-        onScroll();
-        start();
-      } else stop();
-    }).observe(stage);
-    window.addEventListener('scroll', onScroll, { passive: true });
-    reduce.addEventListener('change', () => {
-      readTokens();
-      if (reduce.matches) {
-        visible = false;
-        reset();
-      } else {
-        visible = stage.getBoundingClientRect().bottom > 0;
-        onScroll();
-        start();
-      }
-    });
-    finePointer.addEventListener('change', readTokens);
   }
 </script>
 
 <style>
-  .stage {
-    --stage-progress: 0;
-    --stage-spread: 1;
-    --px: 0;
-    --py: 0;
+  .stage-wrap {
+    position: relative;
     container: stage / inline-size;
     min-width: 0;
-    margin: 0;
-    display: flex;
-    flex-direction: column;
-    border-inline: 0;
+    /* Kemiringan kursor: perspektif di pembungkus, rotasi di pelat. */
+    perspective: 1600px;
   }
 
-  /* Bidang panggung: kisi koordinat gelap sangat samar, rasio tetap per komposisi. */
+  .stage {
+    --tx: 0;
+    --ty: 0;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    margin: 0;
+    transform: rotateX(calc(var(--ty) * var(--hero-tilt) * -1)) rotateY(calc(var(--tx) * var(--hero-tilt)));
+    view-timeline: --stage block;
+  }
+
+  /* Bingkai ganda ala pelat buku: garis kedua di dalam tepi pelat. */
+  .stage::after {
+    content: '';
+    position: absolute;
+    inset: var(--space-2);
+    z-index: 3;
+    border: var(--border-hair) solid var(--plate-rule-strong);
+    pointer-events: none;
+  }
+
   .stage__field {
     position: relative;
     overflow: hidden;
     aspect-ratio: 600 / 760;
   }
 
-  /* Lapisan 1 sebagai elemen semu sendiri (lebih besar satu sel di tiap sisi) agar paralaks kursor tidak membuka tepi. */
+  /* Lapisan 1a: kisi waktu × harga (lebih besar dari bidang agar geseran tidak membuka tepi). */
   .stage__field::before {
     content: '';
     position: absolute;
-    inset: calc(-1 * var(--grid-cell));
+    inset: calc(-4 * var(--grid-cell));
     background-image:
       linear-gradient(to right, var(--plate-grid) var(--stroke-hair), transparent var(--stroke-hair)),
       linear-gradient(to bottom, var(--plate-grid) var(--stroke-hair), transparent var(--stroke-hair));
     background-size: var(--grid-cell) var(--grid-cell);
-    transform: translate3d(
-      calc(var(--px) * var(--parallax-pointer) * -0.25),
-      calc(var(--py) * var(--parallax-pointer) * -0.25),
-      0
-    );
+    transform: translate3d(calc(var(--tx) * var(--hero-pointer) * -0.3), calc(var(--ty) * var(--hero-pointer) * -0.3), 0);
+  }
+
+  /* Kilau: pita cahaya tipis yang menyapu seluruh pelat. Tak terlihat tanpa animasi (keadaan diam = pelat polos). */
+  .stage__sheen {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    background: linear-gradient(105deg, transparent 38%, var(--hero-sheen) 50%, transparent 62%) 120% 0 / 250% 100% no-repeat;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .stage__spiral {
+    position: absolute;
+    opacity: 0.55;
+    transform: translate3d(calc(var(--tx) * var(--hero-pointer) * -0.3), calc(var(--ty) * var(--hero-pointer) * -0.3), 0);
+  }
+
+  .stage__spiral--wide {
+    display: none;
   }
 
   .stage__svg {
@@ -425,10 +290,7 @@ const origin = (x: number, y: number, box: { w: number; h: number }) => `${pct(x
     width: 100%;
     height: 100%;
     overflow: visible;
-    /* Lapisan terdepan: geser penuh + kemiringan kecil ke arah kursor (R9.2). Nol saat diam/gerak dikurangi. */
-    transform: perspective(1600px)
-      translate3d(calc(var(--px) * var(--parallax-pointer) * -1), calc(var(--py) * var(--parallax-pointer) * -1), 0)
-      rotateY(calc(var(--px) * var(--tilt-max))) rotateX(calc(var(--py) * var(--tilt-max) * -1));
+    transform: translate3d(calc(var(--tx) * var(--hero-pointer) * -1), calc(var(--ty) * var(--hero-pointer) * -1), 0);
   }
 
   .stage__svg--wide {
@@ -479,32 +341,9 @@ const origin = (x: number, y: number, box: { w: number; h: number }) => `${pct(x
     stroke-width: var(--stroke-trace);
   }
 
-  /* R9.2: siklus jejak. Tak terlihat tanpa JS / gerak dikurangi (keadaan diam = gambar R9.1). Tanpa blur/glow. */
-  .stage__trace {
-    fill: none;
-    stroke: var(--plate-ink);
-    stroke-width: var(--stroke-trace);
-    stroke-linejoin: round;
-    opacity: 0;
-  }
-
-  .stage__pulse {
-    fill: none;
+  .stage__now-guide {
     stroke: var(--plate-mark);
-    stroke-width: var(--stroke-hair);
-    opacity: 0;
-  }
-
-  .stage__head {
-    fill: var(--plate-ink);
-    opacity: 0;
-  }
-
-  .stage__landing {
-    fill: none;
-    stroke: var(--plate-ink);
-    stroke-width: var(--stroke-trace);
-    opacity: 0;
+    stroke-opacity: 0.7;
   }
 
   .stage__cut {
@@ -513,30 +352,31 @@ const origin = (x: number, y: number, box: { w: number; h: number }) => `${pct(x
     stroke-width: var(--stroke-hair);
   }
 
+  /* Label grafik = gaya caption Fig./Objek (italic small caps). Latar pelat di belakang huruf (stroke warna
+     pelat, dilukis di bawah isi) memutus garis yang lewat, jadi label tidak pernah tertimpa garis.
+     Ukuran dalam satuan viewBox: ±13–15px pada lebar pelat biasa. */
   .stage__labels {
     fill: var(--plate-ink-3);
     font-family: var(--font-label);
-    font-size: 13px;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
+    font-style: italic;
+    font-variant-caps: small-caps;
+    letter-spacing: 0.02em;
+    paint-order: stroke;
+    stroke: var(--plate);
+    stroke-width: 5px;
+    stroke-linejoin: round;
+  }
+
+  .stage__labels--wide {
+    font-size: 21px;
+  }
+
+  .stage__labels--compact {
+    font-size: 23px;
   }
 
   .stage__label-mark {
     fill: var(--plate-mark);
-  }
-
-  /* Satu interaksi: sebaran tumbuh ∝ √horizon saat menggulir. Kurva di T melebar dan memendek (luas tetap). */
-  .stage__spread,
-  .stage__density {
-    transform-box: view-box;
-  }
-
-  .stage__spread {
-    transform: scaleY(var(--stage-spread));
-  }
-
-  .stage__density {
-    transform: scale(calc(1 / var(--stage-spread)), var(--stage-spread));
   }
 
   /* Emblem: diposisikan dalam persen bidang agar sejajar dengan medan. */
@@ -548,50 +388,20 @@ const origin = (x: number, y: number, box: { w: number; h: number }) => `${pct(x
     pointer-events: none;
   }
 
-  /* `transform` membuat grup terisolasi, jadi blend `screen` dipasang di grup ini (bukan hanya di <img>):
-     latar hitam murni emblem melebur ke panggung, bukan tampil sebagai kotak hitam. */
+  /* `transform` membuat grup terisolasi, jadi blend `screen` dipasang di grup ini (bukan hanya di <img>). */
   .stage__art-inner {
     position: absolute;
     left: calc(-200 / 600 * 100%);
     top: calc(-10 / 500 * 100%);
     width: calc(700 / 600 * 100%);
     mix-blend-mode: screen;
-    /* Gulir (R9.1) + kursor (R9.2, lapisan tengah 55%). */
-    transform: translate3d(
-      calc(var(--px) * var(--parallax-pointer) * -0.55),
-      calc(var(--py) * var(--parallax-pointer) * -0.55 - var(--stage-progress) * var(--parallax-shift)),
-      0
-    );
-  }
-
-  .stage__art-inner :global(.emblem--plate) {
-    width: 100%;
-  }
-
-  /* Ringkas: pembacaan di pita medan, tepat di bawah garis potong (tidak menimpa figur), di sisi kiri yang
-     kosong (di atas jalur masa lalu) agar tidak bertabrakan dengan kurva sebaran saat sebaran melebar. */
-  .stage__readout {
-    position: absolute;
-    top: calc(512 / 760 * 100%);
-    left: var(--space-4);
-    display: flex;
-    gap: var(--space-1);
-    margin: 0;
-    /* Garis bantu "sekarang" berhenti di belakang teks, tidak memotong angka. */
-    padding-inline-end: var(--space-1);
-    background: var(--plate);
-    color: var(--plate-ink-3);
-  }
-
-  .stage__readout b {
-    font-weight: 400;
-    color: var(--plate-ink);
+    transform: translate3d(calc(var(--tx) * var(--hero-pointer) * -0.6), calc(var(--ty) * var(--hero-pointer) * -0.6), 0);
   }
 
   .stage__caption {
     display: grid;
     gap: var(--space-2);
-    padding: var(--space-4) var(--gutter) var(--space-6);
+    padding: var(--space-4) var(--space-6) var(--space-8);
     border-top: var(--border-hair) solid var(--plate-rule);
   }
 
@@ -605,18 +415,44 @@ const origin = (x: number, y: number, box: { w: number; h: number }) => `${pct(x
     color: var(--plate-ink-2);
   }
 
-  /* Komposisi lebar ditentukan oleh lebar panggung sendiri (container query), bukan lebar layar: panggung
-     yang sempit selalu memakai komposisi ringkas dan keterangan bertumpuk, jadi teks tidak pernah bertabrakan. */
+  /* Benang merah: garis kuningan dari "Sekarang" (x0) keluar pelat sampai judul bagian berikutnya.
+     Di luar alur tata letak (absolut di bawah pelat); panjangnya diatur wadah (HomeLanding) lewat
+     --stage-thread-length = jarak dari tepi bawah pelat ke garis judul bagian berikutnya. */
+  .stage__thread {
+    position: absolute;
+    top: 100%;
+    left: calc(368 / 600 * 100% - 0.375rem);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 0.75rem;
+    height: var(--stage-thread-length, var(--space-16));
+    color: var(--ink-2);
+    transform-origin: top center;
+  }
+
+  .stage__thread-line {
+    flex: 1;
+    width: var(--stroke-hair);
+    background: var(--brass);
+  }
+
+  .stage__thread :global(.glyph-hourglass) {
+    margin-top: var(--space-1);
+  }
+
   @container stage (min-width: 34rem) {
     .stage__field {
       aspect-ratio: 1000 / 720;
     }
 
-    .stage__svg--wide {
+    .stage__svg--wide,
+    .stage__spiral--wide {
       display: block;
     }
 
-    .stage__svg--compact {
+    .stage__svg--compact,
+    .stage__spiral--compact {
       display: none;
     }
 
@@ -625,28 +461,171 @@ const origin = (x: number, y: number, box: { w: number; h: number }) => `${pct(x
     }
 
     .stage__art-inner {
-      left: -15%;
-      top: calc(-6 / 720 * 100%);
-      width: 86%;
+      left: var(--art-wide-left);
+      top: var(--art-wide-top);
+      width: var(--art-wide-width);
     }
 
-    .stage__readout {
-      top: var(--space-6);
-      right: var(--space-6);
-      left: auto;
-    }
-
-    /* Label figur & objek sebaris, teks keterangan di bawahnya selebar kolom baca. */
     .stage__caption {
       grid-template-columns: minmax(0, 1fr) auto;
       align-items: baseline;
       gap: var(--space-2) var(--space-6);
-      padding: var(--space-4) var(--space-6) var(--space-6);
+      padding: var(--space-4) var(--space-8) var(--space-8);
     }
 
     .stage__text {
       grid-column: 1 / -1;
       grid-row: 2;
+    }
+
+    .stage__thread {
+      left: calc(684 / 1000 * 100% - 0.375rem);
+    }
+  }
+
+  /* ---------- Momen hero: scroll-driven (keadaan diam di atas = keadaan akhir) ---------- */
+  @keyframes stage-draw {
+    from {
+      stroke-dashoffset: var(--draw-from, 0.85);
+    }
+    to {
+      stroke-dashoffset: 0;
+    }
+  }
+
+  @keyframes stage-shift {
+    from {
+      translate: 0 calc(var(--shift) * -1);
+    }
+    to {
+      translate: 0 var(--shift);
+    }
+  }
+
+  /* Desktop: mulai dari nol (komposisi tepat saat halaman dibuka). */
+  @keyframes stage-shift-down {
+    from {
+      translate: 0 0;
+    }
+    to {
+      translate: 0 var(--shift);
+    }
+  }
+
+  @keyframes stage-sheen {
+    0% {
+      opacity: 0;
+      background-position: 120% 0;
+    }
+    25%,
+    75% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 0;
+      background-position: -20% 0;
+    }
+  }
+
+  @keyframes thread-draw {
+    from {
+      transform: scaleY(0);
+    }
+    to {
+      transform: scaleY(1);
+    }
+  }
+
+  /* Garis waktu: mobile/tablet memakai view timeline pelat (pelat masuk dari bawah, di bawah teks hero);
+     desktop memakai gulir halaman dari atas (pelat sudah terlihat penuh saat halaman dibuka, jadi gerak dimulai
+     dari keadaan awal yang tenang: cabang & spiral baru sebagian, paralaks nol). */
+  /* Longhand sengaja (bukan `animation:`): minifier menggabungkan shorthand + animation-timeline menjadi satu
+     shorthand yang ditolak Chrome, sehingga animasinya hilang. */
+  @supports (animation-timeline: view()) {
+    @media (prefers-reduced-motion: no-preference) {
+      /* Garis tergambar: cabang dari jam pasir ke kanan (awal path); spiral dari matanya di jam pasir ke luar
+         (akhir path, jadi offset negatif). */
+      .stage__draw,
+      .stage__spiral :global(.golden-spiral__curve) {
+        stroke-dasharray: 1;
+        animation-name: stage-draw;
+        animation-timing-function: linear;
+        animation-fill-mode: both;
+        animation-timeline: --stage;
+        animation-range: entry 40% cover 50%;
+      }
+
+      .stage__spiral :global(.golden-spiral__curve) {
+        --draw-from: -0.8;
+      }
+
+      /* Paralaks gulir: lapisan jauh tertinggal, lapisan depan mendahului. */
+      .stage__field::before,
+      .stage__spiral,
+      .stage__art-inner,
+      .stage__svg {
+        animation-name: stage-shift;
+        animation-timing-function: linear;
+        animation-fill-mode: both;
+        animation-timeline: --stage;
+        animation-range: cover 0% cover 100%;
+      }
+
+      .stage__field::before,
+      .stage__spiral {
+        --shift: var(--hero-shift-back);
+      }
+
+      .stage__art-inner {
+        --shift: var(--hero-shift-mid);
+      }
+
+      .stage__svg {
+        --shift: var(--hero-shift-front);
+      }
+
+      .stage__sheen {
+        animation-name: stage-sheen;
+        animation-timing-function: linear;
+        animation-fill-mode: both;
+        animation-timeline: --stage;
+        animation-range: cover 50% cover 78%;
+      }
+
+      .stage__thread {
+        animation-name: thread-draw;
+        animation-timing-function: linear;
+        animation-fill-mode: both;
+        animation-timeline: view();
+        animation-range: entry 0% cover 45%;
+      }
+
+      @media (min-width: 64rem) {
+        .stage__draw,
+        .stage__spiral :global(.golden-spiral__curve) {
+          --draw-from: 0.7;
+          animation-timeline: scroll(root);
+          animation-range: 0 25vh;
+        }
+
+        .stage__spiral :global(.golden-spiral__curve) {
+          --draw-from: -0.7;
+        }
+
+        .stage__field::before,
+        .stage__spiral,
+        .stage__art-inner,
+        .stage__svg {
+          animation-name: stage-shift-down;
+          animation-timeline: scroll(root);
+          animation-range: 0 100vh;
+        }
+
+        .stage__sheen {
+          animation-timeline: scroll(root);
+          animation-range: 20vh 50vh;
+        }
+      }
     }
   }
 </style>

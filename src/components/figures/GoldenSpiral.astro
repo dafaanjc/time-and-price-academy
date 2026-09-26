@@ -1,0 +1,54 @@
+---
+// Spiral emas sebagai motif vektor (garis kuningan): hubungan waktu dan harga yang ada di balik figur emblem,
+// digambar ulang agar bisa dipakai terpisah (hero Tahap 3, ornamen). Geometri: src/lib/golden-spiral.ts.
+// Satu ornamen per area. Dekoratif (aria-hidden); maknanya selalu dibawa teks di sekitarnya.
+// Garis `pathLength="1"` agar bisa "digambar" dengan stroke-dashoffset 1 → 0.
+import { goldenSpiral, spiralPath, squaresPath } from '../../lib/golden-spiral';
+
+interface Props {
+  /** Jumlah persegi (dan seperempat lingkaran). */
+  iterations?: number;
+  /** Tampilkan garis pembagi persegi panjang emas (tipis) di belakang spiral. */
+  squares?: boolean;
+  class?: string;
+}
+
+const { iterations = 9, squares = true, class: className } = Astro.props;
+const width = 1000;
+const spiral = goldenSpiral(width, iterations);
+const pad = 2;
+---
+
+<svg
+  class:list={['golden-spiral', className]}
+  viewBox={`${-pad} ${-pad} ${width + 2 * pad} ${spiral.height + 2 * pad}`}
+  aria-hidden="true"
+  focusable="false"
+>
+  {squares && <path class="golden-spiral__squares" d={squaresPath(spiral)}></path>}
+  <path class="golden-spiral__curve" d={spiralPath(spiral)} pathLength="1"></path>
+</svg>
+
+<style>
+  .golden-spiral {
+    display: block;
+    width: 100%;
+    height: auto;
+    overflow: visible;
+  }
+
+  .golden-spiral__squares {
+    fill: none;
+    stroke: var(--rule);
+    stroke-width: 1px;
+    vector-effect: non-scaling-stroke;
+  }
+
+  .golden-spiral__curve {
+    fill: none;
+    stroke: var(--brass);
+    stroke-width: var(--stroke-trace);
+    stroke-linecap: round;
+    vector-effect: non-scaling-stroke;
+  }
+</style>

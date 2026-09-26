@@ -1,11 +1,12 @@
 ---
 // Indeks kategori sebagai daftar editorial (bukan kisi kartu): satu baris per kategori seperti daftar isi
-// katalog pameran — nomor "01 / 05", motif teknis kecil, judul serif + deskripsi, lalu konsep di dalamnya.
+// katalog pameran — nomor "01 / 05", objek ukiran kategori (figures/CategoryObject, Tahap 4), judul serif +
+// deskripsi, lalu konsep di dalamnya.
 // Garis rambut antarbaris; sorotan saat hover/fokus hanya tick kuningan di kiri dan garis bawah judul.
 // Sumber: src/data/categories.ts (urutan = nomor). Kategori baru muncul otomatis.
 import { categories, categoryIndexLabel } from '../data/categories';
 import { categoryHref, conceptHref, getConceptsByCategory } from '../lib/concepts';
-import CategoryMotif from './figures/CategoryMotif.astro';
+import CategoryObject from './figures/CategoryObject.astro';
 
 interface Props {
   /** Level heading judul kategori (mengikuti heading bagian di atasnya). */
@@ -27,7 +28,7 @@ const grouped = await getConceptsByCategory();
             <span class="label__index">{categoryIndexLabel(category.id)}</span>
           </p>
           <div class="entry__motif">
-            <CategoryMotif motif={category.motif} />
+            <CategoryObject object={category.object} />
           </div>
           <div class="entry__body">
             <Heading class="entry__title">
@@ -98,8 +99,11 @@ const grouped = await getConceptsByCategory();
     grid-area: index;
   }
 
+  /* Objek ukiran: ukuran tetap kecil, seperti gambar di kartu katalog. */
   .entry__motif {
     grid-area: motif;
+    width: 100%;
+    max-width: 7.5rem;
   }
 
   .entry__body {

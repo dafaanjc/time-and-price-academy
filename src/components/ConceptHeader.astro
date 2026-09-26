@@ -1,5 +1,6 @@
 ---
-// Pembuka halaman konsep yang padat: judul + istilah asli, deskripsi, meta satu baris, atribusi.
+// Kepala bab (Tahap 5): garis ganda kuningan, nomor jilid, meta satu baris, judul Bodoni besar + istilah asli,
+// deskripsi, atribusi.
 import type { Concept } from '../lib/concepts';
 import Byline from './Byline.astro';
 import ConceptMeta from './ConceptMeta.astro';
@@ -7,13 +8,24 @@ import ConceptMeta from './ConceptMeta.astro';
 interface Props {
   concept: Concept;
   url?: string;
+  /** Nomor jilid: urutan konsep di dalam kategorinya. */
+  volume?: { n: number; total: number };
 }
 
-const { concept, url } = Astro.props;
+const { concept, url, volume } = Astro.props;
 const { title, termEn, description } = concept.data;
+const pad = (n: number) => String(n).padStart(2, '0');
 ---
 
 <header class="concept-header">
+  {
+    volume && (
+      <p class="label concept-header__volume">
+        <span class="label__index">Jilid {pad(volume.n)}</span>
+        <span class="label__sep" aria-hidden="true">·</span><span>dari {pad(volume.total)} dalam kategori</span>
+      </p>
+    )
+  }
   <ConceptMeta concept={concept} />
   <h1 class="concept-header__title">
     {title}{' '}
@@ -31,22 +43,30 @@ const { title, termEn, description } = concept.data;
     max-width: var(--measure);
   }
 
+  /* Garis ganda kuningan di atas nomor jilid, seperti halaman judul bab buku riset. */
+  .concept-header__volume {
+    padding-top: var(--space-3);
+    border-top: var(--border-mark) double var(--brass);
+  }
+
   .concept-header__title {
     display: flex;
     flex-direction: column;
     gap: var(--space-1);
     margin: 0;
-    font-size: clamp(var(--text-2xl), 5vw, var(--text-4xl));
+    font-size: clamp(var(--text-3xl), 6vw, var(--text-5xl));
     line-height: var(--leading-display);
     letter-spacing: var(--tracking-display);
   }
 
   /* Istilah asli sebagai baris kedua judul (bagian dari nama heading bagi pembaca layar). */
   .concept-header__term {
+    font-family: var(--font-text);
     font-size: var(--text-lg);
     font-style: italic;
     font-weight: 400;
-    color: var(--ink-3);
+    letter-spacing: 0;
+    color: var(--ink-soft);
   }
 
   .concept-header__desc {

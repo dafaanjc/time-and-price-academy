@@ -1,30 +1,39 @@
 # Font
 
+## Situs — paket @fontsource
+
+Font situs tidak disimpan di folder ini. Dipasang lewat npm (subset latin, SIL OFL 1.1) dan diimpor
+di awal `src/styles/global.css`; Vite menyalin file WOFF2 ke build (self-hosted, tanpa CDN).
+Dua file di-preload di `SeoHead.astro`: Newsreader 400 dan Bodoni Moda 500.
+
+| Paket | Bobot | Dipakai untuk |
+|---|---|---|
+| `@fontsource/bodoni-moda` | 500, 400 italic | Judul & display (`--font-display`) |
+| `@fontsource/newsreader` | 400, 400 italic, 600 | Teks baca, antarmuka, label katalog (`--font-text`) |
+| `@fontsource/ibm-plex-mono` | 400 | Angka hasil hitungan & input (`--font-num`) |
+
+Arah visual: `docs/redesign-brief.md`.
+
 ## TTF — gambar OpenGraph
 
-Dipakai oleh `src/lib/og-image.ts` saat build untuk merender `/og/*.png`. Font disertakan di repo
-agar hasil gambar identik di mesin lokal dan di GitHub Actions (tidak bergantung pada font sistem).
+Dipakai oleh `src/lib/og-image.ts` saat build untuk merender `/og/*.png` (sharp/Pango hanya membaca
+TTF/OTF, bukan WOFF). Font disertakan di repo agar hasil gambar identik di mesin lokal dan di GitHub Actions.
 
-| File | Font | Lisensi |
+| File | Nama keluarga (Pango) | Lisensi |
 |---|---|---|
-| `SourceSerif4-SemiBold.ttf`, `SourceSerif4-Italic.ttf` | Source Serif 4 (Adobe) | SIL OFL 1.1, lihat `OFL-SourceSerif4.txt` |
-| `SourceSans3-Regular.ttf`, `SourceSans3-SemiBold.ttf` | Source Sans 3 (Adobe) | SIL OFL 1.1, lihat `OFL-SourceSans3.txt` |
+| `BodoniModa-Medium.ttf` | `Bodoni Moda Medium` | SIL OFL 1.1, lihat `OFL-BodoniModa.txt` |
+| `Newsreader-Regular.ttf`, `Newsreader-Italic.ttf` | `Newsreader` (gaya Regular / Italic) | SIL OFL 1.1, lihat `OFL-Newsreader.txt` |
+| `Newsreader-SemiBold.ttf` | `Newsreader SemiBold` | SIL OFL 1.1, lihat `OFL-Newsreader.txt` |
 
-Sumber: Google Fonts, melalui paket npm `@expo-google-fonts/source-serif-4` dan
-`@expo-google-fonts/source-sans-3` (v0.4.1).
+Dibuat dari file WOFF subset latin di paket `@fontsource/bodoni-moda` dan `@fontsource/newsreader` (v5.3.0),
+tanpa mengubah glyph:
 
-## WOFF2 — situs (`web/`)
+```sh
+node scripts/woff-to-ttf.mjs node_modules/@fontsource/bodoni-moda/files/bodoni-moda-latin-500-normal.woff src/assets/fonts/BodoniModa-Medium.ttf
+node scripts/woff-to-ttf.mjs node_modules/@fontsource/newsreader/files/newsreader-latin-400-normal.woff src/assets/fonts/Newsreader-Regular.ttf
+node scripts/woff-to-ttf.mjs node_modules/@fontsource/newsreader/files/newsreader-latin-400-italic.woff src/assets/fonts/Newsreader-Italic.ttf
+node scripts/woff-to-ttf.mjs node_modules/@fontsource/newsreader/files/newsreader-latin-600-normal.woff src/assets/fonts/Newsreader-SemiBold.ttf
+```
 
-Dimuat lewat `@font-face` di `src/styles/global.css` (subset latin). Dua file di-preload di
-`SeoHead.astro`: Sans 400 dan Serif 600.
-
-| File | Dipakai untuk |
-|---|---|
-| `source-sans-3-latin-400-normal.woff2` | Teks isi, antarmuka |
-| `source-sans-3-latin-400-italic.woff2` | Teks miring |
-| `source-sans-3-latin-600-normal.woff2` | Tebal, label |
-| `source-serif-4-latin-600-normal.woff2` | Judul |
-| `source-serif-4-latin-400-italic.woff2` | Istilah asli, kutipan |
-
-Sumber: paket npm `@fontsource/source-sans-3` dan `@fontsource/source-serif-4` (v5.3.0), SIL OFL 1.1
-(teks lisensi sama dengan file `OFL-*.txt` di folder ini).
+Nama keluarga di tabel `name` menentukan spesifikasi Pango (`"Keluarga, Gaya ukuran"`, koma memisahkan
+keluarga dari gaya).

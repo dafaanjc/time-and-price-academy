@@ -104,6 +104,9 @@ const titles = new Map((await getConcepts()).map((c) => [c.id, c.data.title]));
   }
 
   .problem-list__concepts a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.75rem;
     color: var(--ink-2);
   }
 

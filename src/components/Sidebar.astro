@@ -19,7 +19,12 @@ import ConceptNav from './ConceptNav.astro';
       height: calc(100dvh - var(--header-height));
       overflow-y: auto;
       padding: var(--space-8) var(--space-6) var(--space-12) var(--gutter);
+      /* Area sekunder: kertas lebih tua, seperti daftar isi di halaman depan buku. */
+      background-color: var(--paper-deep);
+      background-image: var(--paper-grain);
       border-right: var(--border-hair) solid var(--rule);
+      scrollbar-width: thin;
+      scrollbar-color: var(--rule-strong) transparent;
     }
   }
 </style>

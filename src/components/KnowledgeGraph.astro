@@ -1,5 +1,6 @@
 ---
-// Graf prasyarat sebagai diagram teknis: garis hairline siku, simpul lingkaran kecil, tautan ke halaman konsep.
+// Graf prasyarat sebagai diagram teknis (Tahap 5: simpul = label katalog, garis = tinta; jalur yang ditunjuk
+// menyala kuningan): garis hairline siku, penanda kecil, label berbingkai, tautan ke halaman konsep.
 // Simpul yang disorot (hover/fokus keyboard) menyala kuningan, garis prasyaratnya ikut, simpul yang tidak
 // berhubungan meredup, dan kartu keterangan (nama + ringkasan) muncul halus. Tanpa JS graf tetap utuh;
 // hanya sorotan & keterangan yang hilang. Di layar sempit graf dipertahankan pada ukuran terbacanya dan
@@ -89,6 +90,7 @@ const tips = graph.nodes.map((n) => {
                 <rect class="node__hit" width={NODE_WIDTH} height={NODE_HEIGHT} />
                 <circle class="node__ring" cx={NODE_ANCHOR_X} cy={NODE_HEIGHT / 2} r={NODE_RADIUS + 5} />
                 <path class="node__dot" d={markerPath(markerOf(n.group), NODE_ANCHOR_X, NODE_HEIGHT / 2, NODE_RADIUS)} />
+                <rect class="node__plate" x={LABEL_X - 7} y="4" width={NODE_WIDTH - LABEL_X + 3} height={NODE_HEIGHT - 8} />
                 <text x={LABEL_X} dominant-baseline="central" aria-hidden="true">
                   {n.lines.map((line, i) => (
                     <tspan x={LABEL_X} y={lineY(n.lines.length, i)}>
@@ -293,7 +295,7 @@ const tips = graph.nodes.map((n) => {
 
   .edge {
     fill: none;
-    stroke: var(--rule-strong);
+    stroke: var(--ink-soft);
     stroke-width: var(--stroke-hair);
     transition:
       stroke var(--motion-base) var(--ease),
@@ -314,7 +316,7 @@ const tips = graph.nodes.map((n) => {
   }
 
   .arrow {
-    fill: var(--rule-strong);
+    fill: var(--ink-soft);
   }
 
   .arrow--active {
@@ -333,6 +335,21 @@ const tips = graph.nodes.map((n) => {
 
   .has-active .node:not(.is-active):not(.is-related) {
     opacity: 0.45;
+  }
+
+  /* Label katalog: bidang kertas berbingkai hairline di belakang judul. */
+  .node__plate {
+    fill: var(--paper);
+    stroke: var(--rule-strong);
+    stroke-width: var(--stroke-hair);
+    transition: stroke var(--motion-base) var(--ease);
+  }
+
+  .node:hover .node__plate,
+  .node:focus-visible .node__plate,
+  .node.is-active .node__plate,
+  .node.is-related .node__plate {
+    stroke: var(--mark);
   }
 
   .node__dot {
@@ -427,9 +444,10 @@ const tips = graph.nodes.map((n) => {
   .tip__meta {
     fill: var(--ink-3);
     font-family: var(--font-label);
-    font-size: var(--text-2xs);
-    letter-spacing: var(--tracking-mono);
-    text-transform: uppercase;
+    font-size: var(--text-xs);
+    font-style: italic;
+    font-variant-caps: small-caps;
+    letter-spacing: 0.02em;
   }
 
   .tip__title {

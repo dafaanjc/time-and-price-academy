@@ -48,6 +48,32 @@ const id = layoutSectionIds.sources;
     list-style: none;
   }
 
+  /* Kolom margin (desktop lebar): label objek yang rapat. */
+  @media (min-width: 80rem) {
+    .source-list {
+      padding-top: var(--space-2);
+      border-top: var(--border-mark) double var(--brass);
+    }
+
+    .source-list h2 {
+      font-family: var(--font-label);
+      font-size: var(--text-sm);
+      font-style: italic;
+      font-weight: 400;
+      font-variant-caps: small-caps;
+      letter-spacing: 0.02em;
+      color: var(--ink-3);
+    }
+
+    .source-list :global(.source-card) {
+      padding: var(--space-3);
+    }
+
+    .source-list :global(.source-card__title) {
+      font-size: var(--text-base);
+    }
+  }
+
   .source-list__empty {
     margin: 0;
     font-size: var(--text-sm);
