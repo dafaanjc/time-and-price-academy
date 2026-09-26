@@ -1,8 +1,9 @@
 ---
-// Hero beranda — Tahap 3 "Pelat Ukiran" (docs/redesign-brief.md). Teks hero tidak berubah sejak R9.1.
+// Hero beranda — Tahap 3 "Pelat Ukiran" (docs/redesign-brief.md). Teks hero sama dengan R9.1, kecuali baris merek
+// (induk + produk) di atas judul yang dihapus pada revisi Tahap 3: header sudah menjadi identitas.
 // Nama file & kelas (`landing__*`) sengaja berbeda dari HomeHero lama di `main`: Astro menurunkan ID cakupan CSS
 // dari path file, jadi dev server yang masih memegang CSS HomeHero lama tidak bisa lagi menimpa markup ini.
-// Kiri (dinding terang): merek induk + produk, judul besar kalimat biasa, pertanyaan inti ("apa yang terjadi saat
+// Kiri (dinding terang): judul kalimat biasa, pertanyaan inti ("apa yang terjadi saat
 // keputusan Anda salah?"), lead, dua pintu masuk (masalah; jam pasir modal di bagian berikutnya).
 // Kanan: pelat ukiran (figures/HeroStage) — spiral emas & kisi, emblem resmi, cabang kemungkinan dari jam pasir;
 // benang merah dari "Sekarang" turun ke bagian "00 Anggaran salah". Tanpa kontrol: alat hitung ada di bawah hero.
@@ -13,10 +14,6 @@ import HeroStage from './figures/HeroStage.astro';
 
 <section class="landing" aria-labelledby="hero-title">
   <div class="landing__text">
-    <p class="landing__brand">
-      <span class="label">{siteConfig.masterBrand}</span>
-      <span class="landing__product">{siteConfig.product}</span>
-    </p>
     <h1 id="hero-title" class="landing__title">{siteConfig.heroLine}</h1>
     <p class="landing__question">Pertanyaan yang lebih penting: apa yang terjadi saat keputusan Anda salah?</p>
     <p class="landing__lead">
@@ -41,27 +38,11 @@ import HeroStage from './figures/HeroStage.astro';
     padding-block: 0 var(--space-8);
   }
 
-  /* Merek induk (mono kecil) di atas nama produk (serif): dua tingkat, dipisah garis rambut. */
-  .landing__brand {
-    display: inline-grid;
-    gap: var(--space-1);
-    margin: 0;
-    padding-bottom: var(--space-2);
-    border-bottom: var(--border-hair) solid var(--rule-strong);
-  }
-
-  .landing__product {
-    font-family: var(--font-serif);
-    font-size: var(--text-xl);
-    font-weight: 600;
-    line-height: 1;
-    letter-spacing: var(--tracking-display);
-  }
-
-  /* Judul kalimat biasa, sangat besar dan rapat: satu pernyataan, bukan slogan kapital. */
+  /* Judul kalimat biasa, besar dan rapat: satu pernyataan, bukan slogan kapital. Skala sengaja dibatasi
+     (revisi Tahap 3) agar paragraf dan kedua tombol terlihat tanpa gulir di 1440×900 dan 1920×1080. */
   .landing__title {
-    margin: var(--space-6) 0 var(--space-4);
-    font-size: clamp(var(--text-3xl), 11vw, var(--text-5xl));
+    margin: 0 0 var(--space-4);
+    font-size: clamp(var(--text-3xl), 11vw, var(--text-4xl));
     line-height: var(--leading-hero);
     letter-spacing: var(--tracking-display);
     text-wrap: balance;
@@ -138,12 +119,14 @@ import HeroStage from './figures/HeroStage.astro';
       grid-column: 1 / span 5;
     }
 
+    /* Maks --text-4xl (±76px, sebelumnya --text-6xl ±101px): −25 %. 1440px → ±55px, 1920px → ±73px. */
     .landing__title {
-      font-size: clamp(var(--text-4xl), 5vw, var(--text-6xl));
+      font-size: clamp(var(--text-3xl), 3.8vw, var(--text-4xl));
     }
 
+    /* Ikut proporsional: --text-lg (sebelumnya --text-xl). */
     .landing__question {
-      font-size: var(--text-xl);
+      font-size: var(--text-lg);
     }
 
     /* Pelat utuh di kolom 6–12: bingkainya terlihat di keempat sisi. */

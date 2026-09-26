@@ -82,7 +82,8 @@ Both light and dark themes are required (`prefers-color-scheme`).
 ### Typography
 - **Serif** (`--font-serif`, Source Serif 4): headings and display. `h1` uses `--tracking-display`;
   exhibit titles may use `--text-5xl` with `--leading-display` on desktop only. The homepage hero title
-  (`siteConfig.heroLine`) is sentence case, up to `--text-6xl` with `--leading-hero`, desktop only.
+  (`siteConfig.heroLine`) is sentence case, `clamp(--text-3xl, 3.8vw, --text-4xl)` with `--leading-hero` on desktop
+  (question in `--text-lg`): the lead and both CTAs must stay above the fold at 1440×900 and 1920×1080.
 - **Sans** (`--font-sans`, Source Sans 3): body and UI. Highly readable: `--text-base` (17px),
   `--leading-body` 1.6, line length `--measure` (66ch), leads `--measure-narrow`.
 - **Mono** (`--font-label`): metadata and labels, always **small, uppercase, tracked**. Use the
@@ -175,7 +176,7 @@ weighted mean marker → a ±σ spread), not present the ideas as unrelated card
 ### Hero: engraved plate (Tahap 3) + Capital Hourglass section
 The hero establishes Time & Price Academy → Risk Lab, states the philosophy and poses the question; the
 section directly below lets the visitor answer it.
-- Hero left, on the wall: brand line (`masterBrand` mono over `product` serif), `siteConfig.heroLine`
+- Hero left, on the wall (no brand eyebrow: the header is the identity): `siteConfig.heroLine`
   ("Trading bukan cuma soal entry."), the question in serif italic, a lead, two links (problems; `#jam-pasir`).
   No stats row, no controls.
 - Hero right: `figures/HeroStage`, one `.plate` with a double frame, whole on the paper in columns 6–12 on
@@ -183,7 +184,10 @@ section directly below lets the visitor answer it.
   back = faint dark grid + `figures/GoldenSpiral` anchored with its eye on the figure's hourglass (`spiralEye`)
   → middle = the emblem art (`BrandEmblem`) → front = procedural **outcome field** (`src/lib/outcome-field.ts`, tested: from "now" at the figure's
   hourglass, 4 → 12 → 24 branching paths, ±2σ envelope ∝ √t, flat brass E[P] — no drift implied — and a
-  density curve at T; compact adds one past path). Emblem at monumental scale (frame crop only).
+  density curve at T; compact adds one past path). Emblem at monumental scale (frame crop only); in the wide
+  composition it sits left of the Harga axis with a gap and a dashed guide from the hourglass to "now".
+  Chart labels (Harga, Sekarang, T, Waktu, E[P]) use the caption style (italic small caps) with a plate-coloured
+  halo (`paint-order: stroke`) and never sit on a line.
   Caption: FIG. 00 (what the field means) + OBJEK 00. It is an artefact, not a widget: no inputs. Below the plate a
   brass thread continues the "Sekarang" guide down to the `00 Anggaran salah` heading, ending in
   `HourglassGlyph` (length = hero bottom padding + next section top padding, `--stage-thread-length`).

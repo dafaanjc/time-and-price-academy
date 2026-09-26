@@ -47,24 +47,31 @@ const past = (() => {
 
 const pct = (v: number, of: number) => `${Math.round((v / of) * 10000) / 100}%`;
 
+// Kotak emblem per komposisi (satuan viewBox). Lebar: figur digeser ke kiri (revisi Tahap 3) agar ada jarak
+// antara jam pasir (tepi kanan ±603) dan sumbu Harga/"sekarang" (x0 = 684); kepala tetap utuh (tepi kiri ±49).
+// Garis bantu tipis menyambungkan jam pasir ke "sekarang". Ringkas tidak berubah.
+const ART_WIDE = { x: -220, y: -6, w: 860 };
+const ART_COMPACT = { x: -200, y: -10, w: 700 };
+
 // Spiral emas: matanya di pusat jam pasir yang dipegang figur. Pusat jam pasir pada aset 1024px ≈ (830, 420),
-// lalu dipetakan lewat kotak emblem tiap komposisi (lihat .stage__art-inner di bawah):
-//   lebar:    kiri −150, atas −6, lebar 860  → (547, 347)
-//   ringkas:  kiri −200, atas −10, lebar 700 → (367, 277)
-const HOURGLASS = { x: 830 / 1024, y: 420 / 1024 };
+// lalu dipetakan lewat kotak emblem tiap komposisi → lebar (477, 347), ringkas (367, 277).
+// Tepi kanan jam pasir pada aset ≈ 980/1024.
+const HOURGLASS = { x: 830 / 1024, y: 420 / 1024, right: 980 / 1024 };
+const hourglassRightWide = Math.round(ART_WIDE.x + HOURGLASS.right * ART_WIDE.w);
 const spiralBox = (box: { w: number; h: number }, art: { x: number; y: number; w: number }, width: number) => {
   const [ex, ey] = spiralEye(1000);
   const k = width / 1000;
   const eye = { x: art.x + HOURGLASS.x * art.w, y: art.y + HOURGLASS.y * art.w };
   return `left: ${pct(eye.x - ex * k, box.w)}; top: ${pct(eye.y - ey * k, box.h)}; width: ${pct(width, box.w)}`;
 };
-const spiralWide = spiralBox(W, { x: -150, y: -6, w: 860 }, 1400);
-const spiralCompact = spiralBox(C, { x: -200, y: -10, w: 700 }, 900);
+const spiralWide = spiralBox(W, ART_WIDE, 1400);
+const spiralCompact = spiralBox(C, ART_COMPACT, 900);
+const artWideStyle = `--art-wide-left: ${pct(ART_WIDE.x, W.w)}; --art-wide-top: ${pct(ART_WIDE.y, W.h)}; --art-wide-width: ${pct(ART_WIDE.w, W.w)}`;
 ---
 
 <div class="stage-wrap">
   <figure class="stage plate" data-stage aria-labelledby="stage-caption">
-    <div class="stage__field">
+    <div class="stage__field" style={artWideStyle}>
       <!-- Lapisan 1b: spiral emas (belakang, di atas kisi). Dekoratif. -->
       <div class="stage__spiral stage__spiral--wide" style={spiralWide}>
         <GoldenSpiral iterations={10} />
@@ -86,18 +93,19 @@ const spiralCompact = spiralBox(C, { x: -200, y: -10, w: 700 }, 900);
         <path class="svg-tick" d={[0, 1, 2, 3, 4, 5, 6].map((i) => `M${W.x0 + i * ((W.xT - W.x0) / 6)} ${W.axis} v6`).join(' ')}></path>
         <path class="svg-guide stage__now-guide" d={`M${W.x0} 96 V${W.h}`}></path>
         <path class="svg-guide" d={`M${W.xT} 96 V${W.axis}`}></path>
+        <path class="svg-guide" d={`M${hourglassRightWide + 8} ${W.y0} H${W.x0 - 8}`}></path>
         {wide.paths.map((d) => <path class="stage__path stage__draw" d={d} pathLength="1" />)}
         <path class="stage__envelope" d={wide.upper}></path>
         <path class="stage__envelope" d={wide.lower}></path>
         <path class="stage__density-curve" d={wide.density}></path>
         <path class="stage__expected" d={wide.expected}></path>
         <circle class="stage__now" cx={W.x0} cy={W.y0} r="4.5"></circle>
-        <g class="stage__labels">
-          <text x={W.x0} y={W.axis + 26} text-anchor="middle">Sekarang</text>
-          <text x={W.xT} y={W.axis + 26} text-anchor="middle">T</text>
-          <text x={W.w - 24} y={W.axis - 10} text-anchor="end">Waktu →</text>
-          <text x={W.x0 + 8} y="90">Harga</text>
-          <text class="stage__label-mark" x={W.xT - 6} y={W.y0 - 8} text-anchor="end">E[P]</text>
+        <g class="stage__labels stage__labels--wide">
+          <text x={W.x0 - 10} y={W.axis + 28} text-anchor="end">Sekarang</text>
+          <text x={W.xT + 8} y={W.axis - 10}>T</text>
+          <text x={W.w - 24} y={W.axis + 28} text-anchor="end">Waktu →</text>
+          <text x={W.x0 + 8} y="92">Harga</text>
+          <text class="stage__label-mark" x={W.xT - 8} y={W.y0 - 10} text-anchor="end">E[P]</text>
         </g>
       </svg>
 
@@ -112,11 +120,11 @@ const spiralCompact = spiralBox(C, { x: -200, y: -10, w: 700 }, 900);
         <path class="stage__density-curve" d={compact.density}></path>
         <path class="stage__expected" d={compact.expected}></path>
         <circle class="stage__now" cx={C.x0} cy={C.y0} r="4"></circle>
-        <g class="stage__labels">
-          <text x="28" y={C.y0 - 22}>Masa lalu</text>
-          <text x={C.x0} y={C.axis - 8} text-anchor="middle">Sekarang</text>
-          <text x={C.xT} y={C.axis - 8} text-anchor="middle">T</text>
-          <text class="stage__label-mark" x={C.xT - 4} y={C.y0 - 6} text-anchor="end">E[P]</text>
+        <g class="stage__labels stage__labels--compact">
+          <text x="28" y={C.y0 - 24}>Masa lalu</text>
+          <text x={C.x0 - 8} y={C.axis - 8} text-anchor="end">Sekarang</text>
+          <text x={C.xT - 8} y={C.axis - 8} text-anchor="end">T</text>
+          <text class="stage__label-mark" x={C.xT - 8} y={C.y0 - 8} text-anchor="end">E[P]</text>
         </g>
       </svg>
     </div>
@@ -344,12 +352,27 @@ const spiralCompact = spiralBox(C, { x: -200, y: -10, w: 700 }, 900);
     stroke-width: var(--stroke-hair);
   }
 
+  /* Label grafik = gaya caption Fig./Objek (italic small caps). Latar pelat di belakang huruf (stroke warna
+     pelat, dilukis di bawah isi) memutus garis yang lewat, jadi label tidak pernah tertimpa garis.
+     Ukuran dalam satuan viewBox: ±13–15px pada lebar pelat biasa. */
   .stage__labels {
     fill: var(--plate-ink-3);
     font-family: var(--font-label);
-    font-size: 13px;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
+    font-style: italic;
+    font-variant-caps: small-caps;
+    letter-spacing: 0.02em;
+    paint-order: stroke;
+    stroke: var(--plate);
+    stroke-width: 5px;
+    stroke-linejoin: round;
+  }
+
+  .stage__labels--wide {
+    font-size: 21px;
+  }
+
+  .stage__labels--compact {
+    font-size: 23px;
   }
 
   .stage__label-mark {
@@ -438,9 +461,9 @@ const spiralCompact = spiralBox(C, { x: -200, y: -10, w: 700 }, 900);
     }
 
     .stage__art-inner {
-      left: -15%;
-      top: calc(-6 / 720 * 100%);
-      width: 86%;
+      left: var(--art-wide-left);
+      top: var(--art-wide-top);
+      width: var(--art-wide-width);
     }
 
     .stage__caption {
