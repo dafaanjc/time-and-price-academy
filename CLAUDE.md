@@ -20,7 +20,7 @@ Hard rules that already exist in the codebase:
 ## Redesign "Kabinet Risiko" (active — `docs/redesign-brief.md`)
 The brief is the source of truth for the visual redesign and **overrides the "Visual Design System" section
 below wherever they conflict**; work one stage (Tahap) at a time. Done: Stage 1 (foundation), Stage 2 (logo system),
-Stage 3 (hero "Pelat Ukiran"), Stage 4 (homepage sections), Stage 5 (concept/category/path/map pages).
+Stage 3 (hero "Pelat Ukiran"), Stage 4 (homepage sections), Stage 5 (concept/category/path/map pages), Stage 6 (polish & audit).
 - Stage 4 patterns: problems = archive index cards (`HomeProblems`: numbered head with brass double rule, quote in
   Newsreader italic, ruled meta rows, punch hole); concept chain = CSS 3D bookshelf (`LearningSystem`: spine out,
   hover/focus pulls the book out and turns it `--book-turn` to show the cover; touch/narrow = books resting angled
@@ -33,6 +33,10 @@ Stage 3 (hero "Pelat Ukiran"), Stage 4 (homepage sections), Stage 5 (concept/cat
   text/at the end on narrow screens; catalogue entries (`ConceptRows`, `LearningPath`, `PathNav`) use Bodoni brass
   volume numerals; `KnowledgeGraph` nodes are framed catalogue labels with ink edges, hovered paths brass; the
   category page uses `figures/CategoryObject` in its `PageHead` (`CategoryMotif` is no longer mounted).
+- Stage 6 audit rules: interactive targets ≥ 44px (`min-height: 2.75rem`, inline-flex for links in lists); fonts used above
+  the fold are preloaded in `SeoHead` (Newsreader 400/600/italic, Bodoni 500) so the hero doesn't shift on font swap;
+  accessible name of a link must contain its visible text; `aria-current` never on an `<a>` without `href`.
+  Measured (Lighthouse mobile, static build): Performance 96–100, Accessibility 100.
 - Substance never changes: no edits to MDX, copy, argument order, data or formulas. Only layout, type, colour,
   illustration, motion, visual components and the logo.
 - One theme only: light (`color-scheme: light`, no dark variants). Palette: `--paper`, `--paper-deep`, `--ink`,

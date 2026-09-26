@@ -39,13 +39,9 @@ const { concepts } = Astro.props;
     display: grid;
     grid-template-columns: 3rem minmax(0, 1fr) auto;
     column-gap: var(--space-2);
-    padding-block: var(--space-3);
+    padding-block: var(--space-1);
     border-bottom: var(--border-hair) solid var(--rule);
     counter-increment: concept;
-  }
-
-  .concept-rows__item:first-child {
-    padding-top: 0;
   }
 
   /* Nomor jilid seperti kartu katalog perpustakaan: Bodoni, kuningan. */
@@ -54,12 +50,15 @@ const { concepts } = Astro.props;
     grid-row: 1 / span 2;
     font-family: var(--font-display);
     font-size: var(--text-xl);
-    line-height: 1.1;
+    line-height: 2.75rem;
     letter-spacing: var(--tracking-display);
     color: var(--mark);
   }
 
   .concept-rows__title {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.75rem;
     font-family: var(--font-display);
     font-size: var(--text-lg);
     font-weight: var(--weight-display);

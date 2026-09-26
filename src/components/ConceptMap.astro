@@ -6,6 +6,7 @@ import {
   LOCAL_DOT_X,
   LOCAL_LABEL_X,
   LOCAL_LINE_HEIGHT,
+  ROW_PAD,
   type LocalGraphLayout,
   type LocalRole,
 } from '../lib/local-graph';
@@ -50,9 +51,12 @@ const summary = graph.nodes
       }
     </g>
     {
-      graph.nodes.map((n) => (
-        <a href={n.role === 'current' ? undefined : n.href} class={`node node--${n.role}`} aria-label={n.title} aria-current={n.role === 'current' ? 'page' : undefined}>
-          <rect class="node__hit" x="0" y={n.y - (n.lines.length * LOCAL_LINE_HEIGHT) / 2 - 6} width={graph.width} height={n.lines.length * LOCAL_LINE_HEIGHT + 12} />
+      graph.nodes.map((n) => {
+      // Simpul konsep ini bukan tautan: <g role=group> (aria-current dilarang pada <a> tanpa href).
+      const Node = n.role === 'current' ? 'g' : 'a';
+      return (
+        <Node href={n.role === 'current' ? undefined : n.href} class={`node node--${n.role}`} role={n.role === 'current' ? 'group' : undefined} aria-label={n.title} aria-current={n.role === 'current' ? 'page' : undefined}>
+          <rect class="node__hit" x="0" y={n.y - (n.lines.length * LOCAL_LINE_HEIGHT + ROW_PAD) / 2} width={graph.width} height={n.lines.length * LOCAL_LINE_HEIGHT + ROW_PAD} />
           {n.role === 'current' && <circle class="node__ring" cx={LOCAL_DOT_X} cy={n.y} r="10" />}
           <circle class="node__dot" cx={LOCAL_DOT_X} cy={n.y} r="5" />
           <text x={LOCAL_LABEL_X} aria-hidden="true">
@@ -62,8 +66,9 @@ const summary = graph.nodes
               </tspan>
             ))}
           </text>
-        </a>
-      ))
+        </Node>
+      );
+    })
     }
   </svg>
   <figcaption class="label">Peta hubungan konsep</figcaption>
