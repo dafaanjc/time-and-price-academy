@@ -20,6 +20,18 @@ export const categoryMotifs = ['axes', 'band', 'oscillation', 'kink', 'tree'] as
 export type CategoryMotif = (typeof categoryMotifs)[number];
 
 /**
+ * Objek ukiran per kategori (Tahap 4 redesign, docs/redesign-brief.md), digambar oleh
+ * components/figures/CategoryObject.astro sebagai gambar garis etsa dengan arsiran:
+ * - dice-hourglass: dadu dan jam pasir (Fondasi: peluang dan waktu)
+ * - scales: timbangan (Manajemen Risiko)
+ * - bust: kepala patung klasik (Psikologi)
+ * - coin: koin (Keuangan Perilaku)
+ * - dividers: jangka (Teori Keputusan)
+ */
+export const categoryObjects = ['dice-hourglass', 'scales', 'bust', 'coin', 'dividers'] as const;
+export type CategoryObject = (typeof categoryObjects)[number];
+
+/**
  * Penanda simpul di peta pengetahuan (R9): bentuk monokrom, bukan warna, agar kategori terbaca di kedua
  * tema dan tanpa bergantung pada warna. Digambar oleh `markerPath()` di src/lib/graph.ts.
  */
@@ -41,6 +53,7 @@ export interface Category {
   title: string;
   description: string;
   motif: CategoryMotif;
+  object: CategoryObject;
   marker: CategoryMarker;
   topics?: readonly CategoryTopic[];
 }
@@ -51,6 +64,7 @@ export const categories: Category[] = [
     id: 'foundations',
     title: 'Fondasi',
     motif: 'axes',
+    object: 'dice-hourglass',
     marker: 'circle',
     description:
       'Konsep dasar untuk membaca risiko: probabilitas, distribusi, nilai harapan, dan variabilitas.',
@@ -59,6 +73,7 @@ export const categories: Category[] = [
     id: 'risk-management',
     title: 'Manajemen Risiko',
     motif: 'band',
+    object: 'scales',
     marker: 'square',
     description: 'Cara mengukur, membatasi, dan mengelola risiko dalam keputusan keuangan.',
   },
@@ -66,6 +81,7 @@ export const categories: Category[] = [
     id: 'psychology',
     title: 'Psikologi',
     motif: 'oscillation',
+    object: 'bust',
     marker: 'diamond',
     description: 'Bagaimana emosi dan kondisi mental memengaruhi cara kita menghadapi risiko.',
     topics: [
@@ -78,6 +94,7 @@ export const categories: Category[] = [
     id: 'behavioral-finance',
     title: 'Keuangan Perilaku',
     motif: 'kink',
+    object: 'coin',
     marker: 'triangle',
     description: 'Pola perilaku dan bias yang muncul ketika manusia mengambil keputusan keuangan.',
     topics: [
@@ -89,6 +106,7 @@ export const categories: Category[] = [
     id: 'decision-theory',
     title: 'Teori Keputusan',
     motif: 'tree',
+    object: 'dividers',
     marker: 'cross',
     description: 'Kerangka untuk memilih tindakan terbaik ketika hasilnya tidak pasti.',
   },

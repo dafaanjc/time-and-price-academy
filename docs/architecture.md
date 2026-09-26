@@ -191,10 +191,11 @@ Detail skema dan cara menambah konsep ada di [`content-model.md`](./content-mode
 | `figures/CapitalHourglass` | (Bagian `00 Anggaran salah` di bawah hero, token netral tema.) Instrumen jam pasir modal: pasir = modal, tiap keputusan salah menjatuhkan risiko % dari modal berjalan; skala dikalibrasi dari luas tabung, pembanding 1%, kontrol risiko 1/2/5/10% + "Salah sekali lagi". Geometri & hitungan murni di `src/lib/hourglass.ts` (diuji); tanpa JS keadaan awal tetap tergambar + teks setara |
 | `figures/RiskField` | (Tidak dipasang sejak R9; disimpan untuk kemungkinan dipakai di Distribusi.) FIG. 01 Medan Risiko: relief kepadatan 3D (three.js, dimuat malas lewat `import()`); kualitas high/medium/low dari `src/lib/risk-field/quality.ts`, geometri murni di `geometry.ts`, adegan di `scene.ts`; fallback & isi HTML awal = `TimePriceFigure bare` |
 | `HomePhilosophy` | Pernyataan Waktu × Harga + garis ukur "satu jalur → sebaran", tiga prinsip sebagai catatan tepi |
-| `HomeProblems` | Masalah trader di beranda: pengantar menempel (kiri) + entri bernomor di sumbu tegak (kanan) |
-| `LearningSystem` | Rantai konsep Risiko → … → Varians (`src/data/concept-chain.ts`) sebagai diagram bertick dengan `figures/ChainGlyph` |
+| `HomeProblems` | Masalah trader di beranda (Tahap 4): pengantar, lalu kartu indeks arsip (nomor + garis ganda kuningan, kutipan Newsreader italic, baris Keputusan/Konsep, lubang kartu); 1 kolom → 2 kolom ≥ 48rem |
+| `LearningSystem` | Rantai konsep Risiko → … → Varians (`src/data/concept-chain.ts`) sebagai rak buku CSS 3D (Tahap 4): punggung jilid (nomor + judul), hover/fokus menarik & memutar buku menampilkan sampul (nomor, judul, `figures/ChainGlyph`, pertanyaan); layar sempit/sentuh: buku miring dalam baris scroll-snap |
 | `figures/ChainGlyph` | Glyph teknis bertumpuk per langkah rantai (path, band, slice, curve, mean, spread) |
-| `CategoryIndex` | Indeks kategori sebagai daftar editorial: nomor "01 / 05", motif, judul, deskripsi, konsep |
+| `CategoryIndex` | Indeks kategori sebagai daftar editorial: nomor "01 / 05", objek ukiran (`figures/CategoryObject`), judul, deskripsi, konsep |
+| `figures/CategoryObject` | Objek ukiran per kategori (`object` di `categories.ts`): dadu & jam pasir, timbangan, kepala patung, koin, jangka — garis etsa, arsiran, satu aksen kuningan |
 | `figures/TimePriceFigure` | FIG. 01, gambar teknik isometrik Waktu × Harga (SVG inline; geometri dari `src/lib/iso.ts`); `bare` = tanpa figure/caption, dipakai sebagai fallback RiskField |
 | `figures/CategoryMotif` | Motif SVG teknis per kategori (`motif` di `categories.ts`: axes, band, oscillation, kink, tree) |
 | `tools/ToolFrame` | Kerangka alat hitung: label, judul, lalu empat tahap berlabel (R10) 01 Input → 02 Asumsi (catatan batasan) → 03 Hasil → 04 Konsekuensi (`aria-live`). Angka hasil yang berubah setelah pengguna bertindak ditandai sekali (`.value-changed`). Selalu bergaya instrumen; `variant` hanya mengatur penempatan |

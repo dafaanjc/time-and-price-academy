@@ -20,7 +20,13 @@ Hard rules that already exist in the codebase:
 ## Redesign "Kabinet Risiko" (active — `docs/redesign-brief.md`)
 The brief is the source of truth for the visual redesign and **overrides the "Visual Design System" section
 below wherever they conflict**; work one stage (Tahap) at a time. Done: Stage 1 (foundation), Stage 2 (logo system),
-Stage 3 (hero "Pelat Ukiran").
+Stage 3 (hero "Pelat Ukiran"), Stage 4 (homepage sections).
+- Stage 4 patterns: problems = archive index cards (`HomeProblems`: numbered head with brass double rule, quote in
+  Newsreader italic, ruled meta rows, punch hole); concept chain = CSS 3D bookshelf (`LearningSystem`: spine out,
+  hover/focus pulls the book out and turns it `--book-turn` to show the cover; touch/narrow = books resting angled
+  in a scroll-snap row); calculators = brass precision instrument (`ToolFrame` for every tool: brass inner frame,
+  italic small-caps labels, Plex Mono inputs/results/axis numbers; `UkuranPosisi` graduated risk meter with a brass
+  pointer); category index = engraved `figures/CategoryObject` (`object` in `categories.ts`).
 - Substance never changes: no edits to MDX, copy, argument order, data or formulas. Only layout, type, colour,
   illustration, motion, visual components and the logo.
 - One theme only: light (`color-scheme: light`, no dark variants). Palette: `--paper`, `--paper-deep`, `--ink`,
@@ -234,15 +240,17 @@ per-vertex opacity. No lights, shadows, glow, bloom, neon or spinning.
 Single source of truth: `src/data/categories.ts` (`foundations`, `risk-management`, `psychology`,
 `behavioral-finance`, `decision-theory`). Array order = display order = index number, rendered by
 `categoryIndexLabel()` as `01 / 05` (the total follows the array length). Each entry has a `motif`
-(`axes`, `band`, `oscillation`, `kink`, `tree`) drawn by `components/figures/CategoryMotif.astro`, and a
+(`axes`, `band`, `oscillation`, `kink`, `tree`) drawn by `components/figures/CategoryMotif.astro` (category page),
+an engraved `object` (`dice-hourglass`, `scales`, `bust`, `coin`, `dividers`; unique, tested) drawn by
+`components/figures/CategoryObject.astro` (homepage index; the category page follows in Tahap 5), and a
 `marker` shape (`circle`, `square`, `diamond`, `triangle`, `cross`; unique per category, tested) used on the
 knowledge map.
 Optional `topics` = sub-categories (concept frontmatter `topic`, validated per category; the category page
 groups by topic). Learning paths are tiered via `requires` in `src/data/learning-paths.ts`
 (Fondasi → Heuristik dan Bias → Keputusan di Bawah Risiko); curriculum map in `docs/content-model.md`.
 Containers carry `data-category="<id>"` (hook for `--category-accent` and any per-category tweak in
-`global.css`). To add a category: one entry in `categories.ts` (plus a new motif value and its branch
-in `CategoryMotif` if none of the existing ones fits). `CategoryIndex` (the editorial list on the homepage) picks it up automatically.
+`global.css`). To add a category: one entry in `categories.ts` (plus a new motif/object value and its branch
+in `CategoryMotif` / `CategoryObject` if none of the existing ones fits). `CategoryIndex` (the editorial list on the homepage) picks it up automatically.
 Labels are rendered in markup, never via CSS `content`, so they stay accessible.
 
 ### Planned components (architecture only, built in later phases)
