@@ -5,86 +5,103 @@ slug: risk
 category: foundations
 order: 1
 difficulty: beginner
-description: "Kemungkinan bahwa hasil sebuah keputusan berbeda dari yang diharapkan, termasuk kemungkinan mengalami kerugian."
-status: draft
+description: "Memahami apa sebenarnya yang dimaksud dengan risiko, mengapa risiko tidak sekadar berarti kerugian, dan bagaimana ketidakpastian dapat memengaruhi tujuan."
+status: review
 featured: true
 prerequisites: []
-related: [risk-vs-uncertainty, variance-and-volatility]
-sources: []
+related: [risk-vs-uncertainty, probability, expected-value, variance-and-volatility]
+sources:
+  - type: standard
+    title: "ISO 31000:2018 Risk management — Guidelines"
+    year: 2018
+    publisher: "International Organization for Standardization (ISO)"
+    url: "https://www.iso.org/standard/65694.html"
+keywords: [risk, risk-management, uncertainty, decision-making]
 ---
 
-## Mengapa Ini Penting
+## Risiko Itu Sebenarnya Apa?
 
-Hampir setiap keputusan penting dibuat tanpa kepastian tentang hasilnya: memilih pekerjaan, meminjam uang, menabung, berinvestasi, atau membuka posisi trading. Memahami risiko membantu Anda bertanya hal yang tepat sebelum memutuskan: *apa saja yang bisa terjadi, seberapa mungkin, dan seberapa besar dampaknya bagi saya?*
+Kita sering mengatakan:
 
-Tanpa pemahaman ini, keputusan cenderung dinilai hanya dari hasil akhirnya. Padahal keputusan yang baik bisa berakhir buruk karena faktor yang tidak bisa dikendalikan, dan keputusan yang buruk bisa kebetulan berakhir baik.
+> "Investasi ini berisiko."\
+> "Trading itu berisiko."\
+> "Bisnis itu punya risiko."
 
-## Gagasan Utama
+Tapi ketika ditanya **apa sebenarnya yang dimaksud dengan risiko**, jawabannya sering berhenti di:
 
-<Definisi>
+> "Ya... kemungkinan rugi."
 
-**Risiko adalah kemungkinan bahwa hasil sebuah keputusan berbeda dari yang diharapkan.** Perbedaan itu bisa ke arah yang merugikan (kerugian) maupun menguntungkan, tetapi dalam percakapan sehari-hari kata "risiko" biasanya merujuk pada sisi yang merugikan.
+Masalahnya, definisi itu terlalu sempit.
 
-</Definisi>
+Dalam kerangka ISO 31000, risiko didefinisikan sebagai **efek dari ketidakpastian terhadap tujuan**.
 
-Risiko selalu memiliki dua komponen:
+Dengan kata lain, risiko tidak bisa dipahami hanya dengan bertanya:
 
-1. **Kemungkinan**: seberapa besar peluang suatu hasil terjadi.
-2. **Dampak**: seberapa besar akibatnya bila hasil itu benar-benar terjadi.
+> "Apa yang bisa salah?"
 
-Kejadian yang jarang tetapi berdampak sangat besar bisa lebih berbahaya daripada kejadian yang sering tetapi berdampak kecil. Karena itu, risiko tidak bisa dinilai hanya dari salah satu komponen.
+Kita juga perlu bertanya:
 
-## Penjelasan Sederhana
+> "Apa tujuan yang ingin dicapai?"\
+> "Apa yang belum kita ketahui?"\
+> "Apa yang mungkin terjadi?"\
+> "Dan apa dampaknya terhadap tujuan tersebut?"
 
-Bayangkan Anda ingin menyeberang jalan. Ada kemungkinan tertabrak (kemungkinan), dan bila itu terjadi akibatnya bisa sangat serius (dampak). Menyeberang di zebra cross saat lampu merah menurunkan kemungkinan. Menyeberang di jalan kecil yang kendaraannya pelan menurunkan dampak.
+---
 
-Mengelola risiko tidak berarti menghilangkannya, karena hampir tidak ada tindakan yang bebas risiko. Mengelola risiko berarti **memahami, lalu memilih risiko mana yang layak diambil dan seberapa besar.**
+## Risiko Bukan Sekadar Kerugian
 
-## Contoh Kehidupan Nyata
+Dalam percakapan sehari-hari, risiko hampir selalu terdengar negatif.
 
-<Contoh jenis="kehidupan">
+Risiko kehilangan uang.\
+Risiko kecelakaan.\
+Risiko gagal bisnis.
 
-Seseorang mempertimbangkan dua cara berangkat kerja:
+Tetapi dalam kerangka manajemen risiko, pengertiannya lebih luas.
 
-| Pilihan | Hasil yang diharapkan | Apa yang bisa berbeda |
-| --- | --- | --- |
-| Motor | Tiba dalam 30 menit | Hujan, macet, atau kecelakaan kecil |
-| Kereta | Tiba dalam 45 menit | Keterlambatan jadwal yang sesekali terjadi |
+Suatu ketidakpastian dapat menghasilkan penyimpangan dari kondisi yang diharapkan, baik ke arah yang menguntungkan maupun merugikan.
 
-Motor lebih cepat, tetapi hasilnya lebih bervariasi dan dampak terburuknya (kecelakaan) lebih besar. Kereta lebih lambat, tetapi hasilnya lebih dapat diperkirakan. Tidak ada jawaban yang selalu benar; pilihan terbaik bergantung pada seberapa penting ketepatan waktu dan seberapa besar risiko yang siap ditanggung orang tersebut.
+Karena itu:
 
-</Contoh>
+> **Risiko tidak otomatis berarti kerugian.**
 
-## Contoh Keuangan
+Yang penting adalah adanya ketidakpastian yang dapat memengaruhi tujuan kita.
 
-<Contoh jenis="keuangan">
+Namun dalam banyak konteks praktis—terutama ketika berbicara tentang keselamatan, keuangan, atau keamanan—kata "risiko" memang sering digunakan untuk menyoroti kemungkinan dampak buruk.
 
-*Ilustrasi.* Anda memiliki dana Rp10.000.000 dan dua pilihan:
+---
 
-- **Deposito** dengan bunga tetap. Hasilnya hampir pasti sesuai yang dijanjikan (dengan catatan: dalam batas penjaminan yang berlaku dan selama bank beroperasi normal).
-- **Saham** satu perusahaan. Nilainya bisa naik jauh lebih tinggi daripada bunga deposito, tetapi juga bisa turun, bahkan dalam jumlah besar.
+## Risiko Selalu Berkaitan dengan Tujuan
 
-Hasil yang diharapkan dari saham mungkin lebih tinggi, tetapi rentang hasil yang mungkin terjadi juga jauh lebih lebar. Rentang inilah yang dirasakan sebagai risiko. Pertanyaan yang perlu dijawab bukan hanya "mana yang untungnya lebih besar", tetapi juga "berapa kerugian terburuk yang sanggup saya tanggung tanpa mengganggu kebutuhan hidup?"
+Bayangkan hujan turun.
 
-</Contoh>
+Apakah hujan adalah risiko?
 
-## Contoh Trading
+Jawabannya tergantung.
 
-<Contoh jenis="trading">
+Kalau tujuan Anda adalah mengadakan konser outdoor, hujan dapat mengganggu acara.
 
-*Ilustrasi, bukan rekomendasi.* Seorang trader dengan modal Rp50.000.000 membuka posisi dan menetapkan titik keluar bila harga bergerak berlawanan. Jika titik keluar itu tercapai, ia rugi Rp500.000, atau 1% dari modal.
+Tetapi kalau tujuan Anda adalah mengisi waduk yang kekurangan air, hujan justru dapat membantu.
 
-Di sini risiko dibuat **terukur sebelum posisi dibuka**: trader tahu berapa kerugian yang direncanakan bila analisisnya salah. Ini tidak menjamin kerugian tidak akan melebihi rencana. Harga bisa melompat melewati titik keluar, misalnya saat pasar dibuka setelah libur atau ketika ada berita besar. Selisih semacam itu adalah bagian dari risiko yang tetap harus diperhitungkan.
+Peristiwanya sama.
 
-</Contoh>
+Yang berbeda adalah: **tujuan dan konteksnya.**
 
-## Cara Kerja Konsep
+Itulah mengapa pertanyaan pertama ketika membicarakan risiko seharusnya bukan:
 
-Cara berpikir tentang risiko dapat diringkas menjadi empat langkah:
+> "Apa yang berbahaya?"
 
-1. **Identifikasi**: apa saja hasil yang mungkin terjadi, termasuk yang tidak diinginkan?
-2. **Ukur**: seberapa mungkin masing-masing hasil, dan seberapa besar dampaknya? Konsep [probabilitas](../probability/) dan [distribusi probabilitas](../probability-distribution/) membantu di tahap ini.
-3. **Bandingkan**: apakah hasil yang diharapkan sepadan dengan risikonya? Konsep [nilai harapan](../expected-value/) dan [volatilitas](../variance-and-volatility/) memberi alat untuk membandingkan.
-4. **Kendalikan**: kurangi kemungkinan, batasi dampak, sebar risiko, atau putuskan untuk tidak mengambilnya sama sekali.
+tetapi:
 
-Satu hal penting: tidak semua situasi bisa diukur dengan angka. Ketika peluangnya sendiri tidak diketahui, kita berhadapan dengan [ketidakpastian](../risk-vs-uncertainty/), yang dibahas di konsep berikutnya.
+> **"Apa yang sedang kita coba capai?"**
+
+Tanpa tujuan yang jelas, kita akan kesulitan menilai apakah suatu ketidakpastian benar-benar relevan terhadap keputusan kita.
+
+---
+
+## Struktur Sederhana Sebuah Risiko
+
+Untuk membuatnya lebih mudah, kita bisa memecah sebuah situasi menjadi beberapa bagian:
+
+```text
+Sumber Risiko → Event → Consequence → Dampak terhadap Tujuan
+```
