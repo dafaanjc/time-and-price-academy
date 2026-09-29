@@ -5,84 +5,160 @@ slug: risk-vs-uncertainty
 category: foundations
 order: 2
 difficulty: beginner
-description: "Perbedaan antara situasi yang peluang hasilnya dapat diukur (risiko) dan situasi yang peluangnya tidak dapat diketahui (ketidakpastian)."
-status: draft
+description: "Memahami perbedaan antara risiko dan ketidakpastian, dari gagasan Frank Knight hingga bagaimana keduanya memengaruhi keputusan dalam keuangan, bisnis, dan trading."
+status: review
 featured: false
 prerequisites: [risk]
-related: [probability]
-sources: []
+related: [risk, probability, probability-distribution, expected-value, variance-and-volatility]
+sources:
+  - type: book
+    title: "Risk, Uncertainty and Profit"
+    authors: ["Frank H. Knight"]
+    year: 1921
+    publisher: "Houghton Mifflin"
+keywords: [risk, uncertainty, probability, decision-making, frank-knight]
 ---
 
-## Mengapa Ini Penting
+## Apakah Risiko dan Ketidakpastian Itu Sama?
 
-Banyak alat pengukur risiko, seperti probabilitas, nilai harapan, dan volatilitas, hanya bekerja bila kita tahu, atau setidaknya bisa memperkirakan dengan wajar, peluang dari setiap hasil. Masalahnya, tidak semua situasi seperti itu.
+Kita sering menggunakan kata **risiko** dan **ketidakpastian** seolah-olah keduanya sama.
 
-Jika situasi yang peluangnya tidak diketahui diperlakukan seolah-olah peluangnya bisa dihitung, angka yang dihasilkan terlihat meyakinkan padahal dasarnya rapuh. Membedakan risiko dari ketidakpastian membantu Anda tahu **kapan angka bisa dipercaya dan kapan harus lebih berhati-hati.**
+Misalnya:
 
-## Gagasan Utama
+> "Masa depan itu penuh risiko."
 
-- **Risiko**: hasil yang mungkin terjadi diketahui, dan peluang masing-masing hasil dapat diukur atau diperkirakan dengan wajar.
-- **Ketidakpastian**: hasil yang mungkin terjadi, peluangnya, atau keduanya tidak dapat diketahui secara andal.
+atau:
 
-Pembedaan ini sering dikaitkan dengan ekonom Frank H. Knight dalam bukunya *Risk, Uncertainty and Profit* (1921). Karena itu, ketidakpastian jenis ini kadang disebut *Knightian uncertainty*.
+> "Kita tidak tahu apa yang akan terjadi, jadi semuanya tidak pasti."
 
-Dalam praktik, keduanya bukan dua kotak yang terpisah tegas, melainkan dua ujung sebuah spektrum. Sebagian besar keputusan nyata berada di antara keduanya.
+Keduanya memang berhubungan.
 
-## Penjelasan Sederhana
+Tetapi ada perbedaan penting.
 
-Bandingkan dua situasi:
+Kalau kita tidak tahu apa yang akan terjadi, pertanyaan berikutnya adalah:
 
-1. **Melempar dadu yang adil.** Anda tidak tahu angka berapa yang akan keluar, tetapi Anda tahu pasti hanya ada enam kemungkinan, masing-masing dengan peluang 1/6. Ini **risiko**.
-2. **Menebak kapan teknologi yang belum pernah ada akan diterima masyarakat luas.** Tidak ada daftar lengkap hasil yang mungkin, dan tidak ada data masa lalu yang benar-benar sebanding. Ini **ketidakpastian**.
+> **Seberapa jauh kita bisa memperkirakan kemungkinan yang terjadi?**
 
-Pada situasi pertama, kita bisa berhitung. Pada situasi kedua, berhitung tetap bisa membantu, tetapi hasil hitungannya harus diperlakukan sebagai dugaan, bukan fakta.
+Di sinilah perbedaan antara **risk** dan **uncertainty** mulai menjadi penting.
 
-## Contoh Kehidupan Nyata
+Salah satu pembahasan paling berpengaruh mengenai perbedaan ini datang dari ekonom **Frank H. Knight** dalam bukunya *Risk, Uncertainty and Profit* (1921).
 
-<Contoh jenis="kehidupan">
+Knight membedakan situasi yang probabilitasnya masih dapat diperkirakan atau "diukur" dari situasi ketika probabilitas yang relevan tidak dapat ditentukan secara bermakna berdasarkan informasi yang tersedia.
 
-- **Asuransi kendaraan** bekerja dengan risiko. Perusahaan asuransi memiliki data dari banyak pengemudi, sehingga frekuensi klaim bisa diperkirakan dengan cukup baik untuk kelompok besar.
-- **Membuka usaha jenis baru di kota kecil** lebih dekat ke ketidakpastian. Belum ada usaha serupa yang bisa dijadikan pembanding, sehingga sulit memperkirakan berapa peluang usaha itu bertahan.
+Versi sederhananya:
 
-</Contoh>
+> **Risk adalah ketidakpastian yang masih dapat kita modelkan atau ukur dengan cara tertentu.**
 
-## Contoh Keuangan
+> **Uncertainty adalah kondisi ketika kita bahkan kesulitan menentukan probabilitas yang dapat dipercaya.**
 
-<Contoh jenis="keuangan">
+Tetapi jangan berhenti pada definisi sederhana tersebut.
 
-*Ilustrasi.* Bandingkan dua keputusan investasi:
+Dalam literatur modern, batas antara risk dan uncertainty tidak selalu dianggap sebagai garis yang kaku. Banyak situasi berada di antara keduanya, tergantung informasi, model, asumsi, dan konteks yang kita miliki.
 
-| Situasi | Lebih dekat ke | Alasan |
-| --- | --- | --- |
-| Membeli obligasi dari penerbit yang sudah lama menerbitkan obligasi dan memiliki riwayat pembayaran panjang | Risiko | Ada catatan historis yang bisa dipakai untuk memperkirakan kemungkinan gagal bayar |
-| Mendanai perusahaan rintisan dengan model bisnis yang belum pernah dicoba | Ketidakpastian | Tidak ada data pembanding yang andal untuk memperkirakan peluang berhasil |
+---
 
-Pada situasi kedua, hitungan seperti "peluang berhasil 30%" mungkin tetap dibuat. Namun angka itu lebih mencerminkan penilaian pribadi daripada frekuensi yang terukur.
+## Kenapa Perbedaan Ini Penting?
 
-</Contoh>
+Karena cara kita memperlakukan suatu situasi akan berbeda.
 
-## Contoh Trading
+Kalau kita memiliki probabilitas yang cukup dapat diperkirakan, kita bisa menggunakan:
 
-<Contoh jenis="trading">
+- probability,
+- expected value,
+- distribution,
+- scenario analysis,
+- risk assessment,
+- dan model statistik.
 
-*Ilustrasi, bukan rekomendasi.* Seorang trader menguji sebuah strategi pada data historis dan menemukan bahwa strategi itu memberi hasil tertentu dalam kondisi pasar yang pernah terjadi. Selama kondisi pasar mirip dengan data uji, hasil uji itu memberi gambaran **risiko** yang bisa diperkirakan.
+Tetapi ketika probabilitasnya sendiri tidak dapat ditentukan dengan baik, masalah kita bukan sekadar:
 
-Namun ketika terjadi peristiwa yang belum pernah tercakup dalam data, misalnya perubahan aturan pasar yang mendadak, hasil uji historis bisa kehilangan relevansinya. Pada saat itu trader berhadapan dengan **ketidakpastian**: statistik lama tidak lagi menjamin apa pun tentang perilaku harga berikutnya.
+> "Berapa peluangnya?"
 
-</Contoh>
+Melainkan:
 
-## Cara Kerja Konsep
+> **"Apakah kita benar-benar punya dasar untuk menentukan peluang tersebut?"**
 
-Beberapa pertanyaan praktis untuk menentukan posisi sebuah keputusan di spektrum risiko–ketidakpastian:
+Ini perbedaan yang sangat penting.
 
-1. **Apakah daftar hasil yang mungkin sudah lengkap?** Jika ada hasil penting yang bahkan sulit dibayangkan, Anda condong ke ketidakpastian.
-2. **Dari mana angka peluangnya berasal?** Frekuensi dari banyak kejadian serupa lebih kuat daripada tebakan atau data yang sedikit.
-3. **Apakah kondisi masa lalu masih mirip dengan sekarang?** Data historis hanya relevan bila situasinya sebanding.
+Sebab seseorang bisa membuat angka probabilitas yang sangat presisi tanpa memiliki pengetahuan yang cukup untuk membuat angka tersebut dapat dipercaya.
 
-Semakin dekat ke ketidakpastian, semakin penting untuk:
+---
 
-- **menyisakan margin keamanan**, misalnya tidak memakai seluruh modal pada satu keputusan;
-- **menguji beberapa skenario** alih-alih bergantung pada satu angka;
-- **menjaga fleksibilitas**, sehingga keputusan bisa diubah ketika informasi baru muncul.
+## Contoh Paling Sederhana
 
-Di konsep berikutnya, [Probabilitas](../probability/), kita membahas alat utama untuk mengukur sisi "risiko" dari spektrum ini.
+Bayangkan kita melempar koin yang seimbang.
+
+Secara ideal, ada dua hasil:
+
+- kepala
+- ekor
+
+Jika koin benar-benar seimbang dan mekanismenya dipahami, kita dapat membangun model probabilitas yang relatif sederhana.
+
+Kita bisa mengatakan:
+
+> kemungkinan kepala ≈ 50%
+
+> kemungkinan ekor ≈ 50%
+
+Kita mungkin belum tahu hasil lemparan berikutnya.
+
+Tetapi **ketidaktahuan kita tidak berarti kita tidak dapat memodelkan kemungkinan hasilnya.**
+
+Inilah contoh situasi yang lebih dekat dengan konsep **risk** dalam pengertian Knight.
+
+Sekarang ubah situasinya.
+
+Bayangkan sebuah perusahaan sedang meluncurkan produk yang benar-benar baru.
+
+Tidak ada produk sejenis yang cukup comparable.
+
+Tidak ada data historis yang memadai.
+
+Preferensi konsumen bisa berubah.
+
+Kompetitor mungkin merespons.
+
+Regulasi mungkin berubah.
+
+Bahkan kategori produknya mungkin belum terbentuk dengan jelas.
+
+Sekarang pertanyaannya:
+
+> Berapa probabilitas produk ini gagal?
+
+Kita masih bisa membuat angka.
+
+Misalnya:
+
+> "Peluang gagal 37%."
+
+Tetapi dari mana angka 37% itu berasal?
+
+Kalau data pembentuknya sangat lemah, angka tersebut mungkin terlihat ilmiah tetapi sebenarnya hanya merupakan **estimasi yang penuh asumsi**.
+
+Di sinilah kita mulai bergerak dari risk menuju **uncertainty**.
+
+---
+
+## Knight: Risk vs Uncertainty
+
+Frank H. Knight membahas perbedaan ini dalam:
+
+> *Risk, Uncertainty and Profit* (1921)
+
+Knight membedakan antara situasi ketika probabilitas dapat ditentukan dan situasi ketika ketidakpastian tidak dapat direduksi menjadi probabilitas yang dapat dihitung secara objektif.
+
+Dalam bahasa sederhananya:
+
+```text
+Kita tidak tahu hasil masa depan
+          │
+          ├── Kita masih punya dasar untuk memperkirakan kemungkinan
+          │          ↓
+          │        RISK
+          │
+          └── Kita bahkan sulit menentukan kemungkinan yang bermakna
+                     ↓
+                  UNCERTAINTY
+```
