@@ -7,38 +7,201 @@ topic: decision-under-risk
 order: 4
 difficulty: intermediate
 description: "Pilihan dapat berubah ketika informasi yang sama disajikan dengan cara berbeda, misalnya sebagai peluang untung atau sebagai peluang rugi."
-status: draft
+status: review
 featured: false
 prerequisites: [prospect-theory]
-related: [anchoring, reference-point]
-keywords: [framing, bingkai, cara penyajian, win rate]
-sources: []
+related: [anchoring, reference-point, loss-aversion, expected-value, disposition-effect]
+keywords: ["framing", "bingkai", "cara penyajian", "win rate", "winrate 90%", "iklan broker", "risk reward", "RRR", "cicilan 0%", "cashback", "stop loss", "biaya asuransi"]
+sources:
+  - type: primary-research
+    title: "The Framing of Decisions and the Psychology of Choice"
+    authors: ["Amos Tversky", "Daniel Kahneman"]
+    year: 1981
+    publisher: "Science, 211(4481), 453–458"
+    doi: "10.1126/science.7455683"
+    note: "Menunjukkan bahwa preferensi berbalik ketika masalah yang sama dibingkai sebagai untung atau rugi, termasuk soal 'penyakit langka' yang terkenal, serta pengaruh bingkai pada akun psikologis."
+  - type: primary-research
+    title: "Prospect Theory: An Analysis of Decision under Risk"
+    authors: ["Daniel Kahneman", "Amos Tversky"]
+    year: 1979
+    publisher: "Econometrica, 47(2), 263–291"
+    doi: "10.2307/1914185"
+    note: "Dasar teoretis efek pembingkaian: hasil dinilai relatif terhadap titik acuan, sehingga cara menyajikan masalah dapat menggeser titik acuan dan sikap terhadap risiko."
 ---
 
 ## Mengapa Ini Penting
 
-_Draf: bagian ini belum ditulis._
+Informasi keuangan hampir tidak pernah disajikan secara netral. Iklan broker menonjolkan winrate, laporan reksa dana menonjolkan imbal hasil kumulatif, dan penjual cicilan menonjolkan angsuran bulanan. Setiap penyajian memilih satu sudut pandang, dan sudut pandang itu dapat mengubah pilihan walaupun isinya tidak berubah.
+
+Konsep ini penting karena tiga alasan:
+
+1. **Isi yang sama bisa mendorong keputusan yang berlawanan.** Bukan karena informasinya berbeda, tetapi karena cara penyajiannya menggeser apa yang terasa sebagai untung dan rugi.
+
+2. **Trader membingkai keputusannya sendiri.** Stop loss yang dibingkai sebagai "kekalahan" terasa jauh lebih berat daripada stop loss yang dibingkai sebagai "biaya menjalankan strategi".
+
+3. **Penawarnya bisa dilatih.** Menerjemahkan setiap informasi ke bentuk yang sama, misalnya [nilai harapan](../expected-value/) per transaksi atau imbal hasil per tahun, mengurangi kekuatan bingkai.
 
 ## Gagasan Utama
 
-_Draf: bagian ini belum ditulis._
+<Definisi>
+
+**Efek pembingkaian adalah kecenderungan pilihan berubah ketika informasi yang sama secara isi disajikan dengan cara yang berbeda, misalnya sebagai untung atau sebagai rugi.** Menurut model pengambilan keputusan yang rasional, pilihan seharusnya hanya bergantung pada isi, bukan pada cara penyajian.
+
+</Definisi>
+
+Amos Tversky dan Daniel Kahneman (1981) memperlihatkan efek ini dalam soal yang kemudian terkenal sebagai soal "penyakit langka". Peserta diminta membayangkan wabah yang diperkirakan menewaskan 600 orang, dan harus memilih antara dua program penanganan.
+
+Kelompok pertama menerima bingkai **nyawa yang diselamatkan**:
+
+```text
+Program A: 200 orang akan selamat
+Program B: peluang 1/3 semua 600 orang selamat, peluang 2/3 tidak ada yang selamat
+
+Hasil: 72% memilih A, 28% memilih B
+```
+
+Kelompok kedua menerima bingkai **nyawa yang hilang**:
+
+```text
+Program C: 400 orang akan meninggal
+Program D: peluang 1/3 tidak ada yang meninggal, peluang 2/3 semua 600 orang meninggal
+
+Hasil: 22% memilih C, 78% memilih D
+```
+
+Program A dan C identik: 200 selamat berarti 400 meninggal. Program B dan D juga identik. Namun mayoritas berpindah dari pilihan yang pasti ke pilihan yang berisiko hanya karena bingkainya berganti dari "selamat" ke "meninggal".
+
+Penjelasannya datang dari [teori prospek](../prospect-theory/) (Kahneman dan Tversky, 1979). Bingkai menentukan [titik acuan](../reference-point/). Dalam bingkai "selamat", hasil dinilai sebagai keuntungan dari nol, dan di wilayah untung orang cenderung menghindari risiko. Dalam bingkai "meninggal", hasil dinilai sebagai kerugian, dan di wilayah rugi orang cenderung mencari risiko.
+
+Tversky dan Kahneman (1981) juga menunjukkan bahwa bingkai memengaruhi cara orang mengelompokkan hasil ke dalam "akun psikologis". Kehilangan uang tunai seharga sebuah tiket tidak terlalu menghalangi orang untuk membeli tiket, tetapi kehilangan tiket yang sudah dibeli membuat banyak orang enggan membeli lagi, walaupun kerugian uangnya sama. Kerugian kedua dicatat dalam "akun" yang sama dengan pengeluaran untuk tiket, sehingga harga tiket terasa berlipat.
+
+> **Isi yang sama dengan bingkai berbeda dapat menghasilkan pilihan yang berlawanan. Bingkai menentukan apa yang terasa sebagai untung dan apa yang terasa sebagai rugi.**
 
 ## Penjelasan Sederhana
 
-_Draf: bagian ini belum ditulis._
+Bayangkan seorang dokter menjelaskan sebuah operasi kepada pasien. Ia bisa berkata, "Dari setiap 100 pasien, 90 masih hidup lima tahun kemudian." Ia juga bisa berkata, "Dari setiap 100 pasien, 10 meninggal dalam lima tahun." Kedua kalimat memberi informasi yang persis sama.
+
+Namun kalimat pertama membuat operasi terasa sebagai harapan, sedangkan kalimat kedua membuatnya terasa sebagai ancaman. Pasien yang mendengar kalimat pertama mungkin langsung setuju; pasien yang mendengar kalimat kedua mungkin meminta waktu berpikir. Angkanya tidak berubah, yang berubah adalah titik acuannya: hidup sebagai keuntungan, atau kematian sebagai kerugian.
+
+Cara yang paling sederhana untuk menetralkan bingkai adalah mendengar keduanya sekaligus: "90 hidup, 10 meninggal." Dengan kedua sisi terlihat, keputusan kembali bertumpu pada isi.
+
+Dalam trading, bingkai yang paling sering bekerja adalah winrate. "Menang 9 dari 10" terdengar hebat, tetapi tanpa sisi yang lain, yaitu berapa besar menang dan berapa besar kalah, angka itu tidak memberi tahu apakah strateginya menguntungkan.
 
 ## Contoh Kehidupan Nyata
 
-_Draf: bagian ini belum ditulis._
+<Contoh jenis="kehidupan">
+
+*Ilustrasi.* Dua penawaran sehari-hari berikut memperlihatkan bingkai yang mengubah rasa tanpa mengubah isi.
+
+**1. "Cuma Rp300.000 per bulan."** Sebuah toko elektronik menawarkan televisi dengan cicilan 0% selama 12 bulan: "Cuma Rp300.000 per bulan!" Harga tunainya Rp3.200.000.
+
+```text
+Total cicilan    = 12 × Rp300.000 = Rp3.600.000
+Harga tunai      = Rp3.200.000
+Selisih          = Rp400.000 ≈ 12,5% di atas harga tunai
+```
+
+Bingkai "per bulan" membuat pembeli membandingkan Rp300.000 dengan gaji bulanannya, bukan membandingkan Rp3.600.000 dengan Rp3.200.000. Label "0%" pun menjadi bingkai: bunganya memang nol, tetapi harganya tidak sama dengan harga tunai.
+
+**2. Diskon tunai atau biaya tambahan kartu.** Sebuah toko bangunan menjual barang seharga Rp1.000.000 bila dibayar tunai dan Rp1.020.000 bila dibayar dengan kartu. Bila toko menyebut selisih itu "diskon tunai 2%", pembeli kartu merasa sekadar tidak mendapat diskon. Bila toko menyebutnya "biaya tambahan kartu 2%", pembeli kartu merasa dirugikan. Selisihnya sama, Rp20.000, tetapi bingkai kedua terasa sebagai kerugian.
+
+</Contoh>
 
 ## Contoh Keuangan
 
-_Draf: bagian ini belum ditulis._
+<Contoh jenis="keuangan">
+
+*Ilustrasi.* Sebuah materi pemasaran reksa dana menulis: "Imbal hasil 40% dalam tiga tahun!" Materi lain untuk produk sejenis menulis: "Biaya pengelolaan hanya 1% per tahun." Kedua kalimat benar, tetapi bingkainya dipilih untuk membuat angka pertama terasa besar dan angka kedua terasa kecil.
+
+Menerjemahkan keduanya ke bingkai yang sama mengubah gambaran:
+
+```text
+Imbal hasil 40% dalam 3 tahun, dalam bentuk per tahun
+  (1,40)^(1/3) − 1 ≈ 11,9% per tahun
+
+Biaya 1% per tahun, dalam bentuk kumulatif 10 tahun
+  1 − 0,99^10 ≈ 9,6% dari nilai portofolio
+```
+
+Angka "40%" terasa jauh lebih mengesankan daripada "11,9% per tahun", padahal keduanya sama. Sebaliknya, "hanya 1%" terasa sepele, padahal dalam sepuluh tahun biaya itu menggerus hampir sepersepuluh nilai investasi, belum termasuk keuntungan yang hilang karena dana itu tidak ikut berkembang.
+
+Kebiasaan yang membantu adalah menerjemahkan setiap angka ke satu bingkai baku sebelum membandingkan: imbal hasil **per tahun**, biaya **kumulatif** untuk jangka waktu investasi yang direncanakan, dan hasil **setelah biaya**.
+
+</Contoh>
 
 ## Contoh Trading
 
-_Draf: bagian ini belum ditulis._
+<Contoh jenis="trading">
+
+*Ilustrasi, bukan rekomendasi.* Sebuah iklan sistem trading otomatis berbunyi: "Winrate 90%!" Seorang trader membandingkannya dengan strategi yang sedang ia uji, yang winrate-nya hanya 35%. Bingkai winrate membuat pilihan terasa jelas. Tetapi winrate hanya separuh informasi. Bila besar menang dan kalah ikut diperhitungkan:
+
+```text
+Sistem iklan
+  Menang 90%, rata-rata +0,2R   → 0,90 × 0,2R = +0,18R
+  Kalah 10%, rata-rata −2,5R    → 0,10 × 2,5R = −0,25R
+  Nilai harapan                 = −0,07R per transaksi
+
+Strategi yang diuji
+  Menang 35%, rata-rata +3R     → 0,35 × 3R   = +1,05R
+  Kalah 65%, rata-rata −1R      → 0,65 × 1R   = −0,65R
+  Nilai harapan                 = +0,40R per transaksi
+```
+
+Sistem dengan winrate 90% merugi perlahan, sementara strategi yang "sering kalah" justru menguntungkan. Bingkai winrate menyembunyikan kerugian besar yang jarang terjadi, dan kerugian besar yang jarang itulah yang menentukan hasil akhir.
+
+Bingkai juga bekerja pada cara trader memandang stop loss-nya sendiri. Dengan strategi 35% tadi, trader akan kena stop loss sekitar 65 kali dari setiap 100 transaksi. Bila setiap stop loss dibingkai sebagai "kekalahan", 65 kekalahan per 100 transaksi akan terasa sangat menyakitkan, dan godaan untuk menggeser atau menghapus stop loss menjadi besar. Bila stop loss dibingkai sebagai "biaya menjalankan strategi", seperti premi asuransi yang dibayar agar kerugian besar tidak terjadi, stop loss yang sama terasa sebagai bagian dari rencana.
+
+Kedua bingkai tidak mengubah angka. Yang berubah adalah titik acuan, dan titik acuan menentukan apakah trader tetap mengikuti strategi dengan nilai harapan positif atau meninggalkannya karena "terlalu sering kalah".
+
+</Contoh>
 
 ## Cara Kerja Konsep
 
-_Draf: bagian ini belum ditulis._
+Efek pembingkaian bekerja dengan menggeser titik acuan, lalu teori prospek melakukan sisanya:
+
+```text
+Informasi yang sama
+          │
+          ├── Bingkai untung ("selamat", "winrate 90%", "imbal hasil 40%")
+          │         → titik acuan di bawah hasil → terasa untung → menghindari risiko
+          │
+          └── Bingkai rugi ("meninggal", "kalah 65 kali", "biaya tambahan")
+                    → titik acuan di atas hasil → terasa rugi → mencari risiko
+          │
+          ▼
+Pilihan berubah walaupun isinya tidak berubah
+```
+
+Tabel berikut merangkum bingkai yang umum di dunia keuangan dan cara menetralkannya:
+
+| Bingkai yang disajikan | Yang tersembunyi | Bingkai baku untuk membandingkan |
+|---|---|---|
+| Winrate tinggi | Besar kerugian saat kalah | Nilai harapan per transaksi dalam R |
+| Imbal hasil kumulatif | Lamanya periode | Imbal hasil per tahun |
+| Biaya per tahun yang kecil | Efek kumulatif | Biaya total selama jangka investasi |
+| Cicilan per bulan | Harga total | Total yang dibayar dibandingkan harga tunai |
+| "Belum rugi selama belum dijual" | Nilai posisi saat ini | Nilai pasar hari ini, seolah posisi baru dibuka |
+
+**Kapan pembingkaian tidak bisa dihindari?** Setiap informasi harus disajikan dengan suatu cara, jadi bingkai selalu ada. Tujuannya bukan menemukan penyajian yang "tanpa bingkai", melainkan melihat informasi yang sama dari lebih dari satu bingkai, dan memilih satu bingkai baku untuk setiap jenis keputusan. Untuk strategi trading, bingkai baku yang paling berguna adalah nilai harapan per transaksi dan risiko per transaksi.
+
+**Pertanyaan pemeriksa.** Sebelum mengambil keputusan dari sebuah angka:
+
+1. Bila informasi ini disajikan dari sisi sebaliknya, apakah keputusan saya berubah?
+
+2. Angka apa yang tidak disebutkan: besar kerugian, lamanya periode, biaya total, atau harga tunai?
+
+3. Apakah saya sudah menerjemahkan angka ini ke bingkai baku yang sama dengan alternatifnya?
+
+4. Bagaimana saya membingkai stop loss saya sendiri: sebagai kekalahan, atau sebagai biaya menjalankan rencana?
+
+Untuk membandingkan strategi dengan winrate berbeda dalam bingkai yang sama, yaitu nilai harapan, gunakan alat berikut:
+
+<PenjelajahNilaiHarapan />
+
+Ringkasnya:
+
+> Isi yang sama dapat terasa sebagai untung atau rugi, tergantung cara penyajiannya.
+
+> Winrate tanpa besar menang dan kalah adalah bingkai, bukan informasi lengkap.
+
+> Terjemahkan setiap angka ke bingkai baku sebelum memutuskan.
