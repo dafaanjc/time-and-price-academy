@@ -7,38 +7,194 @@ topic: cognitive-biases
 order: 6
 difficulty: intermediate
 description: "Kecenderungan menilai pengetahuan, kemampuan, atau ketepatan perkiraan sendiri lebih tinggi daripada kenyataannya, misalnya memasang rentang perkiraan yang terlalu sempit."
-status: draft
+status: review
 featured: false
 prerequisites: [heuristics, variance-and-volatility]
-related: [position-sizing, risk-of-ruin]
-keywords: [terlalu yakin, overtrading, pede, kalibrasi, ilusi kendali]
-sources: []
+related: [position-sizing, risk-of-ruin, representativeness, expected-value, probability-distribution]
+keywords: ["terlalu yakin", "overtrading", "pede", "kalibrasi", "ilusi kendali", "overconfidence", "sok jago", "all in", "lot gede", "yakin 100%", "merasa lebih jago", "rentang terlalu sempit"]
+sources:
+  - type: primary-research
+    title: "Trading Is Hazardous to Your Wealth: The Common Stock Investment Performance of Individual Investors"
+    authors: ["Brad M. Barber", "Terrance Odean"]
+    year: 2000
+    publisher: "The Journal of Finance, 55(2), 773–806"
+    doi: "10.1111/0022-1082.00226"
+    note: "Data 66.465 rumah tangga di sebuah broker diskon (1991–1996): kelompok yang paling sering bertransaksi memperoleh imbal hasil tahunan jauh di bawah pasar; keyakinan berlebih diajukan sebagai penjelasannya."
+  - type: primary-research
+    title: "The Trouble with Overconfidence"
+    authors: ["Don A. Moore", "Paul J. Healy"]
+    year: 2008
+    publisher: "Psychological Review, 115(2), 502–517"
+    doi: "10.1037/0033-295X.115.2.502"
+    note: "Membedakan tiga bentuk keyakinan berlebih: overestimation, overplacement, dan overprecision, serta menjelaskan mengapa ketiganya tidak selalu muncul bersamaan."
 ---
 
 ## Mengapa Ini Penting
 
-_Draf: bagian ini belum ditulis._
+Hampir semua kerugian besar di akun trading ritel memiliki pola yang sama: bukan satu analisis yang salah, melainkan analisis yang salah **dengan ukuran posisi yang terlalu besar**. Di balik ukuran yang terlalu besar hampir selalu ada keyakinan yang terlalu tinggi.
+
+Konsep ini penting karena tiga alasan:
+
+1. **Keyakinan berlebih langsung diterjemahkan menjadi risiko.** Trader yang terlalu yakin memperbesar lot, memperketat rentang perkiraan, dan memperbanyak transaksi. Ketiganya memperbesar kerugian ketika keyakinan itu keliru.
+
+2. **Ia sulit dirasakan dari dalam.** Keyakinan yang berlebih terasa sama dengan keyakinan yang wajar. Hanya pencatatan dan perbandingan dengan hasil yang bisa membedakannya.
+
+3. **Ia berhubungan erat dengan sebaran hasil.** Salah satu bentuknya adalah memperkirakan [variansi dan volatilitas](../variance-and-volatility/) terlalu kecil, sehingga kejadian yang sebenarnya wajar terasa seperti "mustahil".
 
 ## Gagasan Utama
 
-_Draf: bagian ini belum ditulis._
+<Definisi>
+
+**Keyakinan berlebih adalah kecenderungan menilai pengetahuan, kemampuan, atau ketepatan perkiraan sendiri lebih tinggi daripada kenyataannya.** Istilah ini mencakup beberapa bentuk yang berbeda, dan masing-masing berdampak berbeda pada keputusan.
+
+</Definisi>
+
+Don A. Moore dan Paul J. Healy (2008) menunjukkan bahwa istilah "keyakinan berlebih" selama ini dipakai untuk tiga hal yang berbeda:
+
+- ***Overestimation*:** menilai kemampuan, kinerja, atau peluang keberhasilan sendiri lebih tinggi daripada kenyataannya. Contoh: yakin winrate sendiri 65% padahal 48%.
+
+- ***Overplacement*:** menilai diri lebih baik daripada orang lain. Contoh: merasa lebih jago membaca pasar daripada kebanyakan trader lain.
+
+- ***Overprecision*:** terlalu yakin pada ketepatan perkiraan sendiri, sehingga rentang perkiraan dipasang terlalu sempit. Contoh: yakin harga "paling jauh" bergerak 150 poin hari ini.
+
+Moore dan Healy juga menunjukkan bahwa ketiga bentuk ini tidak selalu muncul bersamaan. Pada tugas yang sulit, orang cenderung melebih-lebihkan kinerjanya sendiri, tetapi justru merasa lebih buruk daripada orang lain. Pada tugas yang mudah, polanya cenderung berbalik. Karena itu, pertanyaan "apakah saya terlalu yakin?" perlu dirinci: yakin tentang apa?
+
+Dampak keyakinan berlebih di pasar keuangan diperlihatkan oleh Brad M. Barber dan Terrance Odean (2000). Mereka meneliti catatan transaksi 66.465 rumah tangga di sebuah broker diskon di Amerika Serikat pada 1991–1996. Rata-rata rumah tangga memutar sekitar 75% portofolionya setiap tahun. Kelompok yang paling sering bertransaksi memperoleh imbal hasil tahunan 11,4%, sementara pasar menghasilkan 17,9%. Barber dan Odean menyimpulkan bahwa keyakinan berlebih dapat menjelaskan tingginya frekuensi transaksi dan buruknya hasil tersebut.
+
+> **Keyakinan berlebih bukan soal merasa pintar; ia soal rentang yang terlalu sempit, ukuran yang terlalu besar, dan transaksi yang terlalu sering.**
 
 ## Penjelasan Sederhana
 
-_Draf: bagian ini belum ditulis._
+Bayangkan menjelang Lebaran, seseorang merencanakan mudik dari Jakarta ke Semarang dengan mobil. "Paling tujuh jam, berangkat jam lima pagi, sampai jam dua belas siang." Ia memesan tempat untuk makan siang bersama keluarga besar jam satu.
+
+Perkiraan tujuh jam itu mungkin benar pada hari biasa. Tetapi pada musim mudik, perjalanan yang sama bisa memakan sembilan, dua belas, bahkan lebih dari lima belas jam, tergantung kepadatan, kecelakaan di jalan, dan antrean di rest area. Masalahnya bukan tebakan tujuh jam itu, melainkan **tidak adanya rentang**. Ia merencanakan seolah-olah hanya ada satu kemungkinan hasil.
+
+Perencana yang lebih tenang akan berkata: "Paling cepat tujuh jam, paling lama mungkin enam belas jam; acara makan siang saya pindah ke makan malam." Perkiraannya sama, tetapi keputusannya jauh lebih tahan terhadap kejutan.
+
+Dalam trading, perkiraan tanpa rentang berubah menjadi posisi tanpa ruang: stop loss yang terlalu ketat, lot yang terlalu besar, dan keyakinan bahwa skenario buruk "tidak mungkin terjadi hari ini".
 
 ## Contoh Kehidupan Nyata
 
-_Draf: bagian ini belum ditulis._
+<Contoh jenis="kehidupan">
+
+*Ilustrasi.* Dua situasi berikut memperlihatkan dua bentuk keyakinan berlebih.
+
+**1. Renovasi rumah (*overprecision*).** Sepasang suami istri merencanakan renovasi dapur: "Dua bulan selesai, biayanya Rp50.000.000." Mereka tidak menyiapkan cadangan. Di tengah jalan ditemukan pipa yang harus diganti, harga keramik naik, dan tukang berhalangan dua minggu. Renovasi selesai dalam empat bulan dengan biaya Rp78.000.000. Angka awal mereka bukan tebakan yang buruk; kesalahannya adalah memperlakukan satu angka sebagai kepastian.
+
+**2. Membuka kedai kopi (*overplacement*).** Seseorang membuka kedai kopi di gang yang sudah memiliki empat kedai serupa. Ia yakin kedainya akan lebih laku karena "racikan saya lebih enak dan saya lebih paham media sosial". Mungkin benar, tetapi keempat pemilik kedai lain kemungkinan besar juga berpikir demikian ketika memulai. Keyakinan bahwa diri sendiri berada di atas rata-rata membuatnya tidak menyiapkan rencana bila penjualan hanya setara rata-rata.
+
+</Contoh>
 
 ## Contoh Keuangan
 
-_Draf: bagian ini belum ditulis._
+<Contoh jenis="keuangan">
+
+*Ilustrasi.* Seorang investor ritel merasa sanggup memilih saham yang "akan naik bulan ini". Ia berpindah-pindah saham rata-rata dua kali sebulan, mengikuti saham yang sedang ramai. Keyakinan bahwa ia bisa memilih lebih baik daripada pasar membuat biaya transaksi terasa tidak penting.
+
+Padahal biaya itu menumpuk. Misalkan biaya beli 0,15% dan biaya jual 0,25% dari nilai transaksi:
+
+```text
+Biaya satu kali putaran (beli + jual)   = 0,15% + 0,25% = 0,40%
+Putaran per tahun                       = 2 × 12 = 24
+Biaya tahunan                           ≈ 24 × 0,40% = 9,6% dari nilai portofolio
+```
+
+Sebelum memperhitungkan untung atau rugi dari pilihan sahamnya, portofolio sudah harus menghasilkan hampir 10% per tahun hanya untuk menutup biaya.
+
+Selisih imbal hasil tahunan yang terlihat kecil juga membesar seiring waktu. Dengan memakai angka tahunan dari Barber dan Odean (2000) sebagai ilustrasi, dan modal Rp100.000.000 selama enam tahun:
+
+```text
+Imbal hasil 17,9% per tahun   → 100 × 1,179^6 ≈ Rp268.600.000
+Imbal hasil 11,4% per tahun   → 100 × 1,114^6 ≈ Rp191.100.000
+Selisih                       ≈ Rp77.500.000
+```
+
+Selisih enam setengah poin persentase per tahun berubah menjadi selisih puluhan juta rupiah. Pertanyaan yang lebih tepat bukan "saham apa yang akan naik bulan ini?", melainkan "apakah hasil saya setelah biaya benar-benar lebih baik daripada alternatif yang pasif?"
+
+</Contoh>
 
 ## Contoh Trading
 
-_Draf: bagian ini belum ditulis._
+<Contoh jenis="trading">
+
+*Ilustrasi, bukan rekomendasi.* Seorang trader XAUUSD baru saja mengalami enam kemenangan beruntun. Ia menyimpulkan bahwa ia sudah "menemukan ritme" dan menaikkan risiko dari 1% menjadi 5% per transaksi. Ia juga menambah frekuensi dari sekitar 20 menjadi 80 transaksi per bulan.
+
+Keyakinan berlebih bekerja di tiga tempat sekaligus. Pertama, pada ukuran posisi. Rangkaian delapan kekalahan beruntun adalah kejadian yang bisa terjadi pada strategi yang wajar sekalipun, bila jumlah transaksinya cukup banyak:
+
+```text
+Delapan kekalahan beruntun, risiko dari saldo berjalan
+
+Risiko 1%   → sisa modal = 0,99^8 ≈ 92,3%   → turun ≈ 7,7%
+Risiko 5%   → sisa modal = 0,95^8 ≈ 66,3%   → turun ≈ 33,7%
+
+Kenaikan yang dibutuhkan untuk kembali ke modal awal
+  dari turun 7,7%    → 1 / 0,923 − 1 ≈ 8,3%
+  dari turun 33,7%   → 1 / 0,663 − 1 ≈ 50,8%
+```
+
+Kedua, pada frekuensi. Misalkan biaya spread dan komisi rata-rata setara 0,1R per transaksi:
+
+```text
+20 transaksi per bulan   → biaya ≈ 20 × 0,1R = 2R
+80 transaksi per bulan   → biaya ≈ 80 × 0,1R = 8R
+```
+
+Bila nilai harapan strateginya +0,2R per transaksi sebelum biaya, tambahan transaksi yang diambil tanpa setup yang lengkap cenderung menurunkan nilai harapan rata-rata, sementara biayanya naik empat kali lipat.
+
+Ketiga, pada rentang perkiraan. Enam kemenangan beruntun terasa seperti bukti bahwa winrate-nya tinggi, padahal enam transaksi adalah sampel yang sangat kecil (lihat [heuristik keterwakilan](../representativeness/)). Menaikkan risiko setelah rangkaian menang adalah jalan pintas menuju [risiko kehancuran](../risk-of-ruin/).
+
+</Contoh>
 
 ## Cara Kerja Konsep
 
-_Draf: bagian ini belum ditulis._
+Keyakinan berlebih menerjemahkan penilaian diri yang terlalu tinggi menjadi keputusan yang terlalu berisiko:
+
+```text
+Penilaian diri terlalu tinggi
+          │
+          ├── Overestimation   → winrate dan kemampuan ditaksir terlalu tinggi
+          │                        → lot terlalu besar
+          │
+          ├── Overplacement    → merasa lebih jago dari pelaku pasar lain
+          │                        → transaksi terlalu sering
+          │
+          └── Overprecision    → rentang perkiraan terlalu sempit
+                                   → skenario buruk tidak direncanakan
+          │
+          ▼
+Kerugian ketika salah jauh lebih besar daripada yang direncanakan
+```
+
+Tabel berikut merangkum ketiga bentuknya dalam trading:
+
+| Bentuk | Pertanyaan yang dijawab terlalu optimis | Dampak pada keputusan | Penawarnya |
+|---|---|---|---|
+| *Overestimation* | Seberapa bagus saya? | Risiko per transaksi dinaikkan | Winrate dan nilai harapan dihitung dari jurnal |
+| *Overplacement* | Seberapa bagus saya dibanding orang lain? | Terlalu sering bertransaksi | Bandingkan hasil setelah biaya dengan alternatif pasif |
+| *Overprecision* | Seberapa pasti perkiraan saya? | Stop loss terlalu ketat, tidak ada rencana skenario buruk | Nyatakan perkiraan sebagai rentang, lalu periksa seberapa sering hasil keluar dari rentang |
+
+**Kalibrasi.** Cara paling langsung untuk mengukur *overprecision* adalah kalibrasi. Setiap kali membuat perkiraan, tulis rentang yang Anda yakini 90%, misalnya "pergerakan harga hari ini antara 80 dan 250 poin". Setelah 30 perkiraan, hitung berapa kali hasil sebenarnya berada di dalam rentang. Bila jauh kurang dari 27 kali, rentang Anda terlalu sempit.
+
+**Kapan keyakinan tinggi itu wajar?** Keyakinan tinggi dapat dibenarkan bila didukung sampel yang besar, umpan balik yang jelas, dan hasil yang tercatat. Keyakinan menjadi berbahaya ketika sumbernya rangkaian hasil pendek, perasaan "sedang panas", atau cerita orang lain. Ukuran posisi sebaiknya dikaitkan dengan aturan tertulis, bukan dengan suasana hati setelah menang (lihat [ukuran posisi](../position-sizing/)).
+
+**Pertanyaan pemeriksa.** Sebelum menaikkan risiko atau frekuensi transaksi:
+
+1. Dari berapa transaksi keyakinan saya ini terbentuk?
+
+2. Bila winrate saya sebenarnya 10 poin persentase lebih rendah, apakah strategi ini masih menguntungkan?
+
+3. Seberapa sering hasil sebenarnya berada di luar rentang perkiraan saya?
+
+4. Berapa penurunan modal bila saya kalah delapan kali beruntun dengan risiko yang sedang saya pertimbangkan?
+
+Untuk melihat seberapa lebar sebaran hasil yang wajar, dan betapa seringnya hasil jatuh di luar rentang yang terasa "pasti", gunakan alat berikut:
+
+<PenjelajahDistribusi />
+
+Ringkasnya:
+
+> Keyakinan berlebih terasa sama dengan keyakinan yang wajar.
+
+> Nyatakan perkiraan sebagai rentang, lalu ukur seberapa sering rentang itu meleset.
+
+> Jangan naikkan risiko karena rangkaian menang yang pendek.
