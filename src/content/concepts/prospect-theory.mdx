@@ -7,38 +7,221 @@ topic: decision-under-risk
 order: 3
 difficulty: advanced
 description: "Model deskriptif tentang cara orang memilih di bawah risiko: hasil dinilai relatif terhadap titik acuan, rugi terasa lebih berat, dan peluang kecil cenderung diberi bobot berlebih."
-status: draft
+status: review
 featured: false
 prerequisites: [loss-aversion, bounded-rationality]
-related: [expected-value, reference-point]
-keywords: [Kahneman, Tversky, fungsi nilai, bobot probabilitas]
-sources: []
+related: [expected-value, reference-point, loss-aversion, framing-effect, disposition-effect, probability]
+keywords: ["Kahneman", "Tversky", "fungsi nilai", "bobot probabilitas", "efek refleksi", "efek kepastian", "cut loss", "take profit cepat", "hold loss", "saham gorengan", "undian", "asuransi"]
+sources:
+  - type: primary-research
+    title: "Prospect Theory: An Analysis of Decision under Risk"
+    authors: ["Daniel Kahneman", "Amos Tversky"]
+    year: 1979
+    publisher: "Econometrica, 47(2), 263–291"
+    doi: "10.2307/1914185"
+    note: "Artikel asli teori prospek: fungsi nilai terhadap titik acuan yang cekung untuk untung, cembung untuk rugi, dan lebih curam untuk rugi, serta bobot keputusan yang tidak sama dengan probabilitas."
+  - type: primary-research
+    title: "Advances in Prospect Theory: Cumulative Representation of Uncertainty"
+    authors: ["Amos Tversky", "Daniel Kahneman"]
+    year: 1992
+    publisher: "Journal of Risk and Uncertainty, 5(4), 297–323"
+    doi: "10.1007/BF00122574"
+    note: "Versi kumulatif teori prospek dengan pembobotan peringkat, pola empat arah sikap terhadap risiko, dan estimasi parameter median fungsi nilai dan fungsi bobot."
 ---
 
 ## Mengapa Ini Penting
 
-_Draf: bagian ini belum ditulis._
+Konsep [nilai harapan](../expected-value/) memberi tahu bagaimana pilihan **seharusnya** dinilai: kalikan setiap hasil dengan peluangnya, lalu jumlahkan. Tetapi trader yang memahami nilai harapan pun sering bertindak berlawanan dengannya: menutup posisi untung terlalu cepat, menahan posisi rugi terlalu lama, menolak setup yang nilai harapannya positif setelah beberapa kali rugi, atau tertarik pada peluang kecil dengan hasil fantastis.
+
+Teori prospek menjelaskan pola-pola ini dalam satu kerangka. Pemahaman ini penting karena tiga alasan:
+
+1. **Ia menjelaskan mengapa perasaan dan hitungan sering berbeda arah.** Pilihan yang benar secara hitungan bisa terasa salah, dan sebaliknya, dengan pola yang dapat diprediksi.
+
+2. **Ia memisahkan model deskriptif dari model normatif.** Teori prospek menggambarkan bagaimana orang memilih, bukan bagaimana orang seharusnya memilih. Nilai harapan tetap menjadi patokan keputusan; teori prospek menjelaskan mengapa patokan itu sulit diikuti.
+
+3. **Ia menyatukan konsep-konsep sebelumnya.** [Titik acuan](../reference-point/), [aversi kerugian](../loss-aversion/), dan pembobotan peluang adalah bagian-bagian dari model yang sama, dan [efek disposisi](../disposition-effect/) adalah salah satu akibatnya di pasar.
 
 ## Gagasan Utama
 
-_Draf: bagian ini belum ditulis._
+<Definisi>
+
+**Teori prospek adalah model deskriptif tentang cara orang memilih di bawah risiko: hasil dinilai sebagai untung atau rugi terhadap titik acuan, rugi terasa lebih berat daripada untung yang sama besar, dan peluang tidak dipakai apa adanya, melainkan diubah menjadi bobot keputusan.** Model ini menggambarkan perilaku, bukan cara memilih yang ideal.
+
+</Definisi>
+
+Daniel Kahneman dan Amos Tversky (1979) mengajukan teori ini sebagai kritik terhadap teori utilitas harapan, model standar pengambilan keputusan di bawah risiko. Mereka menunjukkan sejumlah pilihan yang secara konsisten melanggar model standar. Salah satu yang paling terkenal adalah **efek refleksi**. Ketika ditawari pilihan antara menerima 3.000 dengan pasti atau 80% peluang menerima 4.000, sebagian besar peserta memilih yang pasti. Ketika tanda hasilnya dibalik, yaitu kehilangan 3.000 dengan pasti atau 80% peluang kehilangan 4.000, sebagian besar peserta justru memilih berjudi. Nilai harapan pilihan berjudi adalah 3.200 pada soal pertama dan −3.200 pada soal kedua, sehingga menurut nilai harapan jawabannya justru sebaliknya: berjudi pada soal pertama, mengambil yang pasti pada soal kedua. Sikap terhadap risiko berbalik arah begitu hasilnya berubah dari untung menjadi rugi.
+
+Teori prospek menjelaskan pola tersebut dengan dua komponen:
+
+- **Fungsi nilai.** Nilai melekat pada perubahan relatif terhadap titik acuan, bukan pada kekayaan akhir. Fungsinya cekung di wilayah untung (tambahan untung terasa makin kecil), cembung di wilayah rugi (tambahan rugi juga terasa makin kecil), dan lebih curam di wilayah rugi daripada di wilayah untung. Bentuk cekung-cembung ini membuat orang cenderung menghindari risiko saat untung dan mencari risiko saat rugi.
+
+- **Fungsi bobot keputusan.** Peluang diubah menjadi bobot yang tidak sama dengan peluang itu sendiri. Peluang yang sangat kecil cenderung diberi bobot berlebih, sedangkan peluang menengah hingga tinggi cenderung diberi bobot kurang. Kepastian juga diberi bobot istimewa: beralih dari "hampir pasti" ke "pasti" terasa jauh lebih berarti daripada perubahan peluang yang sama besar di tengah rentang.
+
+Tversky dan Kahneman (1992) kemudian menyempurnakan model ini menjadi *cumulative prospect theory*, yang memperbaiki cara bobot dihitung dan memperluasnya ke pilihan dengan banyak hasil. Dari eksperimen mereka, estimasi median parameternya adalah:
+
+```text
+Fungsi nilai
+  v(x) = x^0,88                untuk untung (x ≥ 0)
+  v(x) = −2,25 × (−x)^0,88     untuk rugi   (x negatif)
+
+  0,88  = kelengkungan (α dan β); makin kecil dari 1, makin cepat rasa "jenuh"
+  2,25  = koefisien aversi kerugian (λ); rugi terasa sekitar 2,25 kali lebih berat
+
+Fungsi bobot
+  w(p) = p^c / (p^c + (1 − p)^c)^(1/c)
+  c = 0,61 untuk untung, c = 0,69 untuk rugi
+```
+
+Parameter ini adalah median dari satu kelompok peserta eksperimen, bukan konstanta alam. Nilainya berbeda antarorang dan antarsituasi. Kegunaannya adalah memperlihatkan bentuk dan arah bias, bukan menghitung perasaan seseorang secara tepat.
+
+Tversky dan Kahneman (1992) juga merangkum pola empat arah sikap terhadap risiko: untuk peluang untung yang besar, orang cenderung menghindari risiko; untuk peluang rugi yang besar, orang cenderung mencari risiko; untuk peluang untung yang kecil, orang cenderung mencari risiko (misalnya membeli undian); dan untuk peluang rugi yang kecil, orang cenderung menghindari risiko (misalnya membeli asuransi).
+
+> **Orang tidak menilai kekayaan akhir dengan peluang apa adanya. Orang menilai untung dan rugi terhadap patokan, dengan rugi yang lebih berat dan peluang yang dibengkokkan.**
 
 ## Penjelasan Sederhana
 
-_Draf: bagian ini belum ditulis._
+Bayangkan dua orang mendapat kenaikan gaji yang sama, Rp1.000.000 per bulan. Orang pertama bergaji Rp3.000.000, orang kedua bergaji Rp30.000.000. Bagi orang pertama, kenaikan itu terasa besar; bagi orang kedua, hampir tidak terasa. Tambahan yang sama terasa makin kecil ketika sudah jauh dari titik acuan. Inilah kelengkungan fungsi nilai.
+
+Hal yang sama berlaku untuk rugi. Kerugian Rp1.000.000 yang pertama terasa sangat menyakitkan, tetapi setelah rugi Rp20.000.000, tambahan Rp1.000.000 berikutnya terasa jauh lebih ringan. Karena itu, orang yang sudah rugi cenderung berani mengambil risiko tambahan: tambahan rugi terasa tidak seberapa, sedangkan peluang kembali ke titik acuan terasa sangat menggoda.
+
+Satu hal lagi: di sekitar titik acuan, rugi terasa lebih tajam daripada untung. Kehilangan Rp1.000.000 dari gaji terasa lebih berat daripada rasa senang saat mendapat tambahan Rp1.000.000.
+
+Ketiga sifat ini, yaitu patokan, kejenuhan, dan rugi yang lebih berat, bersama pembobotan peluang yang dibengkokkan, cukup untuk menjelaskan banyak keputusan yang tampak tidak konsisten dalam trading.
 
 ## Contoh Kehidupan Nyata
 
-_Draf: bagian ini belum ditulis._
+<Contoh jenis="kehidupan">
+
+*Ilustrasi.* Seorang karyawan melakukan dua hal dalam minggu yang sama yang tampak saling bertentangan.
+
+**1. Membeli kupon undian.** Ia membeli sepuluh kupon undian berhadiah mobil seharga Rp20.000 per kupon di sebuah pusat perbelanjaan. Peluang menangnya sangat kecil, dan nilai harapan kupon itu jauh di bawah harganya. Tetapi peluang kecil untuk hasil besar terasa lebih besar daripada kenyataannya, sehingga Rp200.000 terasa sebagai harga yang wajar untuk "kesempatan".
+
+**2. Membeli perlindungan ponsel.** Di toko yang sama, ia membeli ponsel baru dan menambahkan perlindungan kerusakan seharga Rp450.000 untuk ponsel seharga Rp3.000.000. Peluang ponselnya rusak parah dalam setahun mungkin kecil, tetapi peluang kecil untuk rugi besar juga terasa lebih besar daripada kenyataannya.
+
+Menurut model utilitas harapan, orang yang mencari risiko seharusnya tidak membeli asuransi, dan orang yang menghindari risiko seharusnya tidak membeli undian. Teori prospek menjelaskan keduanya dengan satu mekanisme: bobot berlebih pada peluang kecil, di sisi untung maupun rugi.
+
+</Contoh>
 
 ## Contoh Keuangan
 
-_Draf: bagian ini belum ditulis._
+<Contoh jenis="keuangan">
+
+*Ilustrasi.* Di sebuah grup Telegram, Saham B disebut sebagai "calon multibagger": harganya sangat murah, pergerakannya liar, dan beberapa anggota bercerita pernah melihat saham serupa naik sepuluh kali lipat. Seorang investor mempertimbangkan membelinya dengan perkiraan kasar berikut:
+
+```text
+Peluang naik 10 kali lipat (+900%)   = 5%
+Peluang turun 60%                    = 95%
+
+Nilai harapan = 0,05 × (+900%) + 0,95 × (−60%)
+              = 45% − 57%
+              = −12%
+```
+
+Secara hitungan, taruhan ini merugikan. Tetapi teori prospek memperkirakan bahwa taruhan seperti ini tetap menarik. Dengan fungsi bobot dari Tversky dan Kahneman (1992), peluang untung 5% diberi bobot keputusan sekitar 13%:
+
+```text
+w(0,05) = 0,05^0,61 / (0,05^0,61 + 0,95^0,61)^(1/0,61) ≈ 0,13
+```
+
+Peluang yang "hanya lima persen" dirasakan seperti peluang tiga belas persen. Ditambah dengan cerita-cerita sukses yang mudah diingat, taruhan dengan nilai harapan negatif terasa seperti kesempatan. Inilah mengapa saham berharga sangat murah dengan pergerakan ekstrem sering diperlakukan seperti kupon undian.
+
+</Contoh>
 
 ## Contoh Trading
 
-_Draf: bagian ini belum ditulis._
+<Contoh jenis="trading">
+
+*Ilustrasi, bukan rekomendasi.* Seorang trader dihadapkan pada tiga situasi dalam satu minggu. Dengan parameter median Tversky dan Kahneman (1992), nilai subjektifnya dapat dihitung untuk memperlihatkan arah bias. Satuan di bawah adalah USD.
+
+**Situasi 1: setup dengan nilai harapan positif.** Setup berpeluang 50% untung USD150 dan 50% rugi USD100.
+
+```text
+Nilai harapan            = 0,5 × 150 − 0,5 × 100 = +25
+
+Nilai menurut teori prospek
+  v(+150) ≈ 82,2    bobot untung w(0,5) ≈ 0,42
+  v(−100) ≈ −129,5  bobot rugi   w(0,5) ≈ 0,45
+  Total ≈ 0,42 × 82,2 − 0,45 × 129,5 ≈ −24
+```
+
+Secara hitungan setup ini layak diambil, tetapi terasa negatif. Ini menjelaskan mengapa banyak trader melewatkan setup yang sesuai rencana, terutama setelah rugi, ketika rasa rugi sedang tajam.
+
+**Situasi 2: posisi yang sedang untung USD100.** Pilihan: tutup sekarang, atau biarkan dengan peluang 50% menjadi USD200 dan 50% kembali ke nol. Nilai harapan keduanya sama, +100.
+
+```text
+Tutup sekarang   → v(+100) ≈ 57,5
+Biarkan          → 0,42 × v(+200) ≈ 0,42 × 105,9 ≈ 44,5
+```
+
+Menutup terasa lebih baik. Di wilayah untung, orang cenderung menghindari risiko.
+
+**Situasi 3: posisi yang sedang rugi USD100.** Pilihan: tutup sekarang, atau biarkan dengan peluang 50% kembali ke nol dan 50% menjadi rugi USD200. Nilai harapan keduanya sama, −100.
+
+```text
+Tutup sekarang   → v(−100) ≈ −129,5
+Biarkan          → 0,454 × v(−200) ≈ 0,454 × (−238,3) ≈ −108,2
+```
+
+Menahan terasa lebih baik. Di wilayah rugi, orang cenderung mencari risiko.
+
+Dalam situasi 2 dan 3, nilai harapannya sama antara menutup dan menahan, tetapi perasaan mendorong ke arah yang berlawanan. Bila keputusan ini berulang ratusan kali, polanya menjadi sistematis: keuntungan dipotong pendek, kerugian dibiarkan panjang. Pola inilah yang dibahas dalam [efek disposisi](../disposition-effect/).
+
+</Contoh>
 
 ## Cara Kerja Konsep
 
-_Draf: bagian ini belum ditulis._
+Teori prospek menggambarkan dua tahap penilaian yang terjadi sebelum sebuah pilihan diambil:
+
+```text
+Pilihan berisiko
+          │
+          ▼
+1. Hasil dibingkai sebagai untung atau rugi terhadap titik acuan
+          │
+          ▼
+2. Setiap hasil dinilai dengan fungsi nilai
+          │   ├── untung: cekung      → menghindari risiko
+          │   ├── rugi:   cembung     → mencari risiko
+          │   └── rugi lebih curam    → aversi kerugian (λ ≈ 2,25)
+          │
+          ▼
+3. Setiap peluang diubah menjadi bobot keputusan
+          │   ├── peluang kecil       → bobot berlebih
+          │   └── peluang menengah–besar → bobot kurang
+          │
+          ▼
+Nilai prospek = jumlah (bobot × nilai) → pilihan yang "terasa" terbaik
+```
+
+Tabel berikut merangkum pola empat arah menurut Tversky dan Kahneman (1992) dan bentuknya di pasar:
+
+| | Untung | Rugi |
+|---|---|---|
+| **Peluang besar** | Menghindari risiko: cepat mengambil untung yang hampir pasti | Mencari risiko: menahan posisi rugi, berharap kembali impas |
+| **Peluang kecil** | Mencari risiko: membeli "saham undian" dan taruhan hasil ekstrem | Menghindari risiko: membayar mahal untuk perlindungan dari kejadian jarang |
+
+**Deskriptif, bukan normatif.** Teori prospek menjelaskan apa yang cenderung kita lakukan. Ia tidak menyarankan agar kita memilih seperti itu. Untuk keputusan yang berulang, seperti transaksi dalam sebuah strategi, patokan yang tepat tetap nilai harapan dan pengendalian risiko. Teori prospek berguna untuk mengenali kapan perasaan sedang mendorong menjauh dari patokan itu. Ia juga merupakan contoh [rasionalitas terbatas](../bounded-rationality/): model yang menggambarkan keputusan manusia apa adanya, bukan pengambil keputusan yang ideal.
+
+**Kapan teori prospek paling relevan?** Ketika ada titik acuan yang jelas (harga entry, saldo awal), ketika posisi sedang berada di wilayah untung atau rugi yang terlihat, dan ketika peluangnya ekstrem (sangat kecil atau hampir pasti). Pengaruhnya cenderung lebih kecil bila keputusan diambil dengan aturan yang ditetapkan sebelum posisi dibuka.
+
+**Pertanyaan pemeriksa.** Sebelum menutup, menahan, atau menolak sebuah posisi:
+
+1. Apakah posisi ini sedang saya nilai dari wilayah untung atau wilayah rugi terhadap harga entry?
+
+2. Bila saya belum memiliki posisi ini, apakah saya akan membukanya sekarang dengan ukuran yang sama?
+
+3. Apakah keputusan ini sesuai dengan aturan yang saya tetapkan sebelum entry?
+
+4. Apakah saya memberi bobot berlebih pada peluang kecil, entah peluang "balik modal" atau peluang "naik sepuluh kali lipat"?
+
+Untuk membandingkan nilai harapan sebuah strategi dengan apa yang terasa, gunakan alat berikut dan ubah peluang serta besar hasilnya:
+
+<PenjelajahNilaiHarapan />
+
+Ringkasnya:
+
+> Untung dan rugi dinilai terhadap patokan, dengan rugi yang lebih berat.
+
+> Saat untung orang cenderung bermain aman; saat rugi orang cenderung berjudi.
+
+> Nilai harapan tetap menjadi patokan keputusan; teori prospek menjelaskan mengapa patokan itu sulit diikuti.
