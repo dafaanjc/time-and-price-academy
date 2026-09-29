@@ -7,38 +7,179 @@ topic: decision-under-risk
 order: 1
 difficulty: beginner
 description: "Patokan yang dipakai untuk menilai sebuah hasil sebagai untung atau rugi, misalnya harga beli. Hasil yang sama bisa terasa berbeda bila titik acuannya berbeda."
-status: draft
+status: review
 featured: false
 prerequisites: [expected-value]
-related: [anchoring, loss-aversion]
-keywords: [harga beli, modal awal, balik modal, impas, BEP]
-sources: []
+related: [anchoring, loss-aversion, prospect-theory, disposition-effect, framing-effect]
+keywords: ["harga beli", "modal awal", "balik modal", "impas", "BEP", "floating loss", "floating profit", "puncak ekuitas", "target harian", "nyangkut", "equity high", "drawdown"]
+sources:
+  - type: primary-research
+    title: "Prospect Theory: An Analysis of Decision under Risk"
+    authors: ["Daniel Kahneman", "Amos Tversky"]
+    year: 1979
+    publisher: "Econometrica, 47(2), 263–291"
+    doi: "10.2307/1914185"
+    note: "Menyatakan bahwa nilai melekat pada perubahan relatif terhadap titik acuan, bukan pada kekayaan akhir, dan bahwa titik acuan dapat bergeser karena ekspektasi dan cara masalah dibingkai."
+  - type: primary-research
+    title: "A Model of Reference-Dependent Preferences"
+    authors: ["Botond Kőszegi", "Matthew Rabin"]
+    year: 2006
+    publisher: "The Quarterly Journal of Economics, 121(4), 1133–1165"
+    doi: "10.1093/qje/121.4.1133"
+    note: "Mengusulkan model di mana titik acuan adalah ekspektasi rasional seseorang tentang hasil yang akan diterimanya, bukan sekadar posisi saat ini."
 ---
 
 ## Mengapa Ini Penting
 
-_Draf: bagian ini belum ditulis._
+Posisi yang sama bisa terasa sebagai untung atau rugi, tergantung dibandingkan dengan apa. Saldo USD10.800 terasa menyenangkan bila bulan dimulai dari USD10.000, tetapi terasa menyakitkan bila minggu lalu saldo sempat mencapai USD11.500. Angkanya sama; yang berbeda adalah titik acuannya.
+
+Konsep ini penting karena tiga alasan:
+
+1. **Titik acuan menentukan apakah sesuatu terasa sebagai untung atau rugi.** Perasaan itu kemudian memengaruhi keputusan berikutnya, sering tanpa disadari.
+
+2. **Titik acuan bisa berpindah.** Harga beli, puncak ekuitas, saldo awal bulan, atau target yang diharapkan dapat bergantian menjadi patokan, dan setiap perpindahan mengubah cara hasil yang sama dirasakan.
+
+3. **Ia adalah fondasi konsep-konsep berikutnya.** [Aversi kerugian](../loss-aversion/), [teori prospek](../prospect-theory/), dan [efek disposisi](../disposition-effect/) semuanya bergantung pada gagasan bahwa hasil dinilai relatif terhadap sebuah acuan.
 
 ## Gagasan Utama
 
-_Draf: bagian ini belum ditulis._
+<Definisi>
+
+**Titik acuan adalah patokan yang dipakai untuk menilai sebuah hasil sebagai untung atau rugi.** Hasil tidak dinilai dari total kekayaan akhir, melainkan dari selisihnya terhadap patokan tersebut, sehingga hasil yang sama bisa terasa berbeda bila patokannya berbeda.
+
+</Definisi>
+
+Gagasan ini menjadi salah satu pilar *prospect theory* yang dikemukakan Daniel Kahneman dan Amos Tversky (1979). Model ekonomi standar, termasuk keputusan berdasarkan [nilai harapan](../expected-value/) atas kekayaan, menilai pilihan dari keadaan akhir: berapa total kekayaan setelah semua hasil terjadi. Kahneman dan Tversky berpendapat bahwa manusia tidak menilai seperti itu. Yang dirasakan adalah **perubahan**: untung atau rugi dibandingkan titik acuan.
+
+Titik acuan biasanya adalah posisi saat ini, tetapi Kahneman dan Tversky juga mencatat bahwa ia dapat bergeser karena ekspektasi, aspirasi, dan cara sebuah masalah disajikan. Mereka juga mengamati bahwa orang yang belum "berdamai" dengan kerugiannya, yaitu yang titik acuannya masih tertinggal di posisi sebelum rugi, cenderung menerima taruhan yang dalam keadaan lain akan ditolaknya.
+
+Botond Kőszegi dan Matthew Rabin (2006) mengembangkan gagasan ini dengan satu pertanyaan penting: dari mana titik acuan berasal? Dalam model mereka, titik acuan adalah **ekspektasi** seseorang tentang hasil yang akan diterimanya. Orang yang sudah menduga akan mendapat bonus besar merasakan bonus biasa sebagai kerugian, sedangkan orang yang tidak menduga apa-apa merasakan bonus yang sama sebagai keuntungan.
+
+Titik acuan berbeda dengan [jangkar](../anchoring/). Jangkar memengaruhi **perkiraan**: berapa harga yang wajar. Titik acuan memengaruhi **perasaan terhadap hasil**: apakah sebuah hasil terasa untung atau rugi.
+
+> **Yang dirasakan bukan berapa yang dimiliki, melainkan berapa selisihnya dari patokan. Ganti patokannya, dan hasil yang sama terasa berbeda.**
 
 ## Penjelasan Sederhana
 
-_Draf: bagian ini belum ditulis._
+Bayangkan dua karyawan di perusahaan yang sama, masing-masing menerima bonus akhir tahun sebesar dua kali gaji.
+
+Karyawan pertama baru bergabung dan tidak tahu kebiasaan bonus di perusahaan itu. Ia menerima dua kali gaji dengan gembira. Karyawan kedua sudah bekerja lima tahun, dan tahun-tahun sebelumnya bonusnya selalu tiga kali gaji. Bagi dia, dua kali gaji terasa seperti kehilangan satu kali gaji.
+
+Uang yang diterima sama persis. Yang berbeda adalah titik acuan: karyawan pertama membandingkan dengan nol, karyawan kedua membandingkan dengan tiga kali gaji yang sudah ia harapkan. Inilah yang dimaksud Kőszegi dan Rabin: ekspektasi menjadi patokan.
+
+Dalam trading, patokan itu bisa berupa harga entry, target keuntungan yang sudah dibayangkan, atau saldo tertinggi yang pernah terlihat. Setiap patokan menghasilkan perasaan yang berbeda terhadap posisi yang sama, dan perasaan itu sering ikut memutuskan langkah berikutnya.
 
 ## Contoh Kehidupan Nyata
 
-_Draf: bagian ini belum ditulis._
+<Contoh jenis="kehidupan">
+
+*Ilustrasi.* Dua situasi berikut memperlihatkan titik acuan yang berasal dari target dan dari perbandingan.
+
+**1. Pedagang bakso dengan target harian.** Seorang pedagang bakso keliling menetapkan target pendapatan Rp500.000 per hari. Pada hari hujan, dagangan sepi, dan ia berkeliling sampai larut malam untuk mengejar target. Pada hari cerah, target tercapai pukul tiga sore, dan ia pulang lebih cepat. Akibatnya ia bekerja paling lama justru pada hari yang paling sepi, dan paling sebentar pada hari yang paling ramai. Target harian menjadi titik acuan: di bawahnya terasa rugi, di atasnya terasa cukup.
+
+**2. Kenaikan gaji yang terasa seperti hukuman.** Seorang karyawan mendapat kenaikan gaji 5%. Ia senang, sampai mendengar rekan satu timnya mendapat 10%. Tiba-tiba kenaikan 5% terasa seperti penilaian buruk. Gajinya tidak berubah sejak pagi; titik acuannya yang berpindah dari gaji lamanya ke kenaikan rekannya.
+
+</Contoh>
 
 ## Contoh Keuangan
 
-_Draf: bagian ini belum ditulis._
+<Contoh jenis="keuangan">
+
+*Ilustrasi.* Seorang investor membeli reksa dana saham dengan nilai aktiva bersih (NAB) Rp1.000 per unit. Beberapa bulan kemudian NAB naik ke Rp1.300. Hari ini NAB berada di Rp1.150.
+
+Bagaimana posisi ini dirasakan bergantung pada titik acuan yang dipakai:
+
+```text
+Titik acuan harga beli (Rp1.000)
+  Perubahan = (1.150 − 1.000) / 1.000 = +15,0%   → terasa untung
+
+Titik acuan NAB tertinggi (Rp1.300)
+  Perubahan = (1.150 − 1.300) / 1.300 ≈ −11,5%   → terasa rugi
+```
+
+Posisinya satu, angkanya satu, tetapi perasaannya bisa berlawanan. Investor yang memakai NAB tertinggi sebagai acuan mungkin merasa "sudah kehilangan Rp150 per unit" dan menunggu harga "kembali ke Rp1.300" sebelum mau menjual. Investor yang memakai harga beli mungkin tergoda menjual untuk "mengamankan untung 15%".
+
+Kedua keputusan itu didorong oleh patokan masa lalu, bukan oleh pertanyaan yang relevan untuk masa depan: apakah reksa dana ini masih sesuai dengan tujuan dan jangka waktu investasinya?
+
+</Contoh>
 
 ## Contoh Trading
 
-_Draf: bagian ini belum ditulis._
+<Contoh jenis="trading">
+
+*Ilustrasi, bukan rekomendasi.* Seorang trader memulai bulan dengan saldo USD10.000. Pada pertengahan bulan, saldonya mencapai USD11.500. Setelah beberapa kerugian, saldonya kini USD10.800.
+
+```text
+Terhadap saldo awal bulan (USD10.000)   = +8,0%   → bulan yang baik
+Terhadap puncak ekuitas (USD11.500)     ≈ −6,1%   → sedang "rugi USD700"
+```
+
+Trader ini memakai puncak ekuitas sebagai titik acuan. Ia merasa sedang rugi dan ingin "mengembalikan USD700" sebelum akhir bulan. Seperti yang dicatat Kahneman dan Tversky (1979), orang yang belum berdamai dengan kerugiannya cenderung menerima taruhan yang biasanya ia tolak. Trader ini menaikkan risiko dari 1% menjadi 3% per transaksi untuk mempercepat pemulihan.
+
+Nilai harapan strateginya tidak berubah karena perasaan itu. Yang berubah hanya ukuran taruhannya:
+
+```text
+Misalkan nilai harapan strategi = +0,15R per transaksi
+
+Risiko 1%   → nilai harapan ≈ 0,15 × 1% = +0,15% modal per transaksi
+Risiko 3%   → nilai harapan ≈ 0,15 × 3% = +0,45% modal per transaksi
+
+Empat kekalahan beruntun
+Risiko 1%   → turun ≈ 1 − 0,99^4 ≈ 3,9%
+Risiko 3%   → turun ≈ 1 − 0,97^4 ≈ 11,5%
+```
+
+Dengan risiko 3%, empat kekalahan beruntun, kejadian yang wajar dalam satu bulan trading, membuat saldo turun sekitar 11,5% dari USD10.800 menjadi sekitar USD9.560, di bawah saldo awal bulan. Keputusan untuk "mengejar puncak" berubah menjadi kerugian yang sungguhan. Padahal pertanyaan yang relevan tidak bergantung pada puncak mana pun: dengan saldo hari ini, berapa risiko per transaksi yang sesuai rencana?
+
+</Contoh>
 
 ## Cara Kerja Konsep
 
-_Draf: bagian ini belum ditulis._
+Titik acuan mengubah hasil yang sama menjadi perasaan yang berbeda, lalu perasaan itu memengaruhi keputusan:
+
+```text
+Hasil (angka yang sama)
+          │
+          ▼
+Dibandingkan dengan titik acuan
+          │
+          ├── Di atas acuan    → terasa untung → cenderung bermain aman, "amankan"
+          │
+          └── Di bawah acuan   → terasa rugi   → cenderung mengambil risiko untuk "balik"
+          │
+          ▼
+Keputusan berikutnya dipengaruhi oleh patokan, bukan oleh prospek ke depan
+```
+
+Tabel berikut merangkum titik acuan yang umum dalam trading dan investasi:
+
+| Titik acuan | Dari mana asalnya | Perasaan yang dihasilkan | Risiko keputusan |
+|---|---|---|---|
+| Harga entry | Transaksi sendiri | Posisi "nyangkut" atau "sudah untung" | Menahan rugi terlalu lama, menjual untung terlalu cepat |
+| Puncak ekuitas | Saldo tertinggi yang pernah terlihat | Merasa rugi walau masih untung | Menaikkan risiko untuk "balik ke puncak" |
+| Saldo awal periode | Kalender (harian, bulanan) | Target harus tercapai | Memaksakan transaksi menjelang akhir periode |
+| Ekspektasi | Target yang sudah dibayangkan | Hasil baik terasa mengecewakan | Mengubah rencana karena kecewa, bukan karena data |
+
+**Kapan titik acuan berguna?** Patokan tetap diperlukan untuk mengukur kinerja: tanpa saldo awal, tidak ada ukuran untung atau rugi. Masalahnya muncul ketika patokan itu dipakai untuk **memutuskan langkah berikutnya**. Keputusan menambah, menahan, atau menutup posisi sebaiknya didasarkan pada keadaan saat ini dan rencana ke depan, bukan pada jarak ke patokan masa lalu.
+
+**Pertanyaan pemeriksa.** Sebelum mengubah rencana karena merasa "sedang rugi" atau "sudah untung":
+
+1. Titik acuan apa yang sedang saya pakai: harga entry, puncak ekuitas, saldo awal bulan, atau ekspektasi?
+
+2. Bila saya baru membuka akun hari ini dengan saldo yang sama, apakah saya akan mengambil keputusan yang sama?
+
+3. Apakah keputusan ini mengubah nilai harapan, atau hanya mengubah ukuran taruhan?
+
+4. Bila keputusan ini salah, di mana saldo saya akan berada dibandingkan titik acuan yang lain?
+
+Untuk melihat seberapa sering penurunan dari puncak ekuitas terjadi pada strategi yang nilai harapannya positif sekalipun, gunakan simulasi berikut:
+
+<SimulasiEkuitas />
+
+Ringkasnya:
+
+> Untung dan rugi selalu relatif terhadap sebuah patokan.
+
+> Patokan bisa berpindah tanpa disadari, dan perasaan ikut berpindah bersamanya.
+
+> Keputusan ke depan dinilai dari keadaan hari ini, bukan dari jarak ke patokan masa lalu.
