@@ -7,38 +7,179 @@ topic: judgment-heuristics
 order: 5
 difficulty: beginner
 description: "Kecenderungan perkiraan tertarik ke angka awal (jangkar) yang kebetulan terlihat, bahkan ketika angka itu tidak relevan, lalu tidak disesuaikan cukup jauh darinya."
-status: draft
+status: review
 featured: false
 prerequisites: [heuristics]
-related: [reference-point]
-keywords: [jangkar, anchor, harga beli, harga tertinggi, target harga]
-sources: []
+related: [reference-point, heuristics, availability, position-sizing, framing-effect]
+keywords: ["jangkar", "anchor", "harga beli", "harga tertinggi", "target harga", "harga IPO", "harga coret", "target analis", "angka bulat", "harga pucuk", "ATH", "lot biasa"]
+sources:
+  - type: primary-research
+    title: "Judgment under Uncertainty: Heuristics and Biases"
+    authors: ["Amos Tversky", "Daniel Kahneman"]
+    year: 1974
+    publisher: "Science, 185(4157), 1124–1131"
+    doi: "10.1126/science.185.4157.1124"
+    note: "Memperkenalkan jangkar dan penyesuaian: perkiraan dimulai dari nilai awal lalu disesuaikan, tetapi penyesuaiannya cenderung kurang jauh, bahkan ketika nilai awal jelas tidak relevan."
+  - type: academic-review
+    title: "A Literature Review of the Anchoring Effect"
+    authors: ["Adrian Furnham", "Hua Chu Boo"]
+    year: 2011
+    publisher: "The Journal of Socio-Economics, 40(1), 35–42"
+    doi: "10.1016/j.socec.2010.10.008"
+    note: "Tinjauan riset efek jangkar di berbagai bidang, termasuk penilaian ahli, beserta penjelasan teoretis dan faktor yang memperkuat atau melemahkannya."
 ---
 
 ## Mengapa Ini Penting
 
-_Draf: bagian ini belum ditulis._
+Hampir setiap keputusan keuangan melibatkan angka: harga wajar, target, ukuran posisi, batas kerugian. Masalahnya, angka yang kita hasilkan sering tidak berasal dari analisis, melainkan tertarik ke angka lain yang kebetulan lebih dulu terlihat. Harga IPO, harga tertinggi tahun lalu, target analis, angka bulat di grafik, bahkan ukuran lot yang biasa dipakai, semuanya bisa menjadi jangkar.
+
+Konsep ini penting karena tiga alasan:
+
+1. **Jangkar bekerja walaupun kita tahu angkanya tidak relevan.** Mengetahui adanya efek jangkar tidak cukup untuk menghilangkannya.
+
+2. **Penyesuaian dari jangkar hampir selalu kurang jauh.** Akibatnya kesalahan perkiraan tidak acak, tetapi condong ke arah jangkar.
+
+3. **Jangkar diam-diam memengaruhi ukuran risiko.** Ukuran lot yang "biasa" dipakai adalah jangkar yang sering bertahan lebih lama daripada modal yang mendasarinya.
 
 ## Gagasan Utama
 
-_Draf: bagian ini belum ditulis._
+<Definisi>
+
+**Efek jangkar adalah kecenderungan perkiraan tertarik ke angka awal (jangkar) yang kebetulan terlihat, lalu tidak disesuaikan cukup jauh darinya, bahkan ketika angka awal itu tidak relevan.** Hasil akhirnya tetap terasa seperti penilaian sendiri, padahal arahnya sudah ditentukan oleh angka pertama.
+
+</Definisi>
+
+Amos Tversky dan Daniel Kahneman (1974) menyebut mekanisme ini *anchoring and adjustment*. Orang membuat perkiraan dengan memulai dari sebuah nilai awal, lalu menyesuaikannya untuk sampai ke jawaban akhir. Masalahnya, penyesuaian itu biasanya berhenti terlalu cepat. Nilai awal bisa berasal dari soal itu sendiri, dari hitungan yang belum selesai, atau dari angka yang sama sekali tidak berhubungan.
+
+Salah satu eksperimen mereka memperlihatkan jangkar yang berasal dari hitungan yang belum selesai. Dua kelompok siswa diberi waktu lima detik untuk memperkirakan hasil perkalian. Satu kelompok melihat `8 × 7 × 6 × 5 × 4 × 3 × 2 × 1`, kelompok lain melihat `1 × 2 × 3 × 4 × 5 × 6 × 7 × 8`. Karena waktunya singkat, peserta hanya sempat mengalikan beberapa angka pertama, lalu menaksir sisanya. Median perkiraan kelompok pertama 2.250, sedangkan kelompok kedua 512. Hasil sebenarnya 40.320. Kedua kelompok jauh terlalu rendah, dan kelompok yang mulai dari angka kecil tertarik lebih kuat ke bawah.
+
+Adrian Furnham dan Hua Chu Boo (2011) meninjau riset efek jangkar dari berbagai bidang, antara lain penilaian harga, negosiasi, perkiraan, dan putusan hukum. Tinjauan mereka menunjukkan bahwa efek ini sangat konsisten dan juga ditemukan pada orang yang ahli di bidangnya. Penjelasannya pun beragam: selain penyesuaian yang kurang jauh, jangkar juga membuat informasi yang cocok dengan angka itu lebih mudah terpikirkan.
+
+Satu hal perlu dibedakan sejak awal. Jangkar memengaruhi **perkiraan**: berapa nilai yang wajar, berapa target yang masuk akal. [Titik acuan](../reference-point/) memengaruhi **perasaan terhadap hasil**: apakah sebuah hasil terasa sebagai untung atau rugi. Harga beli bisa berperan sebagai keduanya, tetapi mekanismenya berbeda.
+
+> **Angka pertama yang terlihat diam-diam menentukan arah perkiraan. Penyesuaian dari sana hampir selalu kurang jauh.**
 
 ## Penjelasan Sederhana
 
-_Draf: bagian ini belum ditulis._
+Bayangkan musim belanja tanggal kembar di lokapasar. Sebuah blender ditampilkan dengan harga Rp899.000 yang dicoret, lalu harga promo Rp449.000 dengan label "hemat 50%". Rasanya seperti kesempatan langka.
+
+Pertanyaan yang jarang diajukan adalah: apakah blender ini memang pernah terjual Rp899.000? Angka yang dicoret bekerja sebagai jangkar. Setelah melihatnya, Rp449.000 dinilai dari jaraknya ke Rp899.000, bukan dari harga blender sejenis di toko lain. Bila blender serupa biasa dijual sekitar Rp400.000, "hemat 50%" sebenarnya adalah harga yang sedikit lebih mahal.
+
+Di pasar keuangan, angka yang dicoret itu bisa berupa harga IPO, harga tertinggi tahun lalu, atau target analis. Angka-angka itu nyata pernah muncul, tetapi belum tentu memberi tahu apa pun tentang nilai sekarang.
 
 ## Contoh Kehidupan Nyata
 
-_Draf: bagian ini belum ditulis._
+<Contoh jenis="kehidupan">
+
+*Ilustrasi.* Dua situasi berikut memperlihatkan jangkar dalam negosiasi dan penilaian.
+
+**1. Negosiasi gaji.** Dalam wawancara kerja, bagian personalia bertanya, "Gaji di tempat lama berapa?" Kandidat menjawab Rp6.000.000. Sejak saat itu, seluruh negosiasi berputar di sekitar angka tersebut: tawaran Rp6.600.000 terasa wajar karena "naik 10%". Padahal kisaran gaji untuk posisi itu di pasar mungkin Rp8.000.000 sampai Rp9.000.000. Angka pertama yang disebut menentukan wilayah tawar, bukan nilai pekerjaannya.
+
+**2. Survei rumah.** Seorang agen properti mengajak calon pembeli melihat rumah seharga Rp1,8 miliar lebih dulu, baru kemudian rumah seharga Rp1,2 miliar yang sebenarnya sesuai kebutuhan. Rumah kedua terasa "murah" karena dibandingkan dengan rumah pertama. Bila urutannya dibalik, rumah yang sama bisa terasa mahal.
+
+</Contoh>
 
 ## Contoh Keuangan
 
-_Draf: bagian ini belum ditulis._
+<Contoh jenis="keuangan">
+
+*Ilustrasi.* Saham A melantai di bursa dengan harga IPO Rp500. Setahun kemudian harganya Rp300. Di grup WhatsApp, kesimpulannya cepat: "Di bawah harga IPO, sudah murah." Pada saat yang sama, sebuah laporan riset memasang target harga Rp1.000, dan angka itu beredar sebagai "potensi naik 233%".
+
+Kedua angka itu jangkar. Harga IPO adalah harga yang disepakati pada masa lalu dengan informasi masa lalu. Target analis adalah hasil hitungan dengan asumsi tertentu. Perhatikan betapa sensitifnya target itu terhadap asumsi:
+
+```text
+Nilai per saham    = laba per saham × rasio harga terhadap laba (PER)
+
+Asumsi laporan     = Rp50 × 20 = Rp1.000
+Laba sama, PER 12  = Rp50 × 12 = Rp600
+Laba turun ke Rp30 = Rp30 × 12 = Rp360
+```
+
+Dengan mengubah dua asumsi saja, "nilai wajar" bergeser dari Rp1.000 ke Rp360, sangat dekat dengan harga pasar sekarang. Investor yang terjangkar pada Rp1.000 akan menilai setiap harga di bawahnya sebagai diskon, tanpa pernah bertanya asumsi mana yang paling masuk akal.
+
+Pertanyaan yang lebih tepat bukan "sudah berapa jauh dari harga IPO atau dari target?", melainkan "asumsi laba dan valuasi apa yang saya yakini, dan berapa nilai yang dihasilkannya?"
+
+</Contoh>
 
 ## Contoh Trading
 
-_Draf: bagian ini belum ditulis._
+<Contoh jenis="trading">
+
+*Ilustrasi, bukan rekomendasi.* Seorang trader XAUUSD terbiasa membuka posisi 1 lot sejak modalnya USD10.000. Dengan stop loss yang biasa ia pakai, 1 lot berarti risiko USD100 per transaksi, atau 1% dari modal. Angka "1 lot" lama-lama terasa seperti ukuran normal.
+
+Setelah periode yang buruk, modalnya turun menjadi USD6.000. Ukuran lotnya tidak berubah, karena 1 lot sudah menjadi jangkar:
+
+```text
+Risiko per transaksi = USD100 (1 lot, stop loss sama)
+
+Modal USD10.000   → risiko = 100 / 10.000 = 1,00%
+Modal USD6.000    → risiko = 100 / 6.000  ≈ 1,67%
+```
+
+Tanpa keputusan sadar, risikonya naik dua pertiga tepat ketika modal sedang paling rapuh. Dampaknya terlihat bila kalah lima kali lagi:
+
+```text
+Dengan lot yang disesuaikan (risiko 1% dari saldo berjalan)
+  sisa modal ≈ 6.000 × 0,99^5 ≈ USD5.706 → turun ≈ 4,9%
+
+Dengan lot jangkar (USD100 tetap per transaksi)
+  sisa modal = 6.000 − 5 × 100 = USD5.500 → turun ≈ 8,3%
+```
+
+Ukuran lot seharusnya dihitung ulang dari modal saat ini dan jarak stop loss setiap kali membuka posisi, bukan diwarisi dari kebiasaan (lihat [ukuran posisi](../position-sizing/)). Jangkar serupa sering muncul pada angka bulat: target keuntungan dipasang di 2.400 karena angkanya "bulat" atau karena pernah menjadi harga tertinggi, bukan karena hitungan peluang dan jarak.
+
+</Contoh>
 
 ## Cara Kerja Konsep
 
-_Draf: bagian ini belum ditulis._
+Efek jangkar bekerja melalui penyesuaian yang berhenti terlalu cepat:
+
+```text
+Angka awal terlihat (relevan atau tidak)
+          │
+          ▼
+Perkiraan dimulai dari angka itu
+          │
+          ▼
+Penyesuaian ke arah jawaban yang wajar
+          │
+          ▼
+Penyesuaian berhenti ketika jawaban "terasa masuk akal"
+          │
+          ▼
+Hasil akhir masih condong ke arah jangkar
+```
+
+Tabel berikut merangkum jangkar yang umum di pasar:
+
+| Jangkar | Perkiraan yang terpengaruh | Bentuk kesalahannya | Penawarnya |
+|---|---|---|---|
+| Harga IPO | Nilai wajar saham | "Di bawah harga IPO berarti murah" | Nilai dari laba dan prospek sekarang |
+| Harga tertinggi sebelumnya | Seberapa "murah" harga sekarang | Diskon dari puncak dianggap peluang | Tanyakan mengapa harga turun |
+| Target analis | Potensi kenaikan | Angka target diperlakukan sebagai fakta | Periksa asumsi di balik target |
+| Angka bulat | Target keuntungan dan stop loss | Level dipilih karena bulat, bukan karena data | Tentukan level dari aturan tertulis |
+| Ukuran lot biasa | Risiko per transaksi | Lot tidak disesuaikan saat modal berubah | Hitung ulang lot dari modal saat ini |
+
+**Kapan jangkar tidak menyesatkan?** Bila angka awalnya memang relevan dan berasal dari data yang baik, memulai dari angka itu adalah langkah yang wajar. Masalahnya ada pada angka yang tidak relevan dan pada penyesuaian yang kurang jauh. Karena efek ini tetap bekerja walaupun kita menyadarinya, cara yang paling andal adalah membuat perkiraan sendiri **sebelum** melihat angka orang lain, dan menulis alasan di balik setiap angka yang dipakai.
+
+**Pertanyaan pemeriksa.** Sebelum menilai harga atau menentukan ukuran posisi:
+
+1. Angka apa yang pertama kali saya lihat, dan apakah angka itu relevan dengan keputusan ke depan?
+
+2. Apakah saya sudah membuat perkiraan sendiri sebelum melihat target atau opini orang lain?
+
+3. Bila jangkar ini tidak ada, dari mana saya akan memulai perkiraan?
+
+4. Apakah ukuran lot saya dihitung dari modal hari ini, atau dari kebiasaan?
+
+Alat berikut menghitung ukuran posisi dari modal dan jarak stop loss saat ini, sehingga lot tidak lagi diwarisi dari angka lama:
+
+<UkuranPosisi />
+
+Ringkasnya:
+
+> Angka pertama yang terlihat menarik perkiraan ke arahnya.
+
+> Buat perkiraan sendiri sebelum melihat angka orang lain.
+
+> Ukuran posisi dihitung ulang dari modal hari ini, bukan diwarisi dari kebiasaan.
