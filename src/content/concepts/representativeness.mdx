@@ -7,38 +7,191 @@ topic: judgment-heuristics
 order: 3
 difficulty: beginner
 description: "Menilai peluang dari seberapa mirip sesuatu dengan gambaran khasnya, sambil mengabaikan frekuensi dasar (base rate) dan ukuran sampel."
-status: draft
+status: review
 featured: false
 prerequisites: [heuristics]
-related: [probability-distribution, availability]
-keywords: [base rate, pola, pattern, sampel kecil, gambler's fallacy]
-sources: []
+related: [probability-distribution, availability, probability, variance-and-volatility, overconfidence]
+keywords: ["base rate", "pola", "pattern", "sampel kecil", "gambler's fallacy", "backtest", "winrate", "pola grafik", "sudah waktunya", "cuan beruntun", "hot hand", "hukum angka kecil"]
+sources:
+  - type: primary-research
+    title: "Belief in the Law of Small Numbers"
+    authors: ["Amos Tversky", "Daniel Kahneman"]
+    year: 1971
+    publisher: "Psychological Bulletin, 76(2), 105–110"
+    doi: "10.1037/h0031322"
+    note: "Menunjukkan bahwa orang, termasuk peneliti terlatih, menganggap sampel kecil sudah mewakili populasinya dan terlalu yakin hasilnya akan terulang."
+  - type: primary-research
+    title: "Subjective Probability: A Judgment of Representativeness"
+    authors: ["Daniel Kahneman", "Amos Tversky"]
+    year: 1972
+    publisher: "Cognitive Psychology, 3(3), 430–454"
+    doi: "10.1016/0010-0285(72)90016-3"
+    note: "Merumuskan heuristik keterwakilan: peluang dinilai dari kemiripan dengan populasi induk dan dari seberapa 'acak' sesuatu terlihat, sehingga ukuran sampel cenderung diabaikan."
+  - type: primary-research
+    title: "Judgment under Uncertainty: Heuristics and Biases"
+    authors: ["Amos Tversky", "Daniel Kahneman"]
+    year: 1974
+    publisher: "Science, 185(4157), 1124–1131"
+    doi: "10.1126/science.185.4157.1124"
+    note: "Merangkum bias yang lahir dari keterwakilan, antara lain pengabaian base rate, ketidakpekaan terhadap ukuran sampel, dan salah paham tentang keacakan."
 ---
 
 ## Mengapa Ini Penting
 
-_Draf: bagian ini belum ditulis._
+Trader hidup dari pola: bentuk grafik, rangkaian menang dan kalah, cerita perusahaan yang "mirip" dengan kisah sukses sebelumnya. Heuristik keterwakilan adalah mesin yang membuat pola terasa bermakna. Masalahnya, rasa "mirip" sering dipakai sebagai pengganti [probabilitas](../probability/), padahal keduanya berbeda.
+
+Konsep ini penting karena tiga alasan:
+
+1. **Ia membuat sampel kecil terasa seperti bukti.** Sepuluh transaksi backtest yang bagus terasa "sudah terbukti", padahal sebaran hasil dari sepuluh transaksi masih sangat lebar.
+
+2. **Ia menyembunyikan frekuensi dasar.** Pertanyaan "seberapa sering hal seperti ini berhasil secara umum?" tertutup oleh cerita yang meyakinkan.
+
+3. **Kesalahannya langsung berdampak pada ukuran posisi.** Keyakinan yang dibangun di atas sampel kecil mendorong risiko per transaksi dinaikkan terlalu cepat.
 
 ## Gagasan Utama
 
-_Draf: bagian ini belum ditulis._
+<Definisi>
+
+**Heuristik keterwakilan adalah kecenderungan menilai peluang sesuatu dari seberapa mirip ia dengan gambaran khas sebuah kelompok atau proses, sambil mengabaikan frekuensi dasar (*base rate*) dan ukuran sampel.** Semakin "khas" sesuatu terlihat, semakin tinggi peluang yang diberikan kepadanya, terlepas dari data yang sebenarnya.
+
+</Definisi>
+
+Daniel Kahneman dan Amos Tversky (1972) merumuskan heuristik ini dalam artikel *Subjective Probability: A Judgment of Representativeness*. Menurut mereka, orang menilai peluang sebuah kejadian dari dua hal: seberapa mirip kejadian itu dengan populasi asalnya, dan seberapa baik kejadian itu mencerminkan ciri-ciri proses yang menghasilkannya. Salah satu akibatnya, ukuran sampel hampir tidak memengaruhi penilaian. Dalam salah satu soal mereka, peserta diminta membandingkan rumah sakit besar dan rumah sakit kecil dalam hal jumlah hari ketika bayi laki-laki yang lahir lebih dari 60%. Kebanyakan peserta menilai keduanya kurang lebih sama, padahal rumah sakit kecil, dengan sampel harian yang lebih sedikit, jauh lebih mungkin mengalami penyimpangan seperti itu.
+
+Setahun sebelumnya, Tversky dan Kahneman (1971) menggambarkan keyakinan yang mereka sebut *law of small numbers*: anggapan bahwa sampel kecil pun akan mencerminkan populasinya dengan setia. Yang menarik, keyakinan ini juga ditemukan pada peneliti yang terlatih secara statistik. Mereka cenderung terlalu yakin bahwa hasil dari sampel kecil akan terulang.
+
+Dalam artikel tahun 1974, Tversky dan Kahneman merangkum beberapa bias yang lahir dari heuristik ini:
+
+- **Pengabaian *base rate*:** ketika diberi deskripsi seseorang yang terdengar khas, peserta menilai profesinya hampir hanya dari deskripsi itu, dan sangat sedikit memperhitungkan proporsi profesi tersebut dalam kelompok.
+
+- **Ketidakpekaan terhadap ukuran sampel:** hasil dari sampel kecil dinilai sama meyakinkannya dengan hasil dari sampel besar.
+
+- **Salah paham tentang keacakan:** rangkaian acak yang pendek diharapkan terlihat "seimbang", sehingga muncul *gambler's fallacy*, yaitu anggapan bahwa hasil yang lama tidak muncul "sudah waktunya" muncul.
+
+> **Kemiripan bukan peluang. Cerita yang khas tidak mengubah seberapa sering sesuatu terjadi, dan sampel kecil tidak mewakili apa-apa dengan andal.**
 
 ## Penjelasan Sederhana
 
-_Draf: bagian ini belum ditulis._
+Bayangkan Anda duduk di KRL dan melihat penumpang di depan Anda: berkacamata, membaca buku tebal berbahasa Inggris, dan membawa tas berisi kertas ujian. Tebakan pertama yang muncul biasanya "dosen".
+
+Tebakan itu terasa kuat karena penumpang tersebut sangat mirip dengan gambaran khas seorang dosen. Tetapi coba pikirkan frekuensi dasarnya. Di antara penumpang KRL, jumlah pegawai kantor, pedagang, dan mahasiswa jauh lebih banyak daripada dosen. Mahasiswa juga membawa buku tebal. Guru les juga membawa kertas ujian. Walaupun deskripsinya cocok dengan dosen, secara hitungan kemungkinan besar ia bukan dosen, karena jumlah dosen memang sedikit.
+
+Dalam trading, pertanyaan "grafik ini mirip pola apa?" sering menggantikan pertanyaan "dari semua kejadian dengan pola seperti ini, berapa yang benar-benar berakhir sesuai harapan?" Pertanyaan pertama dijawab oleh mata. Pertanyaan kedua hanya bisa dijawab oleh data.
 
 ## Contoh Kehidupan Nyata
 
-_Draf: bagian ini belum ditulis._
+<Contoh jenis="kehidupan">
+
+*Ilustrasi.* Dua situasi sehari-hari memperlihatkan dua sisi keterwakilan.
+
+**1. "Anak keempat pasti perempuan."** Sepasang suami istri sudah memiliki tiga anak laki-laki. Keluarga besar ramai berkata bahwa anak keempat "pasti" perempuan karena "sudah waktunya". Rangkaian laki-laki-laki-laki-laki terasa tidak mewakili proses yang acak, sehingga perempuan dianggap lebih mungkin. Padahal peluang jenis kelamin anak berikutnya tidak dipengaruhi oleh urutan anak-anak sebelumnya.
+
+**2. Rating 5,0 dari tiga ulasan.** Di aplikasi pesan antar makanan, Warung X memiliki rating 5,0 dari 3 ulasan, sedangkan Warung Y memiliki rating 4,7 dari 2.000 ulasan. Banyak orang memilih Warung X karena angkanya lebih "sempurna". Rating dari tiga ulasan sangat mudah bernilai ekstrem, ke atas maupun ke bawah. Rating dari 2.000 ulasan jauh lebih menggambarkan kualitas sebenarnya.
+
+</Contoh>
 
 ## Contoh Keuangan
 
-_Draf: bagian ini belum ditulis._
+<Contoh jenis="keuangan">
+
+*Ilustrasi.* Sebuah perusahaan teknologi, Saham A, baru melantai di bursa. Ceritanya sangat mirip dengan perusahaan teknologi global yang sukses besar: pendiri muda, pertumbuhan pengguna cepat, dan liputan media yang ramai. Di grup Telegram, kesimpulannya cepat: "Ini bakal jadi raksasa berikutnya."
+
+Keterwakilan membuat cerita yang khas terasa seperti peluang tinggi. Frekuensi dasarnya memberi gambaran lain. Misalkan dari 200 perusahaan yang melantai di bursa, hanya 20% yang kinerjanya baik tiga tahun kemudian. Cerita "mirip raksasa teknologi" ternyata dimiliki oleh 60% perusahaan yang berhasil, tetapi juga oleh 40% perusahaan yang gagal:
+
+```text
+Perusahaan yang berhasil         = 20% × 200 = 40
+Perusahaan yang gagal            = 80% × 200 = 160
+
+Berhasil DAN punya cerita khas   = 60% × 40  = 24
+Gagal DAN punya cerita khas      = 40% × 160 = 64
+
+P(berhasil | punya cerita khas)  = 24 / (24 + 64) = 24 / 88 ≈ 27%
+```
+
+Cerita yang meyakinkan memang menaikkan peluang, dari 20% ke sekitar 27%, tetapi jauh dari "pasti jadi raksasa". Tiga dari empat perusahaan dengan cerita serupa tetap berakhir mengecewakan dalam ilustrasi ini, karena perusahaan yang gagal jauh lebih banyak jumlahnya. Inilah pengabaian *base rate* dalam bentuk angka.
+
+</Contoh>
 
 ## Contoh Trading
 
-_Draf: bagian ini belum ditulis._
+<Contoh jenis="trading">
+
+*Ilustrasi, bukan rekomendasi.* Seorang trader menguji setup baru pada data XAUUSD. Dari 10 transaksi backtest, 7 menang dan 3 kalah, dengan target dan stop loss yang sama besar (1R lawan 1R). Ia menyimpulkan: "Winrate 70%, strategi ini terbukti," lalu menaikkan risiko dari 1% ke 2% per transaksi.
+
+Seberapa pasti angka 70% itu? Perkiraan kasar ketidakpastiannya bisa dihitung dengan galat baku:
+
+```text
+Galat baku winrate  = akar( p × (1 − p) / n )
+
+n = 10 transaksi    = akar(0,7 × 0,3 / 10)  ≈ 0,145
+Rentang kasar ±2    = 70% ± 29%             → sekitar 41% sampai 99%
+
+n = 200 transaksi   = akar(0,7 × 0,3 / 200) ≈ 0,032
+Rentang kasar ±2    = 70% ± 6%              → sekitar 64% sampai 76%
+```
+
+Dengan target dan stop loss yang sama besar, titik impasnya adalah winrate 50%. Rentang dari 10 transaksi mencakup angka di bawah 50%, artinya data itu belum bisa membedakan strategi yang menguntungkan dari strategi yang merugikan.
+
+Misalkan winrate sebenarnya 45%. Dampaknya pada 50 transaksi berikutnya:
+
+```text
+Nilai harapan per transaksi   = 0,45 × 1R − 0,55 × 1R = −0,10R
+Total 50 transaksi            = 50 × −0,10R          = −5R
+
+Dengan risiko 1% per R        ≈ −5% modal
+Dengan risiko 2% per R        ≈ −10% modal (tanpa efek majemuk)
+```
+
+Keterwakilan tidak hanya salah menilai strategi; ia juga menggandakan kerugian karena keyakinan palsu itu mendorong ukuran posisi yang lebih besar. Pola serupa muncul ke arah sebaliknya: setelah lima kekalahan beruntun, strategi yang sebenarnya menguntungkan bisa ditinggalkan karena rangkaian pendek itu terasa "mewakili" strategi yang rusak. Lima kekalahan beruntun adalah kejadian yang wajar terjadi pada strategi dengan winrate 55% bila jumlah transaksinya cukup banyak (lihat [variansi dan volatilitas](../variance-and-volatility/)).
+
+</Contoh>
 
 ## Cara Kerja Konsep
 
-_Draf: bagian ini belum ditulis._
+Heuristik keterwakilan mengganti pertanyaan tentang frekuensi dengan pertanyaan tentang kemiripan:
+
+```text
+Pertanyaan sebenarnya: "Seberapa sering hal seperti ini terjadi?"
+          │
+          ▼
+Pertanyaan yang dijawab: "Seberapa mirip ini dengan gambaran khasnya?"
+          │
+          ├── Frekuensi dasar       → terabaikan
+          ├── Ukuran sampel         → terabaikan
+          └── Sifat proses acak     → diharapkan "seimbang" dalam rangkaian pendek
+          │
+          ▼
+Peluang terasa tinggi karena ceritanya cocok, bukan karena datanya cukup
+```
+
+Tabel berikut merangkum tiga bentuk utamanya:
+
+| Bentuk | Apa yang diabaikan | Bentuknya dalam trading | Penawarnya |
+|---|---|---|---|
+| Pengabaian *base rate* | Seberapa sering kejadian itu secara umum | "Pola ini khas pembalikan arah" tanpa tahu berapa persen pola serupa gagal | Hitung frekuensi dari data historis sebelum menilai contoh tunggal |
+| Hukum angka kecil | Ukuran sampel | Backtest 10 transaksi dianggap bukti | Kumpulkan sampel besar; lihat rentang, bukan angka tunggal |
+| Salah paham keacakan | Independensi antarkejadian | "Rugi terus sejak Senin, Jumat pasti hijau" atau "sedang panas, pasti menang lagi" | Nilai setiap transaksi dari aturan, bukan dari urutan hasil terakhir |
+
+**Kapan keterwakilan berguna?** Kemiripan adalah petunjuk yang sah bila memang ada hubungan sebab-akibat yang kuat dan frekuensi dasarnya tidak terlalu timpang. Dokter berpengalaman mengenali gejala khas penyakit umum dengan cepat dan tepat. Kemiripan menjadi masalah ketika frekuensi dasarnya sangat kecil, sampelnya sedikit, atau prosesnya didominasi keacakan, seperti hasil transaksi dalam jangka pendek.
+
+**Pertanyaan pemeriksa.** Sebelum menilai sebuah setup atau strategi:
+
+1. Dari semua kejadian yang mirip dengan ini, berapa persen yang berhasil? Apakah saya punya datanya?
+
+2. Berapa ukuran sampel di balik angka winrate yang saya pakai? Berapa rentang ketidakpastiannya?
+
+3. Apakah saya menilai transaksi berikutnya dari urutan hasil terakhir?
+
+4. Bila strategi ini sebenarnya berada di batas bawah rentangnya, berapa kerugian saya dengan ukuran posisi sekarang?
+
+Untuk melihat seberapa lebar hasil yang wajar dari strategi dengan nilai harapan tertentu, termasuk rangkaian kalah panjang yang terjadi hanya karena keacakan, gunakan simulasi berikut:
+
+<SimulasiEkuitas />
+
+Ringkasnya:
+
+> Kemiripan terasa seperti bukti, tetapi bukan bukti.
+
+> Tanyakan frekuensi dasarnya dan ukuran sampelnya sebelum mempercayai pola.
+
+> Keyakinan dari sampel kecil paling berbahaya ketika dipakai untuk memperbesar posisi.
