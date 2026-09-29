@@ -6,39 +6,222 @@ category: psychology
 topic: bounded-rationality
 order: 2
 difficulty: beginner
-description: "Jalan pintas mental untuk menilai peluang dan mengambil keputusan dengan cepat. Sering cukup berguna, tetapi dapat menghasilkan kesalahan yang sistematis (bias)."
-status: draft
+description: "Jalan pintas mental untuk menilai peluang dan mengambil keputusan dengan cepat. Sering berguna, tetapi dapat menghasilkan kesalahan sistematis yang disebut bias."
+status: review
 featured: false
 prerequisites: [bounded-rationality, probability]
-related: [probability-distribution]
-keywords: [jalan pintas mental, rule of thumb, bias kognitif, feeling]
-sources: []
+related: [representativeness, availability, anchoring, expected-value]
+keywords: ["jalan pintas mental", "rule of thumb", "bias kognitif", "feeling", "insting trading", "heuristik penilaian", "sistem 1", "gambler's fallacy"]
+sources:
+  - type: primary-research
+    title: "Judgment under Uncertainty: Heuristics and Biases"
+    authors: ["Amos Tversky", "Daniel Kahneman"]
+    year: 1974
+    publisher: "Science, 185(4157), 1124–1131"
+    doi: "10.1126/science.185.4157.1124"
+    note: "Artikel seminal yang memperkenalkan tiga heuristik penilaian: keterwakilan, ketersediaan, serta jangkar dan penyesuaian."
+  - type: primary-research
+    title: "A Behavioral Model of Rational Choice"
+    authors: ["Herbert A. Simon"]
+    year: 1955
+    publisher: "The Quarterly Journal of Economics, 69(1), 99–118"
+    doi: "10.2307/1884852"
+    note: "Dasar gagasan rasionalitas terbatas: keputusan manusia dibatasi informasi dan kemampuan berhitung."
+  - type: academic-review
+    title: "Heuristic Decision Making"
+    authors: ["Gerd Gigerenzer", "Wolfgang Gaissmaier"]
+    year: 2011
+    publisher: "Annual Review of Psychology, 62, 451–482"
+    doi: "10.1146/annurev-psych-120709-145346"
+    note: "Tinjauan pandangan rasionalitas ekologis: heuristik sederhana dapat akurat bila cocok dengan struktur lingkungannya."
+  - type: book
+    title: "Thinking, Fast and Slow"
+    authors: ["Daniel Kahneman"]
+    year: 2011
+    publisher: "Farrar, Straus and Giroux"
+    isbn: "978-0-374-27563-1"
+    note: "Penjelasan populer-akademis tentang Sistem 1 dan Sistem 2, substitusi pertanyaan, dan batas kepercayaan pada intuisi."
 ---
 
 ## Mengapa Ini Penting
 
-_Draf: bagian ini belum ditulis._
+Hampir semua keputusan trading diambil dalam kondisi yang jauh dari ideal: harga terus bergerak, informasi tidak lengkap, dan waktu untuk berpikir terbatas. Dalam kondisi seperti itu, otak tidak menghitung [probabilitas](../probability/) secara formal. Otak memakai jalan pintas.
+
+Jalan pintas inilah yang disebut **heuristik**. Tanpa heuristik, manusia tidak akan sanggup mengambil keputusan sehari-hari. Masalahnya, heuristik bekerja diam-diam. Trader jarang sadar bahwa penilaian seperti "setup ini kuat" atau "harganya sudah terlalu mahal" lahir dari jalan pintas mental, bukan dari data.
+
+Ada dua alasan mengapa konsep ini perlu dipahami sejak awal:
+
+1. **Kesalahan heuristik bersifat sistematis, bukan acak.** Karena polanya berulang, kesalahan ini dapat dikenali, diberi nama, dan diantisipasi.
+
+2. **Heuristik tidak bisa dimatikan.** Tujuannya bukan menghapus jalan pintas, tetapi mengetahui kapan jalan pintas itu layak dipercaya dan kapan harus diperiksa dengan angka.
+
+Halaman ini adalah pintu masuk untuk tiga heuristik klasik yang dibahas tersendiri: [keterwakilan](../representativeness/), [ketersediaan](../availability/), dan [jangkar](../anchoring/).
 
 ## Gagasan Utama
 
-_Draf: bagian ini belum ditulis._
+<Definisi>
+
+**Heuristik adalah aturan atau jalan pintas mental yang dipakai untuk menilai peluang dan mengambil keputusan dengan cepat, dengan cara mengabaikan sebagian informasi.** Heuristik menghemat waktu dan tenaga berpikir, tetapi dapat menghasilkan kesalahan penilaian yang sistematis, yang disebut **bias**.
+
+</Definisi>
+
+Istilah ini dikenal luas melalui artikel Amos Tversky dan Daniel Kahneman (1974), *Judgment under Uncertainty: Heuristics and Biases*. Keduanya berargumen bahwa ketika menilai peluang suatu kejadian yang tidak pasti, orang mengandalkan sejumlah kecil prinsip heuristik. Prinsip ini menyederhanakan tugas yang rumit, yaitu menilai probabilitas, menjadi penilaian yang jauh lebih sederhana. Hasilnya sering cukup baik, tetapi kadang meleset jauh dan meleset dengan pola yang dapat ditebak.
+
+Tversky dan Kahneman membahas tiga heuristik utama:
+
+- **Keterwakilan** (*representativeness*): menilai peluang berdasarkan seberapa mirip sesuatu dengan gambaran atau pola yang sudah dikenal.
+
+- **Ketersediaan** (*availability*): menilai seberapa sering atau seberapa mungkin sesuatu terjadi berdasarkan seberapa mudah contohnya muncul di ingatan.
+
+- **Jangkar dan penyesuaian** (*anchoring and adjustment*): memulai perkiraan dari satu angka awal, lalu menyesuaikannya, tetapi penyesuaian itu biasanya kurang jauh.
+
+Heuristik adalah wujud konkret dari [rasionalitas terbatas](../bounded-rationality/). Herbert Simon (1955) menjelaskan bahwa manusia tidak memiliki informasi lengkap maupun kemampuan menghitung semua kemungkinan, sehingga yang dicari adalah pilihan yang "cukup baik", bukan yang paling optimal. Heuristik adalah alat yang dipakai otak untuk sampai ke pilihan "cukup baik" itu.
+
+Namun, heuristik tidak otomatis berarti buruk. Gerd Gigerenzer dan Wolfgang Gaissmaier (2011) menunjukkan pandangan lain yang disebut *ecological rationality*: dalam kondisi tertentu, misalnya ketika lingkungan sulit diprediksi dan sampel data kecil, heuristik sederhana yang mengabaikan sebagian informasi dapat menghasilkan penilaian yang lebih akurat daripada model yang rumit.
+
+Kedua pandangan ini dapat dirangkum dalam satu kalimat:
+
+> **Heuristik bukan baik atau buruk; kualitasnya bergantung pada kecocokan antara jalan pintas yang dipakai dan lingkungan tempat keputusan diambil.**
 
 ## Penjelasan Sederhana
 
-_Draf: bagian ini belum ditulis._
+Bayangkan seorang pengemudi ojek daring yang sudah bertahun-tahun narik di Jakarta. Ia punya aturan hafalan:
+
+> "Jam lima sore, jalan utama pasti macet."
+
+> "Lewat jalan tikus saja."
+
+Ia tidak membuka peta, tidak menghitung jarak, dan tidak membandingkan rute. Aturan itu cepat, dan sebagian besar waktu memang benar.
+
+Tetapi pada hari libur nasional, ketika jalan utama justru lengang, aturan yang sama membuatnya tetap masuk gang sempit dan tiba lebih lambat. Kesalahannya tidak acak: ia **selalu** salah ke arah yang sama, karena aturan hafalannya tidak ikut berubah ketika kondisinya berubah.
+
+Begitulah heuristik bekerja. Jalan pintas yang terbentuk dari pengalaman sangat berguna selama kondisinya mirip dengan kondisi saat jalan pintas itu terbentuk. Ketika kondisinya berbeda, jalan pintas itu tetap dipakai dengan rasa yakin yang sama.
+
+Kahneman (2011) menjelaskan mekanisme yang lebih halus: ketika dihadapkan pada pertanyaan yang sulit, kita sering menjawab pertanyaan lain yang lebih mudah, tanpa menyadari bahwa pertanyaannya sudah diganti. Dalam trading, penggantian itu bisa terlihat seperti ini:
+
+> **Pertanyaan sebenarnya:** "Berapa peluang posisi ini menyentuh target sebelum menyentuh stop loss?"
+
+> **Pertanyaan yang diam-diam dijawab:** "Apakah grafik ini mirip dengan grafik yang dulu naik?"
+
+Pertanyaan pertama membutuhkan data. Pertanyaan kedua hanya membutuhkan ingatan. Jawaban atas pertanyaan kedua terasa sama meyakinkannya, padahal yang dijawab adalah hal yang berbeda.
 
 ## Contoh Kehidupan Nyata
 
-_Draf: bagian ini belum ditulis._
+<Contoh jenis="kehidupan">
+
+*Ilustrasi.* Tiga situasi sehari-hari berikut memperlihatkan tiga heuristik utama.
+
+**1. Warung yang ramai (jalan pintas yang sering berguna).** Di kota yang belum dikenal, banyak orang memilih warung makan yang antreannya panjang. Tidak ada yang membaca ulasan satu per satu; antrean dianggap sebagai tanda makanan enak dan aman. Aturan ini cepat dan sering tepat. Namun, antrean bisa panjang karena warung itu satu-satunya yang buka, bukan karena makanannya paling enak.
+
+**2. Takut naik pesawat setelah berita kecelakaan (ketersediaan).** Setelah berita kecelakaan pesawat ramai di televisi dan media sosial, sebagian orang menjadi takut terbang. Namun, orang yang sama naik sepeda motor setiap hari tanpa merasa cemas. Kejadian yang dramatis dan sering diberitakan mudah diingat, sehingga terasa lebih mungkin terjadi. Kemudahan mengingat dipakai sebagai pengganti frekuensi yang sebenarnya.
+
+**3. Tawar-menawar di pasar grosir (jangkar).** Penjual membuka harga sebuah jaket Rp350.000. Setelah menawar cukup alot, pembeli mendapatkannya dengan harga Rp200.000 dan merasa menang. Padahal jaket serupa dijual Rp120.000 di toko lain. Angka Rp350.000 menjadi jangkar: penilaian "murah" diukur dari angka pembuka penjual, bukan dari harga pasar.
+
+</Contoh>
 
 ## Contoh Keuangan
 
-_Draf: bagian ini belum ditulis._
+<Contoh jenis="keuangan">
+
+*Ilustrasi.* Seorang investor ritel pemula melihat Saham B ramai dibicarakan di grup WhatsApp dan media sosial. Saham itu menyentuh auto reject atas (ARA) tiga hari berturut-turut, dan tangkapan layar keuntungan berseliweran di mana-mana. Dalam beberapa menit, tiga heuristik bekerja sekaligus:
+
+- **Keterwakilan:** "Naik tiga hari berturut-turut, berarti perusahaannya bagus." Kualitas perusahaan dinilai dari kemiripan pola harga dengan gambaran "saham bagus", bukan dari laporan keuangan atau prospek usahanya.
+
+- **Ketersediaan:** Yang terlihat di grup hanya orang yang untung. Orang yang rugi jarang mengunggah tangkapan layar, sehingga peluang untung terasa jauh lebih besar dari kenyataannya.
+
+- **Jangkar:** Beberapa minggu kemudian harga turun dari Rp1.500 ke Rp900. Investor berpikir, "Sudah diskon 40%, sekarang murah." Angka Rp1.500 hanyalah harga yang pernah terjadi, bukan ukuran nilai wajar perusahaan.
+
+Mengapa jangkar ini berbahaya bisa dilihat dari hitungan sederhana:
+
+```text
+Turun dari Rp1.500 ke Rp900        = (1.500 − 900) / 1.500 = 40%
+Turun lagi 40% dari Rp900          = Rp540
+Total penurunan dari harga puncak  = (1.500 − 540) / 1.500 = 64%
+```
+
+Label "sudah murah" tidak memberi informasi apa pun tentang seberapa jauh harga masih bisa turun. Pertanyaan yang lebih tepat bukan "sudah turun berapa persen dari puncak?", melainkan "berapa nilai perusahaan ini berdasarkan laba dan prospeknya?" dan "berapa besar dana yang siap saya relakan bila saya salah?"
+
+</Contoh>
 
 ## Contoh Trading
 
-_Draf: bagian ini belum ditulis._
+<Contoh jenis="trading">
+
+*Ilustrasi, bukan rekomendasi.* Seorang trader CFD emas (XAUUSD) memakai setup *breakout*. Ia merasa setup ini "hampir selalu profit", dengan perkiraan tingkat menang sekitar 60%. Perasaan itu terbentuk dari empat transaksi besar yang tangkapan layarnya masih ia simpan dan sering ia lihat. Ini adalah heuristik ketersediaan: contoh yang paling mudah diingat dipakai sebagai perkiraan peluang.
+
+Ketika ia akhirnya membuka jurnal trading, catatan 40 transaksi terakhir menunjukkan 15 kali menang dan 25 kali kalah. Rata-rata keuntungan saat menang 1,5R, dan rata-rata kerugian saat kalah 1R. Di sini 1R berarti besar risiko per transaksi yang sudah ditetapkan sebelumnya.
+
+```text
+Perkiraan dari ingatan (60%):  0,60 × 1,5R − 0,40 × 1R   = +0,50R per transaksi
+Data jurnal (15 dari 40):      0,375 × 1,5R − 0,625 × 1R = −0,0625R per transaksi
+```
+
+Selisih ini bukan detail kecil. Perkiraan dari ingatan memberi [nilai harapan](../expected-value/) positif, sedangkan data jurnal memberi nilai harapan negatif. Dengan risiko 1% per transaksi, 100 transaksi berikutnya kira-kira bernilai +50% menurut perasaan, tetapi sekitar −6,25% menurut data, tanpa memperhitungkan efek majemuk. Sistem yang terasa menguntungkan ternyata perlahan menggerus modal.
+
+Dua heuristik lain sering ikut muncul pada trader yang sama:
+
+- **Keterwakilan dalam bentuk "sudah waktunya menang".** Setelah empat kali kalah beruntun, muncul perasaan bahwa transaksi kelima "pasti" menang. Tversky dan Kahneman (1974) menggambarkan kekeliruan ini sebagai anggapan bahwa rangkaian acak yang pendek pun harus terlihat "seimbang". Bila karakter setup tidak berubah, empat kekalahan beruntun tidak menaikkan peluang transaksi kelima.
+
+- **Jangkar pada harga entry.** Posisi yang sedang rugi ditahan dengan alasan "tunggu balik ke harga entry dulu". Pasar tidak mengetahui harga entry siapa pun. Harga entry adalah jangkar pribadi, bukan informasi tentang arah harga berikutnya.
+
+</Contoh>
 
 ## Cara Kerja Konsep
 
-_Draf: bagian ini belum ditulis._
+Secara umum, heuristik bekerja melalui penggantian pertanyaan. Pertanyaan yang sulit dijawab diganti dengan pertanyaan yang lebih mudah, lalu jawaban atas pertanyaan mudah itu dirasakan sebagai jawaban atas pertanyaan sulit.
+
+```text
+Pertanyaan sulit: "Berapa peluang hasil ini terjadi?"
+          │
+          ▼
+Otak mencari jawaban cepat
+          │
+          ├── Seberapa mirip dengan pola yang dikenal?      → keterwakilan
+          ├── Contoh apa yang paling mudah diingat?         → ketersediaan
+          └── Angka apa yang pertama kali terlihat?         → jangkar
+          │
+          ▼
+Jawaban terasa yakin, padahal pertanyaannya sudah diganti
+```
+
+Tabel berikut merangkum tiga heuristik utama dan bentuk biasnya dalam trading:
+
+| Heuristik | Pertanyaan pengganti | Bias yang sering muncul | Bentuknya dalam trading |
+|---|---|---|---|
+| [Keterwakilan](../representativeness/) | Seberapa mirip ini dengan pola yang saya kenal? | Mengabaikan *base rate*, menganggap sampel kecil sudah mewakili | "Pola ini mirip yang kemarin naik", "sudah lima kali kalah, pasti menang" |
+| [Ketersediaan](../availability/) | Contoh apa yang paling mudah saya ingat? | Frekuensi dinilai dari kemudahan mengingat | Tingkat menang ditaksir dari tangkapan layar profit, bukan dari jurnal |
+| [Jangkar](../anchoring/) | Angka apa yang pertama kali saya lihat? | Penyesuaian dari angka awal kurang jauh | "Sudah diskon dari puncak", "tunggu balik ke harga entry" |
+
+Kekuatan jangkar diperlihatkan dalam salah satu eksperimen di artikel Tversky dan Kahneman (1974). Peserta diminta memperkirakan persentase negara Afrika di Perserikatan Bangsa-Bangsa setelah melihat angka dari roda putar yang tampak acak. Kelompok yang mendapat angka 10 memberi perkiraan median 25%, sedangkan kelompok yang mendapat angka 65 memberi perkiraan median 45%. Angka yang jelas tidak relevan tetap menggeser penilaian.
+
+**Kapan heuristik layak dipercaya?** Kahneman (2011) menjelaskan bahwa intuisi dapat diandalkan bila lingkungannya cukup teratur dan orang memiliki kesempatan panjang untuk berlatih dengan umpan balik yang cepat dan jelas. Pasar keuangan sering tidak memenuhi syarat itu: satu keputusan buruk bisa berakhir untung, dan satu keputusan baik bisa berakhir rugi. Umpan balik dari satu transaksi karena itu tidak dapat dijadikan ukuran kualitas keputusan.
+
+Di sisi lain, temuan Gigerenzer dan Gaissmaier (2011) mengingatkan bahwa aturan sederhana justru bisa tangguh di lingkungan yang sulit diprediksi. Karena itu, pembedanya bukan "heuristik" lawan "tanpa heuristik", melainkan:
+
+- **Heuristik spontan**, yang muncul saat layar bergerak dan emosi sedang tinggi, misalnya "feeling saya bilang naik".
+
+- **Heuristik yang dirancang**, yang ditetapkan sebelumnya, sederhana, dan diuji dengan data, misalnya aturan risiko tetap per transaksi dalam [ukuran posisi](../position-sizing/).
+
+Heuristik jenis kedua tetap merupakan jalan pintas, tetapi jalan pintas yang dipilih dengan kepala dingin, bukan yang memilih dirinya sendiri di tengah tekanan.
+
+**Pertanyaan pemeriksa.** Sebelum membuka posisi, empat pertanyaan berikut membantu mendeteksi apakah heuristik spontan sedang mengambil alih:
+
+1. Pertanyaan apa yang sebenarnya sedang saya jawab: peluang hasilnya, atau kemiripan polanya?
+
+2. Apakah angka peluang yang saya pakai berasal dari jurnal, atau dari ingatan?
+
+3. Angka acuan apa yang sedang saya pakai, dan apakah angka itu relevan dengan keputusan ke depan?
+
+4. Bila penilaian saya salah, berapa kerugiannya dalam R dan dalam rupiah?
+
+Untuk merasakan dampak perbedaan antara perkiraan dari ingatan dan data jurnal, masukkan dua angka tingkat menang yang berbeda pada alat berikut dan bandingkan nilai harapannya:
+
+<PenjelajahNilaiHarapan />
+
+Ringkasnya:
+
+> Heuristik adalah cara otak menjawab pertanyaan sulit dengan cepat.
+
+> Kesalahannya sistematis, sehingga dapat dikenali.
+
+> Perlindungan terbaik bukan melawan intuisi, tetapi memeriksanya dengan data dan membatasi kerugian bila intuisi itu salah.
