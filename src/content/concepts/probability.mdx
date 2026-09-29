@@ -79,3 +79,82 @@ Secara umum:
 │
 └── 1 / 100% = pasti dalam model yang digunakan
 ```
+
+Tetapi hati-hati dengan kata "pasti".
+
+Probabilitas 100% berarti kejadian tersebut memiliki probabilitas 1 dalam model atau ruang kemungkinan yang sedang kita gunakan.
+
+Itu tidak otomatis berarti manusia mengetahui masa depan secara sempurna.
+
+Probabilitas adalah alat untuk merepresentasikan ketidakpastian, bukan mesin untuk menghapus ketidakpastian.
+
+---
+
+## Probability Bukan Prediksi
+
+Ini perbedaan yang sangat penting.
+
+Bayangkan seseorang berkata:\
+"Besok harga emas naik."
+
+Itu adalah prediksi yang sangat spesifik.
+
+Sekarang bandingkan dengan:\
+"Berdasarkan informasi yang tersedia, saya menilai skenario naik memiliki kemungkinan lebih besar daripada skenario turun."
+
+Ini adalah cara berpikir probabilistik.
+
+Probabilistic thinking tidak selalu meminta kita memilih satu hasil. Kita dapat mempertimbangkan beberapa hasil sekaligus.
+
+Misalnya:
+- Naik kuat: 20%
+- Naik moderat: 30%
+- Sideways: 30%
+- Turun moderat: 15%
+- Turun kuat: 5%
+
+Jumlahnya: **100%**
+
+Artinya bukan "Kita tahu masa depan", melainkan "Kita sedang mencoba merepresentasikan ruang kemungkinan yang kita anggap masuk akal."
+
+---
+
+## Mulai dari "Apa Saja yang Bisa Terjadi?"
+
+Untuk memahami probabilitas, kita perlu mengenal dua konsep sederhana:
+
+### Sample Space
+Sample space adalah kumpulan seluruh hasil yang mungkin dalam suatu eksperimen atau situasi yang sedang kita analisis.
+
+Contoh:
+- Lempar koin: `{Kepala, Ekor}`
+- Lempar dadu: `{1, 2, 3, 4, 5, 6}`
+
+### Event
+Dari sample space, kita bisa membentuk event atau kejadian yang ingin kita tanyakan probabilitasnya.
+
+Misalnya pada dadu: "Berapa probabilitas keluar angka genap?"\
+Event genap: `{2, 4, 6}`
+
+P(Genap) = 3 / 6 = 0.5 (50%)
+
+---
+
+## Dari Mana Probability Bisa Datang?
+
+1. **Model Matematis:** Asumsi dadu/koin adil.
+2. **Frekuensi Relatif:** Hasil observasi sampel historis (contoh: win rate trading 55/100 = 55%).
+3. **Model Statistik:** Pemodelan berbasis data dan variabel.
+4. **Subjective Probability:** Tingkat keyakinan/judgment terstruktur berdasarkan informasi yang ada.
+
+---
+
+## Aturan Dasar & Conditional Probability
+
+- **P(A) ≥ 0** (Tidak negatif)
+- **P(S) = 1** (Total seluruh ruang kemungkinan adalah 100%)
+- **Conditional Probability P(A | B):** Probabilitas kejadian A terjadi setelah informasi/kejadian B diketahui.
+
+```text
+P(A | B) = P(A ∩ B) / P(B)
+```
