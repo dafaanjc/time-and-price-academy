@@ -7,38 +7,185 @@ topic: investor-behavior
 order: 5
 difficulty: intermediate
 description: "Kecenderungan investor terlalu cepat menjual posisi yang sedang untung dan terlalu lama menahan posisi yang sedang rugi."
-status: draft
+status: review
 featured: false
 prerequisites: [prospect-theory]
-related: [loss-aversion, reference-point]
-keywords: [nyangkut, hold loss, cut profit, averaging down, jual rugi]
-sources: []
+related: [loss-aversion, reference-point, prospect-theory, anchoring, expected-value, risk-of-ruin]
+keywords: ["nyangkut", "hold loss", "cut profit", "averaging down", "jual rugi", "hold sampai balik modal", "take profit kecepetan", "geser stop loss", "floating loss", "serok bawah", "investor jangka panjang dadakan", "cut loss"]
+sources:
+  - type: primary-research
+    title: "The Disposition to Sell Winners Too Early and Ride Losers Too Long: Theory and Evidence"
+    authors: ["Hersh Shefrin", "Meir Statman"]
+    year: 1985
+    publisher: "The Journal of Finance, 40(3), 777–790"
+    doi: "10.1111/j.1540-6261.1985.tb05002.x"
+    note: "Memperkenalkan istilah efek disposisi dan menjelaskannya dengan teori prospek, akun mental, penghindaran penyesalan, dan pengendalian diri."
+  - type: primary-research
+    title: "Are Investors Reluctant to Realize Their Losses?"
+    authors: ["Terrance Odean"]
+    year: 1998
+    publisher: "The Journal of Finance, 53(5), 1775–1798"
+    doi: "10.1111/0022-1082.00072"
+    note: "Menguji efek disposisi pada catatan transaksi 10.000 akun di sebuah broker diskon: investor jauh lebih cenderung merealisasikan untung daripada rugi, dan pola ini tidak dibenarkan oleh kinerja saham sesudahnya."
 ---
 
 ## Mengapa Ini Penting
 
-_Draf: bagian ini belum ditulis._
+"Nyangkut" adalah salah satu kata yang paling sering terdengar di kalangan investor dan trader ritel. Di balik kata itu ada pola yang sangat konsisten: posisi yang untung cepat dijual "supaya aman", sedangkan posisi yang rugi ditahan "sampai balik modal". Hasilnya adalah portofolio yang berisi kumpulan posisi rugi, dan akun trading dengan keuntungan kecil-kecil serta kerugian besar.
+
+Konsep ini penting karena tiga alasan:
+
+1. **Ia merusak rasio untung-rugi secara diam-diam.** Winrate bisa tetap tinggi, tetapi rata-rata keuntungan menyusut dan rata-rata kerugian membengkak, sehingga [nilai harapan](../expected-value/) berubah negatif.
+
+2. **Ia mengikat modal pada keputusan yang sudah salah.** Dana yang tertahan di posisi rugi tidak bisa dipakai untuk peluang yang lebih baik.
+
+3. **Ia adalah wujud nyata teori di pasar.** [Titik acuan](../reference-point/), [aversi kerugian](../loss-aversion/), dan [teori prospek](../prospect-theory/) bertemu dalam satu kebiasaan yang bisa diukur dari catatan transaksi.
 
 ## Gagasan Utama
 
-_Draf: bagian ini belum ditulis._
+<Definisi>
+
+**Efek disposisi adalah kecenderungan investor menjual posisi yang sedang untung terlalu cepat dan menahan posisi yang sedang rugi terlalu lama.** Keputusan menjual atau menahan didorong oleh posisi harga saat ini terhadap harga beli, bukan oleh prospek posisi tersebut ke depan.
+
+</Definisi>
+
+Istilah ini diperkenalkan oleh Hersh Shefrin dan Meir Statman (1985) dalam artikel *The Disposition to Sell Winners Too Early and Ride Losers Too Long*. Mereka menjelaskan kecenderungan ini dengan menggabungkan beberapa unsur:
+
+- **Teori prospek:** dengan harga beli sebagai titik acuan, posisi untung berada di wilayah tempat orang cenderung menghindari risiko (jual dan amankan), sedangkan posisi rugi berada di wilayah tempat orang cenderung mencari risiko (tahan dan berharap).
+
+- **Akun mental:** setiap posisi diperlakukan sebagai "akun" tersendiri yang ingin ditutup dalam keadaan untung, bukan sebagai bagian dari keseluruhan portofolio.
+
+- **Penghindaran penyesalan:** menjual posisi rugi berarti mengakui bahwa keputusan membeli itu salah. Selama belum dijual, kerugian terasa "belum nyata".
+
+- **Pengendalian diri:** orang tahu bahwa kerugian seharusnya dipotong, tetapi kesulitan melakukannya tanpa aturan yang mengikat.
+
+Terrance Odean (1998) menguji efek ini dengan catatan transaksi 10.000 akun di sebuah broker diskon di Amerika Serikat. Hasilnya: investor memperlihatkan kecenderungan yang kuat untuk merealisasikan keuntungan daripada kerugian. Pola ini tidak dapat dijelaskan oleh keinginan menyeimbangkan portofolio atau menghindari biaya transaksi. Yang paling penting, pola ini juga tidak dibenarkan oleh kinerja sesudahnya: saham untung yang dijual justru cenderung berkinerja lebih baik sesudahnya daripada saham rugi yang ditahan. Pengecualian yang terlihat adalah bulan Desember, ketika penjualan saham rugi meningkat karena alasan pajak di sana. Artinya, ketika ada alasan eksternal yang kuat, investor sanggup menjual posisi rugi.
+
+> **Harga beli adalah sejarah pribadi, bukan informasi tentang masa depan. Efek disposisi terjadi ketika sejarah itu yang menentukan apa yang dijual dan apa yang ditahan.**
 
 ## Penjelasan Sederhana
 
-_Draf: bagian ini belum ditulis._
+Bayangkan sebuah warung sembako dengan gudang kecil. Barang yang laris, seperti minyak goreng dan mi instan, cepat habis terjual. Barang yang tidak laku, misalnya sirup merek baru yang dulu dibeli dalam jumlah banyak, dibiarkan menumpuk di sudut gudang. Pemilik warung enggan menjualnya dengan harga diskon karena "belinya dulu mahal, rugi kalau dijual murah".
+
+Setahun kemudian, gudang itu sebagian besar berisi barang yang tidak laku. Tempat yang seharusnya dipakai untuk barang laris terisi oleh barang yang dipertahankan hanya karena harga belinya. Pemilik warung tidak rugi karena satu keputusan besar, melainkan karena ratusan keputusan kecil untuk "menunggu harga kembali".
+
+Pertanyaan yang lebih tepat bagi pemilik warung bukan "berapa harga belinya dulu?", melainkan "barang apa yang paling layak menempati gudang saya hari ini?" Pertanyaan yang sama berlaku untuk portofolio: posisi mana yang paling layak menempati modal saya hari ini, terlepas dari harga belinya?
 
 ## Contoh Kehidupan Nyata
 
-_Draf: bagian ini belum ditulis._
+<Contoh jenis="kehidupan">
+
+*Ilustrasi.* Dua kebiasaan sehari-hari berikut memperlihatkan pola yang sama.
+
+**1. Lemari pakaian.** Seseorang membersihkan lemarinya. Kaus yang sering dipakai dan masih bagus ia sumbangkan karena "sudah lama punya, sudah balik modal". Jaket mahal yang tidak pernah dipakai tetap disimpan karena "sayang, belinya Rp1.500.000". Setahun kemudian, lemarinya penuh dengan barang yang tidak pernah dipakai, sementara barang yang berguna justru sudah pergi.
+
+**2. Koleksi sepatu.** Seorang kolektor memiliki beberapa pasang sepatu edisi terbatas. Satu pasang yang harga jual kembalinya naik segera ia jual untuk "mengunci untung". Dua pasang yang harga pasarannya turun ia simpan dengan alasan "nanti juga naik lagi". Keputusannya ditentukan oleh harga saat ia membeli, bukan oleh pasang mana yang paling mungkin naik nilainya.
+
+</Contoh>
 
 ## Contoh Keuangan
 
-_Draf: bagian ini belum ditulis._
+<Contoh jenis="keuangan">
+
+*Ilustrasi.* Seorang investor membeli 10 lot (1.000 lembar) Saham A di harga Rp2.000. Harga turun ke Rp1.200. Ia merasa "nyangkut" dan memutuskan untuk "serok bawah", yaitu membeli 10 lot lagi agar harga rata-ratanya turun. Rencana ini tidak dibuat sebelum membeli; ia muncul karena harga beli pertama terasa terlalu jauh untuk dikejar.
+
+```text
+Sebelum averaging down
+  10 lot × Rp2.000                 → harga rata-rata Rp2.000
+  Kenaikan yang dibutuhkan untuk impas  = (2.000 − 1.200) / 1.200 ≈ 66,7%
+
+Sesudah averaging down
+  10 lot × Rp2.000 + 10 lot × Rp1.200   → harga rata-rata Rp1.600
+  Kenaikan yang dibutuhkan untuk impas  = (1.600 − 1.200) / 1.200 ≈ 33,3%
+```
+
+Titik impas terasa lebih dekat, dan itulah yang membuat keputusan ini terasa seperti kemajuan. Tetapi yang berubah bukan prospek Saham A, melainkan ukuran taruhannya. Bila harga turun lagi ke Rp800:
+
+```text
+Tanpa averaging down   → rugi = (2.000 − 800) × 1.000 lembar = Rp1.200.000
+Dengan averaging down  → rugi = (1.600 − 800) × 2.000 lembar = Rp1.600.000
+```
+
+Averaging down tanpa rencana adalah efek disposisi yang ditambah modal baru: keinginan untuk tidak merealisasikan rugi dipecahkan dengan memperbesar posisi yang sedang rugi. Pertanyaan yang lebih tepat: bila saya tidak memiliki Saham A sama sekali, apakah saya akan membeli 20 lot hari ini di harga Rp1.200?
+
+</Contoh>
 
 ## Contoh Trading
 
-_Draf: bagian ini belum ditulis._
+<Contoh jenis="trading">
+
+*Ilustrasi, bukan rekomendasi.* Seorang trader XAUUSD memiliki rencana yang jelas: stop loss 1R dan target 1,5R. Dengan rencana itu, backtest-nya menunjukkan winrate sekitar 45%. Namun jurnal 100 transaksi terakhirnya memperlihatkan angka yang berbeda:
+
+```text
+Rencana
+  Winrate 45%, menang +1,5R, kalah −1R
+  Nilai harapan = 0,45 × 1,5R − 0,55 × 1R = +0,125R per transaksi
+
+Jurnal (dengan efek disposisi)
+  Winrate 58%, rata-rata menang +0,7R, rata-rata kalah −1,4R
+  Nilai harapan = 0,58 × 0,7R − 0,42 × 1,4R = 0,406R − 0,588R ≈ −0,18R per transaksi
+```
+
+Winrate-nya justru naik, dan itu terasa seperti perbaikan. Yang terjadi adalah dua kebiasaan kecil. Posisi untung ditutup sebelum target, "yang penting hijau", sehingga lebih banyak transaksi berakhir sebagai kemenangan kecil. Posisi rugi ditahan dengan menggeser stop loss, "tunggu sebentar lagi", sehingga sebagian bisa diselamatkan, tetapi yang tidak selamat berakhir jauh melewati 1R.
+
+Dalam 100 transaksi, perbedaannya kira-kira:
+
+```text
+Rencana   → 100 × (+0,125R) = +12,5R
+Jurnal    → 100 × (−0,18R)  ≈ −18R
+```
+
+Selisihnya lebih dari 30R, dari strategi yang sama, hanya karena posisi untung dan posisi rugi diperlakukan berbeda. Pada risiko 1% per R, itu berarti perbedaan sekitar 30% modal. Kebiasaan menggeser stop loss juga membuka kemungkinan satu kerugian yang sangat besar, yang menjadi jalan menuju [risiko kehancuran](../risk-of-ruin/).
+
+</Contoh>
 
 ## Cara Kerja Konsep
 
-_Draf: bagian ini belum ditulis._
+Efek disposisi terjadi ketika harga beli menjadi titik acuan untuk keputusan menjual:
+
+```text
+Harga beli (titik acuan)
+          │
+          ├── Harga di atas harga beli → wilayah untung
+          │         → menghindari risiko → "amankan dulu" → jual terlalu cepat
+          │
+          └── Harga di bawah harga beli → wilayah rugi
+                    → mencari risiko + menghindari penyesalan
+                    → "tunggu balik modal", geser stop loss, averaging down
+          │
+          ▼
+Keuntungan kecil, kerugian besar, modal terikat di posisi yang salah
+```
+
+Tabel berikut merangkum bentuk efek disposisi dan aturan yang bisa menjadi penawarnya:
+
+| Bentuk | Kalimat yang biasa terdengar | Dampak | Aturan penawar |
+|---|---|---|---|
+| Jual untung terlalu cepat | "Yang penting hijau" | Rata-rata menang menyusut | Target ditentukan sebelum entry dan hanya diubah dengan alasan tertulis |
+| Tahan rugi terlalu lama | "Belum rugi selama belum dijual" | Rata-rata kalah membengkak | Stop loss dipasang saat entry dan tidak digeser menjauh |
+| Averaging down tanpa rencana | "Serok bawah biar rata-rata turun" | Ukuran posisi rugi membesar | Tambah posisi hanya bila sudah direncanakan sebelum entry pertama |
+| Investor jangka panjang dadakan | "Ya sudah, simpan untuk jangka panjang" | Modal terikat pada posisi yang tidak dipilih ulang | Nilai setiap posisi seolah baru dibuka hari ini |
+
+**Kapan menahan posisi rugi itu wajar?** Menahan posisi yang sedang rugi tidak selalu salah. Bila alasan awal membeli masih berlaku dan rencana sejak awal memang memberi ruang untuk fluktuasi, menahan adalah bagian dari rencana. Yang menjadi masalah adalah menahan **karena** harga di bawah harga beli, tanpa alasan lain. Ujian sederhananya: bila Anda tidak memiliki posisi itu, apakah Anda akan membukanya hari ini dengan ukuran yang sama?
+
+**Pertanyaan pemeriksa.** Setiap kali ingin menutup posisi untung lebih awal, atau menahan posisi rugi lebih lama:
+
+1. Apakah keputusan ini sesuai dengan rencana yang saya tulis sebelum entry?
+
+2. Bila saya tidak memiliki posisi ini, apakah saya akan membukanya sekarang di harga ini?
+
+3. Apakah saya sedang menghindari rasa menyesal, atau menilai prospek ke depan?
+
+4. Menurut jurnal, berapa rata-rata menang dan rata-rata kalah saya dibandingkan rencana?
+
+Untuk melihat bagaimana perubahan rata-rata menang dan kalah mengubah sebaran kurva ekuitas dan drawdown, gunakan simulasi berikut:
+
+<SimulasiEkuitas />
+
+Ringkasnya:
+
+> Harga beli adalah sejarah, bukan ramalan.
+
+> Winrate yang naik bisa menyembunyikan nilai harapan yang turun.
+
+> Nilai setiap posisi seolah baru dibuka hari ini.
