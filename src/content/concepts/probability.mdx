@@ -5,90 +5,77 @@ slug: probability
 category: foundations
 order: 3
 difficulty: beginner
-description: "Ukuran seberapa mungkin suatu kejadian terjadi, dinyatakan sebagai angka antara 0 dan 1."
-status: draft
+description: "Memahami probabilitas sebagai cara berpikir tentang kemungkinan, dari ruang kemungkinan dan kejadian hingga conditional probability, independence, dan penerapannya dalam keputusan finansial."
+status: review
 featured: true
 prerequisites: [risk, risk-vs-uncertainty]
-related: [probability-distribution]
+related: [risk, risk-vs-uncertainty, probability-distribution, expected-value, variance-and-volatility]
 sources: []
+keywords: [probability, probabilitas, uncertainty, decision-making, risk, statistics, trading]
 ---
 
-## Mengapa Ini Penting
+## Kalau Kita Tidak Tahu Masa Depan, Bagaimana Kita Bisa Membicarakannya?
 
-Probabilitas adalah bahasa dasar untuk membicarakan risiko. Tanpa probabilitas, pernyataan seperti "kemungkinan besar untung" atau "jarang rugi" tidak bisa dibandingkan atau diperiksa. Dengan probabilitas, keyakinan dapat dinyatakan sebagai angka, sehingga bisa dihitung, dibandingkan, dan diperbarui ketika ada data baru.
+Di artikel sebelumnya kita membedakan **risk** dan **uncertainty**.
 
-## Gagasan Utama
+Sekarang muncul pertanyaan yang lebih dasar:
 
-<Definisi>
+> **Kalau kita tidak tahu apa yang akan terjadi, bagaimana kita bisa berbicara tentang kemungkinan sesuatu terjadi?**
 
-**Probabilitas adalah ukuran seberapa mungkin suatu kejadian terjadi, dinyatakan sebagai angka antara 0 dan 1** (atau 0% sampai 100%).
+Di sinilah probabilitas masuk.
 
-</Definisi>
+Probabilitas adalah bahasa yang kita gunakan untuk membicarakan **kemungkinan**.
 
-- `P = 0` berarti kejadian itu tidak mungkin terjadi.
-- `P = 1` berarti kejadian itu pasti terjadi.
-- Nilai di antaranya menunjukkan tingkat kemungkinan.
+Bukan bahasa untuk mengatakan:
 
-Ada tiga cara umum untuk memperoleh angka probabilitas:
+> "Ini pasti terjadi."
 
-1. **Klasik**: dari hasil yang sama-sama mungkin. Dadu yang adil punya 6 sisi, jadi peluang tiap angka adalah 1/6.
-2. **Frekuensi**: dari seberapa sering sesuatu terjadi dalam banyak percobaan atau data historis.
-3. **Subjektif**: dari tingkat keyakinan seseorang berdasarkan informasi yang dimilikinya.
+Melainkan untuk mengatakan:
 
-## Penjelasan Sederhana
+> "Berdasarkan informasi dan model yang kita punya, seberapa mungkin kejadian ini terjadi?"
 
-Jika Anda melempar koin yang adil, ada dua hasil yang sama-sama mungkin: angka atau gambar. Peluang keluar gambar adalah 1 dari 2, yaitu 0,5 atau 50%.
+Ini penting karena keputusan sehari-hari hampir selalu dibuat sebelum hasil akhirnya diketahui.
 
-Probabilitas **tidak** memberi tahu apa yang akan terjadi pada satu lemparan berikutnya. Probabilitas memberi tahu pola yang muncul bila lemparan dilakukan berkali-kali. Dengan 10 lemparan, jumlah gambar bisa saja 7. Dengan ribuan lemparan, proporsinya cenderung makin mendekati 50%. Kecenderungan ini dikenal sebagai **hukum bilangan besar**.
+Kita memilih rute sebelum tahu kondisi jalan.
 
-## Contoh Kehidupan Nyata
+Kita membeli barang sebelum tahu apakah barang tersebut akan bertahan lama.
 
-<Contoh jenis="kehidupan">
+Kita membuka bisnis sebelum tahu berapa banyak pelanggan yang akan datang.
 
-Prakiraan cuaca menyebut "peluang hujan 70%". Artinya bukan hujan akan turun selama 70% waktu. Artinya, dalam kondisi cuaca serupa, hujan terjadi pada sekitar 70% kasus. Hari ini tetap bisa tidak hujan. Namun membawa payung adalah keputusan yang masuk akal, karena biaya membawa payung kecil dibandingkan akibat kehujanan.
+Trader membuka posisi sebelum tahu apakah harga akan bergerak sesuai ekspektasi.
 
-Contoh ini menunjukkan hal penting: **keputusan yang baik mempertimbangkan probabilitas dan dampak sekaligus.**
+Dalam semua situasi tersebut, kita tidak memiliki kepastian.
 
-</Contoh>
+Yang kita miliki adalah **informasi tentang kemungkinan**.
 
-## Contoh Keuangan
+---
 
-<Contoh jenis="keuangan">
+## Probabilitas Itu Apa?
 
-*Ilustrasi.* Sebuah pemberi pinjaman memperkirakan bahwa dari peminjam dengan profil tertentu, sekitar 5 dari 100 tidak mampu melunasi pinjamannya. Dari sudut pandang frekuensi, probabilitas gagal bayar untuk kelompok itu kira-kira 0,05.
+Secara sederhana:
 
-Angka itu tidak bisa memberi tahu **siapa** yang akan gagal bayar. Angka itu berguna untuk kelompok besar, misalnya untuk menentukan berapa cadangan dana yang perlu disiapkan dan berapa bunga yang cukup untuk menutup kerugian yang diperkirakan.
+> **Probabilitas adalah ukuran numerik yang digunakan untuk menyatakan seberapa mungkin suatu kejadian terjadi.**
 
-</Contoh>
+Nilainya berada antara:
 
-## Contoh Trading
+**0 sampai 1**
 
-<Contoh jenis="trading">
+atau, jika ditulis sebagai persentase:
 
-*Ilustrasi, bukan rekomendasi.* Seorang trader meninjau 200 kejadian historis dari sebuah pola harga dan mencatat bahwa pada 90 kejadian harga mencapai target tertentu. Frekuensinya `90 / 200 = 0,45`, atau 45%.
+**0% sampai 100%**
 
-Angka ini adalah **perkiraan**, bukan kepastian. Ada beberapa hal yang membatasinya:
+Secara umum:
 
-- 200 kejadian mungkin belum cukup untuk perkiraan yang stabil.
-- Kondisi pasar saat data dikumpulkan belum tentu sama dengan kondisi sekarang.
-- Cara memilih kejadian dalam data bisa tanpa sengaja membuat hasilnya terlihat lebih baik.
-
-</Contoh>
-
-## Cara Kerja Konsep
-
-Beberapa aturan dasar probabilitas:
-
-| Aturan | Rumus | Contoh dengan dadu adil |
-| --- | --- | --- |
-| Batas nilai | `0 ≤ P(A) ≤ 1` | P(keluar 6) = 1/6 ≈ 0,167 |
-| Komplemen | `P(bukan A) = 1 − P(A)` | P(bukan 6) = 5/6 ≈ 0,833 |
-| Penjumlahan (kejadian saling lepas) | `P(A atau B) = P(A) + P(B)` | P(keluar 1 atau 2) = 1/6 + 1/6 = 1/3 |
-| Perkalian (kejadian independen) | `P(A dan B) = P(A) × P(B)` | P(dua lemparan, keduanya 6) = 1/6 × 1/6 = 1/36 ≈ 0,028 |
-
-Dua syarat penting sering terlupa:
-
-- Aturan penjumlahan di atas hanya berlaku bila kedua kejadian **tidak bisa terjadi bersamaan**.
-- Aturan perkalian di atas hanya berlaku bila kedua kejadian **tidak saling memengaruhi**. Di pasar keuangan, banyak kejadian saling terkait, sehingga asumsi independen perlu diperiksa.
-
-Probabilitas satu kejadian saja belum cukup untuk menggambarkan seluruh kemungkinan. Untuk itu kita memerlukan [distribusi probabilitas](../probability-distribution/).
+```text
+0
+│
+├── 0%       = mustahil dalam model yang digunakan
+│
+├── 25%      = kemungkinan relatif rendah
+│
+├── 50%      = dua kemungkinan yang seimbang dalam model tertentu
+│
+├── 75%      = kemungkinan relatif tinggi
+│
+└── 1 / 100% = pasti dalam model yang digunakan
+```
