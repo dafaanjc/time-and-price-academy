@@ -7,38 +7,180 @@ topic: bounded-rationality
 order: 1
 difficulty: intermediate
 description: "Gagasan bahwa keputusan manusia dibatasi oleh informasi, waktu, dan kemampuan berhitung, sehingga orang mencari pilihan yang cukup baik, bukan yang paling optimal."
-status: draft
+status: review
 featured: false
 prerequisites: [expected-value]
-related: [risk-vs-uncertainty, prospect-theory]
-keywords: [satisficing, keputusan cepat, keterbatasan kognitif]
-sources: []
+related: [risk-vs-uncertainty, prospect-theory, heuristics, position-sizing]
+keywords: ["satisficing", "keputusan cepat", "keterbatasan kognitif", "watchlist", "trading plan", "analisis kelamaan", "overthinking", "cukup baik", "aturan tertulis"]
+sources:
+  - type: primary-research
+    title: "A Behavioral Model of Rational Choice"
+    authors: ["Herbert A. Simon"]
+    year: 1955
+    publisher: "The Quarterly Journal of Economics, 69(1), 99–118"
+    doi: "10.2307/1884852"
+    note: "Mengusulkan model pilihan yang memperhitungkan keterbatasan informasi dan kemampuan berhitung, dengan tingkat aspirasi sebagai patokan hasil yang memuaskan."
+  - type: primary-research
+    title: "Rational Choice and the Structure of the Environment"
+    authors: ["Herbert A. Simon"]
+    year: 1956
+    publisher: "Psychological Review, 63(2), 129–138"
+    doi: "10.1037/h0042769"
+    note: "Memperkenalkan istilah satisficing dan menunjukkan bahwa struktur lingkungan menentukan seberapa sederhana aturan keputusan yang sudah memadai."
+  - type: book
+    title: "Bounded Rationality: The Adaptive Toolbox"
+    authors: ["Gerd Gigerenzer", "Reinhard Selten"]
+    year: 2001
+    publisher: "MIT Press (buku suntingan)"
+    isbn: "978-0-262-07214-4"
+    note: "Kumpulan tulisan yang memandang rasionalitas terbatas sebagai kotak perkakas heuristik yang disesuaikan dengan lingkungan, bukan sebagai optimasi dengan kendala."
 ---
 
 ## Mengapa Ini Penting
 
-_Draf: bagian ini belum ditulis._
+Konsep [nilai harapan](../expected-value/) menggambarkan pengambil keputusan yang ideal: mengetahui semua hasil yang mungkin, peluang masing-masing, dan sanggup menghitung pilihan terbaik. Di layar trading, gambaran itu jarang terpenuhi. Instrumen terlalu banyak, informasi datang terus-menerus, dan keputusan harus diambil dalam hitungan menit.
+
+Rasionalitas terbatas menjelaskan apa yang sebenarnya dilakukan manusia dalam kondisi tersebut. Pemahaman ini penting karena tiga alasan:
+
+1. **Batas kemampuan berpikir adalah kenyataan, bukan kelemahan pribadi.** Trader yang merasa harus menganalisis semua instrumen dan semua berita akan kelelahan, lalu justru mengambil keputusan yang lebih buruk.
+
+2. **Batas itu bisa dikelola dengan rancangan.** Watchlist, daftar periksa, dan aturan risiko tertulis adalah cara sadar untuk bekerja di dalam batas, bukan melawannya.
+
+3. **Konsep ini menjadi pintu masuk ke seluruh jalur psikologi.** [Heuristik](../heuristics/) dan bias yang dibahas sesudahnya adalah konsekuensi dari batas yang sama.
 
 ## Gagasan Utama
 
-_Draf: bagian ini belum ditulis._
+<Definisi>
+
+**Rasionalitas terbatas adalah gagasan bahwa keputusan manusia dibatasi oleh informasi yang tersedia, waktu yang ada, dan kemampuan berhitung, sehingga orang mencari pilihan yang cukup baik, bukan pilihan yang paling optimal.** Pilihan tetap diambil dengan alasan, tetapi alasan itu bekerja di dalam batas-batas tersebut.
+
+</Definisi>
+
+Gagasan ini dirumuskan oleh Herbert A. Simon. Dalam artikel tahun 1955, Simon mengkritik model "manusia ekonomi" yang dianggap mengetahui semua alternatif dan mampu menghitung hasil terbaik. Ia mengusulkan model yang lebih realistis: orang menyederhanakan penilaian hasil menjadi "memuaskan" atau "tidak memuaskan" berdasarkan **tingkat aspirasi**, yaitu patokan hasil yang dianggap cukup. Tingkat aspirasi ini dapat naik bila pilihan yang memuaskan mudah ditemukan, dan turun bila sulit ditemukan.
+
+Setahun kemudian, Simon (1956) memperkenalkan istilah *satisficing*, gabungan dari *satisfy* dan *suffice*. Orang tidak mencari pilihan terbaik dari semua kemungkinan, melainkan berhenti mencari ketika menemukan pilihan pertama yang memenuhi aspirasinya. Simon juga menekankan bahwa **struktur lingkungan** menentukan seberapa sederhana aturan keputusan yang sudah memadai. Aturan yang sangat sederhana bisa cukup bila lingkungannya mendukung.
+
+Gerd Gigerenzer dan Reinhard Selten (2001) mengembangkan gagasan ini dengan sudut pandang *adaptive toolbox*: manusia membawa kotak perkakas berisi aturan-aturan sederhana, dan kualitas keputusan bergantung pada kecocokan antara aturan yang dipakai dan lingkungannya. Dalam pandangan ini, rasionalitas terbatas bukan sekadar "optimasi dengan kendala tambahan", dan juga bukan irasionalitas.
+
+Kedua sisi gagasan ini dapat dirangkum sebagai berikut:
+
+> **Manusia tidak memaksimalkan; manusia mencari yang cukup baik. Kualitas keputusan bergantung pada seberapa baik patokan "cukup" itu dirancang.**
 
 ## Penjelasan Sederhana
 
-_Draf: bagian ini belum ditulis._
+Bayangkan seorang mahasiswa baru mencari kamar kos di sekitar kampus. Ada puluhan pilihan, masing-masing berbeda harga, jarak, fasilitas, dan pemiliknya. Membandingkan semuanya secara menyeluruh akan memakan waktu berminggu-minggu, padahal kuliah dimulai minggu depan.
+
+Maka ia menetapkan patokan: sewa paling mahal Rp1.200.000 per bulan, bisa ditempuh jalan kaki, dan ada jendela. Ia mendatangi kos satu per satu, lalu mengambil kos pertama yang memenuhi ketiga syarat itu. Mungkin ada kos yang lebih baik di gang sebelah, tetapi biaya untuk menemukannya tidak sebanding dengan tambahan manfaatnya.
+
+Inilah *satisficing*. Keputusannya tidak sempurna, tetapi masuk akal karena waktu dan tenaga juga merupakan biaya. Bila setelah seminggu tidak ada kos yang memenuhi syarat, ia akan menurunkan patokannya, misalnya menerima jarak yang sedikit lebih jauh. Itulah tingkat aspirasi yang menyesuaikan diri.
+
+Trader menghadapi masalah yang sama. Tidak mungkin memantau semua pasangan mata uang, komoditas, dan indeks di semua kerangka waktu. Pertanyaannya bukan "bagaimana menganalisis semuanya", tetapi "patokan apa yang membuat saya tahu kapan analisis sudah cukup".
 
 ## Contoh Kehidupan Nyata
 
-_Draf: bagian ini belum ditulis._
+<Contoh jenis="kehidupan">
+
+*Ilustrasi.* Seseorang ingin membeli ponsel baru di lokapasar daring. Pencarian "ponsel" menghasilkan ribuan produk dari ratusan penjual.
+
+Ia tidak membaca semua halaman. Ia memasang tiga penyaring: harga maksimal Rp3.000.000, penilaian toko minimal 4,8, dan memori minimal 128 GB. Daftar ribuan produk menyusut menjadi belasan. Dari belasan itu, ia membaca ulasan tiga produk teratas dan membeli yang pertama tidak memiliki keluhan serius.
+
+Penyaring itu adalah tingkat aspirasi yang ditulis dalam bentuk konkret. Tanpa penyaring, orang cenderung mengalami dua kemungkinan: terus mencari tanpa pernah memutuskan, atau akhirnya membeli secara acak karena kelelahan.
+
+</Contoh>
 
 ## Contoh Keuangan
 
-_Draf: bagian ini belum ditulis._
+<Contoh jenis="keuangan">
+
+*Ilustrasi.* Seorang karyawan ingin mulai berinvestasi di pasar saham Indonesia dan merasa harus "menganalisis semua saham dulu" sebelum membeli. Di Bursa Efek Indonesia tercatat ratusan emiten.
+
+```text
+Misalkan ada 800 saham
+Analisis laporan keuangan per saham   = 2 jam
+Total waktu                           = 800 × 2 jam = 1.600 jam
+Bila tersedia 8 jam per minggu        = 1.600 / 8 = 200 minggu ≈ hampir 4 tahun
+```
+
+Rencana "analisis semua dulu" tidak pernah selesai. Pilihan yang realistis adalah menetapkan patokan lebih dulu, misalnya hanya mempertimbangkan perusahaan yang labanya positif lima tahun berturut-turut dan utangnya dalam batas tertentu, lalu menganalisis secara mendalam hanya Saham A, Saham B, dan beberapa kandidat lain yang lolos penyaring.
+
+Alternatif lain yang juga bentuk rasionalitas terbatas adalah reksa dana indeks: alih-alih memilih, investor menerima rata-rata pasar dan menghemat waktu analisis sepenuhnya. Keduanya sah, asalkan dipilih dengan sadar, bukan karena menyerah di tengah jalan.
+
+</Contoh>
 
 ## Contoh Trading
 
-_Draf: bagian ini belum ditulis._
+<Contoh jenis="trading">
+
+*Ilustrasi, bukan rekomendasi.* Seorang trader CFD merasa peluang terbaik bisa muncul di instrumen mana pun, sehingga ia memantau 30 instrumen di 4 kerangka waktu.
+
+```text
+Jumlah grafik yang dipantau   = 30 × 4 = 120 grafik
+Waktu memeriksa satu grafik   = 3 menit
+Satu putaran pemeriksaan      = 120 × 3 = 360 menit = 6 jam
+```
+
+Satu putaran saja menghabiskan satu hari kerja penuh. Akibatnya ia memeriksa secara sekilas, melompat dari grafik ke grafik, dan membuka posisi yang tidak sesuai rencana karena merasa "sayang kalau terlewat".
+
+Jurnalnya memperlihatkan dua kelompok transaksi dalam sebulan. Misalkan 20 transaksi sesuai rencana memiliki nilai harapan +0,20R per transaksi, sedangkan 20 transaksi di luar rencana memiliki nilai harapan −0,15R per transaksi:
+
+```text
+Hanya transaksi sesuai rencana   = 20 × (+0,20R)                  = +4,0R
+Ditambah transaksi di luar rencana = 20 × (+0,20R) + 20 × (−0,15R) = +1,0R
+```
+
+Transaksi tambahan tidak menambah hasil; justru memangkas tiga perempat dari hasil yang diharapkan. Setelah itu ia membatasi watchlist menjadi XAUUSD dan dua pasangan mata uang, satu kerangka waktu utama, serta daftar periksa lima butir. Keputusannya menjadi lebih sedikit, tetapi setiap keputusan mendapat perhatian penuh.
+
+</Contoh>
 
 ## Cara Kerja Konsep
 
-_Draf: bagian ini belum ditulis._
+Perbedaan antara model ideal dan cara manusia sebenarnya memutuskan dapat digambarkan sebagai berikut:
+
+```text
+Model optimal (ideal)
+  Kumpulkan semua alternatif → hitung hasil dan peluang semuanya → pilih yang terbaik
+
+Satisficing (Simon)
+  Tetapkan tingkat aspirasi
+          │
+          ▼
+  Periksa alternatif satu per satu
+          │
+          ├── Memenuhi aspirasi?   → ya    → pilih, berhenti mencari
+          │
+          └── Tidak                → lanjut → bila terlalu lama, sesuaikan aspirasi
+```
+
+Tabel berikut merangkum perbedaan keduanya:
+
+| Aspek | Model optimal | Rasionalitas terbatas |
+|---|---|---|
+| Alternatif | Semua diketahui | Ditemukan satu per satu |
+| Peluang dan hasil | Diketahui atau dapat dihitung | Sebagian, sering hanya perkiraan |
+| Aturan berhenti | Setelah semua dibandingkan | Ketika aspirasi terpenuhi |
+| Biaya berpikir | Diabaikan | Diperhitungkan sebagai biaya nyata |
+| Bentuk dalam trading | "Analisis semua instrumen" | Watchlist, daftar periksa, aturan risiko tetap |
+
+**Kapan rasionalitas terbatas membantu, dan kapan menjadi masalah?** Patokan yang dirancang sebelumnya, dengan kepala dingin dan diuji dengan data, membuat keputusan lebih konsisten. Masalah muncul ketika jalan pintas terbentuk secara spontan di tengah tekanan, misalnya "ambil saja, sudah capek menganalisis". Di situlah [heuristik](../heuristics/) mulai menghasilkan bias yang sistematis. Rasionalitas terbatas juga tidak berarti semua penyederhanaan sama baiknya. Seperti ditekankan Simon (1956), aturan sederhana memadai bila cocok dengan struktur lingkungannya; di pasar yang berubah, patokan perlu ditinjau berkala.
+
+**Pertanyaan pemeriksa.** Sebelum dan sesudah sesi trading:
+
+1. Apakah tingkat aspirasi saya untuk sebuah setup sudah tertulis, atau baru saya tentukan saat melihat grafik?
+
+2. Berapa banyak instrumen yang benar-benar sanggup saya pantau dengan perhatian penuh?
+
+3. Apakah transaksi hari ini lolos daftar periksa, atau diambil karena lelah mencari?
+
+4. Kapan terakhir saya meninjau apakah patokan saya masih cocok dengan kondisi pasar?
+
+Salah satu bentuk paling sederhana dari aturan tertulis adalah risiko tetap per transaksi. Alat berikut menghitung ukuran posisi dari aturan itu, sehingga keputusan ukuran tidak perlu dipikirkan ulang setiap kali:
+
+<UkuranPosisi />
+
+Ringkasnya:
+
+> Tidak ada manusia yang sanggup menghitung semuanya.
+
+> Keputusan yang baik lahir dari patokan "cukup" yang dirancang sebelumnya.
+
+> Batas kemampuan berpikir tidak bisa dihapus, tetapi bisa diperhitungkan.
