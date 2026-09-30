@@ -1,0 +1,88 @@
+# Deploy versi member (terenkripsi StatiCrypt) ke repo PUBLIK terpisah, lalu disajikan GitHub Pages.
+#
+# Alur: repo ini (privat, berisi sumber) → build + validasi → enkripsi HTML → push ke repo deploy (publik).
+# Repo ini tidak menerbitkan Pages sendiri, jadi sumber MDX tidak pernah terbuka.
+#
+# Konfigurasi (Settings → Secrets and variables → Actions):
+#   Secrets:   STATICRYPT_PASSWORD  password member
+#              STATICRYPT_SALT      32 karakter heksadesimal (openssl rand -hex 16); jangan diganti-ganti
+#              DEPLOY_KEY           private key SSH (public key dipasang di repo deploy, izin tulis)
+#   Variables: DEPLOY_REPO          mis. dafaanjc/risk-lab-members (repo publik tujuan)
+#              SITE_URL             mis. https://dafaanjc.github.io
+#              BASE_PATH            mis. /risk-lab-members  (pakai / bila domain khusus atau repo <user>.github.io)
+#   Opsional:  CUSTOM_DOMAIN        mis. akademi.domainanda.com (menulis berkas CNAME)
+name: Deploy site member (terenkripsi)
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-members
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    env:
+      SITE_URL: ${{ vars.SITE_URL }}
+      BASE_PATH: ${{ vars.BASE_PATH }}
+      DEPLOY_REPO: ${{ vars.DEPLOY_REPO }}
+      CUSTOM_DOMAIN: ${{ vars.CUSTOM_DOMAIN }}
+      STATICRYPT_PASSWORD: ${{ secrets.STATICRYPT_PASSWORD }}
+      STATICRYPT_SALT: ${{ secrets.STATICRYPT_SALT }}
+      DEPLOY_KEY: ${{ secrets.DEPLOY_KEY }}
+    steps:
+      - name: Periksa konfigurasi
+        run: |
+          missing=0
+          for name in SITE_URL BASE_PATH DEPLOY_REPO STATICRYPT_PASSWORD STATICRYPT_SALT DEPLOY_KEY; do
+            if [ -z "${!name}" ]; then
+              echo "::error::$name belum diisi (Settings → Secrets and variables → Actions)"
+              missing=1
+            fi
+          done
+          exit $missing
+
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Setup Node
+        uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install
+        run: npm ci
+
+      # Validasi penuh (source check, tes, astro check, build, merek, tautan) memakai SITE_URL dan BASE_PATH di atas.
+      - name: Validate dan build
+        run: npm run validate
+
+      - name: Enkripsi
+        run: npm run build:members
+
+      - name: Push ke repo deploy
+        run: |
+          set -euo pipefail
+          umask 077
+          mkdir -p "$HOME/.ssh"
+          printf '%s\n' "$DEPLOY_KEY" > "$HOME/.ssh/deploy_key"
+          chmod 600 "$HOME/.ssh/deploy_key"
+          ssh-keyscan -t ed25519,rsa github.com >> "$HOME/.ssh/known_hosts" 2>/dev/null
+          export GIT_SSH_COMMAND="ssh -i $HOME/.ssh/deploy_key -o IdentitiesOnly=yes -o StrictHostKeyChecking=yes"
+
+          cd dist-members
+          git init -q -b main
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -q -m "deploy ${GITHUB_SHA::7}"
+          git remote add origin "git@github.com:${DEPLOY_REPO}.git"
+          # Riwayat sengaja tidak disimpan: tiap deploy menggantikan seluruh isi branch main.
+          git push --force origin main
